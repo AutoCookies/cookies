@@ -53,8 +53,6 @@ export const loginUserService = async ({ email, password, res }) => {
     };
 };
 
-
-
 export const logoutUserService = async (req, res) => {
     res.clearCookie("jwt-token", {
         httpOnly: true,

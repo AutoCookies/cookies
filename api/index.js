@@ -42,6 +42,7 @@ app.use(CookieParser())
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", protectRoute, userRoutes);
+app.use("/api/v1/admin", protectRoute, userRoutes);
 
 app.listen(ENV_VARS.PORT, () => {
     console.log(`Server running on port ${ENV_VARS.PORT}`);

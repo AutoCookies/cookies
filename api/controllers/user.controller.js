@@ -4,7 +4,9 @@ import {
     changePasswordService,
     changeUserNameService,
     changeUserFullnameService,
-    changeUserPhoneNumberService
+    changeUserPhoneNumberService,
+    updateProfilePictureService,
+    getProfilePictureService
 } from '../services/user.service.js';
 
 /**
@@ -83,3 +85,45 @@ export const changeUserPhoneNumber = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 }
+
+
+export const updateProfilePicture = async (req, res) => {
+    try {
+        const userId = req.user._id; // Lấy userId từ token đã decode
+        const file = req.file; // Lấy file từ Multer
+
+        if (!file) {
+            return res.status(400).json({ error: "Không có file nào được tải lên!" });
+        }
+
+        const filePath = file.path; // Đường dẫn file tạm
+        console.log(" Đường dẫn file:", filePath);
+
+        const result = await updateProfilePictureService(userId, filePath);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+
+export const getProfilePicture = async (req, res) => {
+    try {
+        const result = getProfilePictureService(req.user);  // Lấy từ user đã đăng nhập
+
+        if (!result.profilePicture) {
+            return res.status(404).json({ message: "Người dùng chưa có ảnh đại diện" });
+        }
+
+        res.json(result);
+    } catch (error) {
+        console.error("Error in getProfilePicture:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+
+
+
+

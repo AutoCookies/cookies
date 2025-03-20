@@ -54,6 +54,7 @@ export const loginUserService = async ({ email, password, res }) => {
     };
 };
 
+// Sau này front end nên cho xóa ảnh và token khi đăng xuất
 export const logoutUserService = async (req, res) => {
     res.clearCookie("jwt-token", {
         httpOnly: true,

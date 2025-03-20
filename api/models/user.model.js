@@ -39,12 +39,12 @@ const userSchema = new mongoose.Schema(
 
     profilePicture: {
       type: String,
-      default: "",
+      default: null,
     },
 
     coverPhoto: {
       type: String,
-      default: "",
+      default: null,
     },
 
     bio: {

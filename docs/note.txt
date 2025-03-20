@@ -1,3 +1,4 @@
 - For user, if a user want to see another user information. They must login to the server, by sending an token from login period. And the JWT will
 check that if the user is login or not.
-- And when they logout the token will be deleted immediately
+- And when they logout the token will be deleted immediately.
+- When change the password the attribute passwordChangeAt of User will be updated (in future will giving a willio in oder to SMS OTP)

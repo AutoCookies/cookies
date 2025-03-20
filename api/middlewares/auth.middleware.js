@@ -26,7 +26,7 @@ export const protectRoute = async (req, res, next) => {
 
         console.log("User from DB:", user);
 
-        req.user = user.toObject();
+        req.user = { ...user.toObject(), _id: user._id.toString() };
 
         next();
     } catch (error) {

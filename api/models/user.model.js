@@ -126,6 +126,8 @@ const userSchema = new mongoose.Schema(
     passwordResetExpires: {
       type: Date,
     },
+
+    visibility: { type: String, enum: ["public", "private"], default: "public" }
   },
   { timestamps: true }
 );

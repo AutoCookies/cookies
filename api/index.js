@@ -2,7 +2,9 @@ import express from "express";
 import { ENV_VARS } from './config/envVars.js';
 import { connectDB } from "./config/db.js";
 import authRoutes from './routes/auth.route.js';
+import userRoutes from './routes/user.route.js';
 import CookieParser from "cookie-parser"
+import { protectRoute } from "./middlewares/auth.middleware.js";
 // import User from "./models/user.model.js";
 // import bcrypt from "bcryptjs";
 
@@ -39,6 +41,7 @@ app.use(express.json())
 app.use(CookieParser())
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/user", protectRoute, userRoutes);
 
 app.listen(ENV_VARS.PORT, () => {
     console.log(`Server running on port ${ENV_VARS.PORT}`);

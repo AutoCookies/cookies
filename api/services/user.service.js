@@ -16,7 +16,7 @@ export const getUser = async (id, currentUser) => {
     return user;
 };
 
-export const changePassword = async (userId, currentPassword, newPassword) => {
+export const changePasswordService = async (userId, currentPassword, newPassword) => {
     const user = await User.findById(userId);
     if (!user) throw new Error("Người dùng không tồn tại!");
 
@@ -32,6 +32,36 @@ export const changePassword = async (userId, currentPassword, newPassword) => {
     // Hash mật khẩu mới và cập nhật vào DB
     user.password = newPassword;
     await user.save();
-    
+
     return { message: "Mật khẩu đã được cập nhật thành công!" };
 };
+
+export const changeUserNameService = async (userId, newUsername) => {
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User does not exist");
+
+    user.username = newUsername;
+    await user.save();
+    
+    return { message: "Username updated successfully!" };
+};
+
+export const changeUserFullnameService = async ( userId, newFullName ) => {
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User does not exist");
+
+    user.fullName = newFullName;
+    await user.save();
+
+    return { message: "Email updated successfully!" };
+}
+
+export const changeUserPhoneNumberService = async ( userId, newUserPhoneNumber ) => {
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User does not exist");
+
+    user.phoneNumber = newUserPhoneNumber;
+    await user.save();
+
+    return { message: "Phone number changed successfully" }
+}

@@ -1,12 +1,13 @@
 import asyncHandler from "express-async-handler";
 import {
-    getUser,
-    getAllUser,
-    deleteUserService
+    getUserService,
+    getAllUserService,
+    deleteUserService,
+    createAccountService
 } from '../services/admin.service.js';
 
 export const getAllUsers = asyncHandler(async (req, res) => {
-    const users = await getAllUser(req.user);
+    const users = await getAllUserService(req.user);
     res.json(users);
 });
 
@@ -16,6 +17,11 @@ export const deleteUser = asyncHandler(async (req, res) => {
 });
 
 export const getUserProfile = asyncHandler(async (req, res) => {
-    const user = await getUser(req.params.id);
+    const user = await getUserService(req.user, req.params.id);
     res.json(user);
+});
+
+export const createAccount = asyncHandler(async (req, res) => {
+    const user = await createAccountService(req.body, req.user, res);
+    res.status(201).json(user);
 });

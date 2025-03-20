@@ -25,6 +25,18 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+    phoneNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
+      validate: {
+        validator: function (v) {
+          return /^[\d+\-() ]{8,15}$/.test(v);
+        },
+        message: props => `${props.value} is not a valid phone number!`
+      }
+    },
+
     profilePicture: {
       type: String,
       default: "",

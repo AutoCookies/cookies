@@ -6,10 +6,7 @@ import userRoutes from './routes/user.route.js';
 import adminRoutes from './routes/admin.route.js';
 import postRoute from './routes/post.route.js';
 import CookieParser from "cookie-parser";
-// import { v2 as cloudinary } from "cloudinary";
-import { protectRoute, isAdmin } from "./middlewares/auth.middleware.js";
 // import User from "./models/user.model.js";
-// import bcrypt from "bcryptjs";
 
 
 const app = express()
@@ -18,13 +15,13 @@ const app = express()
 //     try {
 //         const adminExists = await User.findOne({ role: "admin" });
 
-//         if (adminExists) {
+//         if (!adminExists) {
 //             console.log("Không tìm thấy admin, đang tạo tài khoản admin mặc định...");
 
 //             const adminUser = await User.create({
 //                 username: "admin",
 //                 fullName: "Administrator",
-//                 email: "admin2@example.com",
+//                 email: "admin@example.com",
 //                 password: "admin123", 
 //                 role: "admin",
 //             });
@@ -43,7 +40,7 @@ app.use(CookieParser())
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/admin", isAdmin, adminRoutes);
+app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/posts", postRoute)
 
 app.listen(ENV_VARS.PORT, () => {

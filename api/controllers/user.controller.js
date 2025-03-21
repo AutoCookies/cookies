@@ -6,7 +6,8 @@ import {
     changeUserFullnameService,
     changeUserPhoneNumberService,
     updateProfilePictureService,
-    getProfilePictureService
+    getProfilePictureService,
+    searchUserByNameService
 } from '../services/user.service.js';
 
 /**
@@ -86,7 +87,6 @@ export const changeUserPhoneNumber = async (req, res) => {
     }
 }
 
-
 export const updateProfilePicture = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -118,6 +118,20 @@ export const getProfilePicture = async (req, res) => {
     } catch (error) {
         console.error("Error in getProfilePicture:", error.message);
         res.status(400).json({ message: error.message });
+    }
+};
+
+export const searchUserByName = async (req, res) => {
+    try {
+        const { name } = req.query;
+        if (!name || name.trim() === "") {
+            return res.status(400).json({ error: "Vui lòng nhập tên cần tìm!" });
+        }
+
+        const users = await searchUserByNameService(name);
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };
 

@@ -69,6 +69,12 @@ export const changeUserPhoneNumberService = async ( userId, newUserPhoneNumber )
     return { message: "Phone number changed successfully" }
 }
 
+/**
+ * Cập nhật ảnh đại diện cho người dùng
+ * @param {string} userId - ID của người dùng
+ * @param {Buffer} imageBuffer - Ảnh đại diện dạng Buffer
+ * @returns {Promise<Object>} - Kết quả bao gồm message và profilePicture của người dùng
+ */
 export const updateProfilePictureService = async (userId, imageBuffer) => {
     try {
         if (!imageBuffer) {
@@ -82,10 +88,10 @@ export const updateProfilePictureService = async (userId, imageBuffer) => {
         if (user.profilePicture) {
             // Lấy public_id từ URL
             const publicId = user.profilePicture.split("/").pop().split(".")[0]; // Lấy phần cuối URL (không có extension)
-            console.log("🔄 Xóa ảnh cũ:", publicId);
+            console.log("Xóa ảnh cũ:", publicId);
 
             await cloudinary.uploader.destroy(`user_profiles/${publicId}`);
-            console.log("✅ Ảnh cũ đã xóa thành công!");
+            console.log("Ảnh cũ đã xóa thành công!");
         }
 
         console.log("📤 Bắt đầu upload ảnh từ buffer...");
@@ -105,24 +111,23 @@ export const updateProfilePictureService = async (userId, imageBuffer) => {
             throw new Error("Không thể upload ảnh!");
         }
 
-        console.log("✅ Upload thành công:", result.secure_url);
+        console.log("Upload thành công:", result.secure_url);
 
         // Cập nhật ảnh mới vào database
         user.profilePicture = result.secure_url;
         await user.save();
 
-        console.log("✅ Cập nhật profilePicture thành công!");
+        console.log("Cập nhật profilePicture thành công!");
 
         return {
             message: "Ảnh đại diện đã được cập nhật thành công!",
             profilePicture: user.profilePicture
         };
     } catch (error) {
-        console.error("❌ Lỗi trong updateProfilePictureService:", error);
+        console.error("Lỗi trong updateProfilePictureService:", error);
         throw error;
     }
 };
-
 
 export const getProfilePictureService = (user) => {
     if (!user || !user.profilePicture) {
@@ -131,5 +136,20 @@ export const getProfilePictureService = (user) => {
     return { profilePicture: user.profilePicture };
 };
 
+export const searchUserByNameService = async (query, limit = 10) => {
+    try {
+        const users = await User.find({
+            $or: [
+                { fullname: { $regex: query, $options: "i" } }, // Tìm theo fullname
+                { username: { $regex: query, $options: "i" } } // Tìm theo username
+            ]
+        })
+        .limit(limit) // Giới hạn số lượng kết quả
+        .select("_id username fullname email avatar"); // Chỉ lấy thông tin cần thiết
 
+        return users;
+    } catch (error) {
+        throw new Error("Lỗi khi tìm kiếm người dùng: " + error.message);
+    }
+};
 

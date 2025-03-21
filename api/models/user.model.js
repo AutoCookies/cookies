@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import BanHistory  from "./banHistory.model.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -128,9 +129,10 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    isBanned: {
-      type: Boolean,
-      default: false,
+    BanHistory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "BanHistory",
+      default: null
     },
 
     passwordChangedAt: {

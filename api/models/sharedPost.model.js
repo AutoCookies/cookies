@@ -35,3 +35,4 @@ const SharePostSchema = new mongoose.Schema(
 );
 
 export const SharePost = mongoose.model("SharePost", SharePostSchema);
+

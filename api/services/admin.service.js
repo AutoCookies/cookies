@@ -143,6 +143,16 @@ export const banUserService = async (userId, adminId, { duration, reason }) => {
         banExpiresAt.setDate(banExpiresAt.getDate() + duration);
     }
 
+    user.BanHistory.push({
+        admin: adminId,
+        reason,
+        duration,
+        banExpiresAt
+    });
+
+    user.isBanned = true;
+    await user.save();
+
     const banRecord = new BanHistory({
         user: userId,
         admin: adminId,

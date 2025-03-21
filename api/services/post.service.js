@@ -32,13 +32,11 @@ export const createPostService = async (userId, title, content, imageBuffer) => 
         title,
         content,
         image: imageUrl,
-        likes: [],
-        comments: [],
     });
 
     user.posts.push(newPost._id);
     await user.save();
-
+    await redisClient.del('all_posts');
     return newPost;
 };
 
@@ -133,53 +131,6 @@ export const deletePostService = async (userId, postId) => {
     return { message: "Bài viết đã được xóa thành công!" };
 };
 
-
-export const likePostService = async (userId, postId) => {
-    const user = await User.findById(userId);
-    if (!user) throw new Error("Người dùng không tồn tại!");
-
-    // Tìm trong Post trước, nếu không có thì tìm trong SharePost
-    let post = await Post.findById(postId) || await SharePost.findById(postId);
-    if (!post) throw new Error("Bài viết không tồn tại!");
-
-    // Kiểm tra nếu user đã like
-    if (post.likes.includes(userId)) {
-        throw new Error("Bạn đã thích bài viết này rồi!");
-    }
-
-    // Thêm userId vào danh sách likes
-    post.likes.push(userId);
-    user.likedPosts.push(postId);
-
-    await post.save();
-    await user.save();
-
-    return post;
-};
-
-export const unlikePostService = async (userId, postId) => {
-    const user = await User.findById(userId);
-    if (!user) throw new Error("Người dùng không tồn tại!");
-
-    // Tìm trong Post trước, nếu không có thì tìm trong SharePost
-    let post = await Post.findById(postId) || await SharePost.findById(postId);
-    if (!post) throw new Error("Bài viết không tồn tại!");
-
-    // Kiểm tra nếu user chưa like
-    if (!post.likes.includes(userId)) {
-        throw new Error("Bạn chưa thích bài viết này!");
-    }
-
-    // Xóa userId khỏi danh sách likes
-    post.likes = post.likes.filter(id => id.toString() !== userId.toString());
-    user.likedPosts = user.likedPosts.filter(id => id.toString() !== postId.toString());
-
-    await post.save();
-    await user.save();
-
-    return post;
-};
-
 export const sharePostService = async (userId, postId, caption) => {
     const post = await Post.findById(postId);
     if (!post) throw new Error("Bài viết không tồn tại!");
@@ -238,36 +189,4 @@ export const getAllPostsService = async () => {
         throw new Error("Không thể lấy danh sách bài viết!");
     }
 };
-
-export const commentPostService = async (userId, postId, text) => {
-    const user = await User.findById(userId);
-    if (!user) throw new Error("Người dùng không tồn tại!");
-
-    if (!text.trim()) throw new Error("Bình luận không được để trống!");
-
-    let post = await Post.findById(postId);
-    let sharePost = await SharePost.findById(postId);
-
-    if (!post && !sharePost) {
-        throw new Error("Bài viết không tồn tại!");
-    }
-
-    const comment = {
-        user: userId,
-        text,
-        createdAt: new Date(),
-    };
-
-    if (post) {
-        post.comments.push(comment);
-        await post.save();
-    } else if (sharePost) {
-        sharePost.comments.push(comment);
-        await sharePost.save();
-    }
-
-    return { message: "Bình luận đã được thêm!" };
-};
-
-
 

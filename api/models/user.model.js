@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import BanHistory  from "./banHistory.model.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -80,15 +79,9 @@ const userSchema = new mongoose.Schema(
     posts: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        refPath: "postType",
+        ref: "Post",
       }
     ],
-
-    postType: {
-      type: String,
-      enum: ["Post", "SharePost"],
-      required: false,
-    },
 
     likedPosts: [
       {
@@ -129,7 +122,12 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    BanHistory: {
+    isBanned: {
+      type: Boolean,
+      default: false
+    },
+
+    banHistory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "BanHistory",
       default: null

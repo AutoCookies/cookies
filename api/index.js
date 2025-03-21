@@ -5,6 +5,8 @@ import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import adminRoutes from './routes/admin.route.js';
 import postRoute from './routes/post.route.js';
+import commentRoute from './routes/comment.route.js';
+import likeRoute from './routes/like.route.js';
 import CookieParser from "cookie-parser";
 // import User from "./models/user.model.js";
 
@@ -42,6 +44,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/posts", postRoute)
+app.use("/api/v1/comments", commentRoute);
+app.use("/api/v1/like", likeRoute);
 
 app.listen(ENV_VARS.PORT, () => {
     console.log(`Server running on port ${ENV_VARS.PORT}`);

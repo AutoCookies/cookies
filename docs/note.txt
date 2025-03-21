@@ -10,3 +10,5 @@ check that if the user is login or not.
 
 User function:
 - Find a user with Name
+
+Một bài post sẽ có commentCount thống kê số comment trong Comment db, khi đó nó sẽ đếm số lượng Comment có PostId trùng với bài Post

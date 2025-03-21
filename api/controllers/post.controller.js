@@ -3,11 +3,8 @@ import {
     getOwnPostsService,
     updatePostService,
     deletePostService,
-    likePostService,
-    unlikePostService,
     sharePostService,
     getAllPostsService,
-    commentPostService
 } from '../services/post.service.js';
 
 /**
@@ -83,32 +80,6 @@ export const deletePost = async (req, res) => {
     }
 };
 
-export const likePost = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const { postId } = req.params;
-
-        const post = await likePostService(userId, postId);
-
-        return res.status(200).json({ message: "Đã thích bài viết!", post });
-    } catch (error) {
-        return res.status(400).json({ message: error.message });
-    }
-};
-
-export const unlikePost = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const { postId } = req.params;
-
-        const post = await unlikePostService(userId, postId);
-
-        return res.status(200).json({ message: "Đã bỏ thích bài viết!", post });
-    } catch (error) {
-        return res.status(400).json({ message: error.message });
-    }
-};
-
 export const sharePost = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -134,21 +105,3 @@ export const getAllPosts = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
-
-export const commentPost = async (req, res) => {
-    try {
-        const { postId } = req.params;
-        const { content } = req.body;
-        const userId = req.user._id;
-        if (!content) {
-            return res.status(400).json({ error: "Nội dung bình luận không được để trống!" });
-        }
-
-        const response = await commentPostService(userId, postId, content);
-        return res.status(200).json(response);
-    } catch (error) {
-        console.error("Lỗi khi bình luận:", error);
-        return res.status(500).json({ error: error.message });
-    }
-};
-

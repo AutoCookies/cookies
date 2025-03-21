@@ -1,31 +1,24 @@
-import BanHistory from "../models/banHistory.model.js";
-
 export const checkBanStatus = async (req, res, next) => {
-    try {
-        const userId = req.user?._id; // Lấy ID từ user đã đăng nhập
-        if (!userId) {
-            return res.status(401).json({ error: "Bạn chưa đăng nhập!" });
+    const user = req.user; // User lấy từ middleware xác thực trước đó
+
+    if (user.isBanned) {
+        const now = new Date();
+        
+        // Kiểm tra nếu hết hạn ban thì bỏ cấm
+        if (user.banExpiresAt && now >= new Date(user.banExpiresAt)) {
+            user.isBanned = false;
+            user.banExpiresAt = null;
+            user.banReason = null;
+            await user.save();
+            return next(); // Cho phép tiếp tục vì đã hết hạn ban
         }
 
-        // Kiểm tra xem user có bị cấm không
-        const activeBan = await BanHistory.findOne({
-            user: userId,
-            $or: [
-                { banExpiresAt: null }, // Cấm vĩnh viễn
-                { banExpiresAt: { $gte: new Date() } } // Cấm vẫn còn hiệu lực
-            ]
+        return res.status(403).json({ 
+            message: `Tài khoản của bạn đã bị cấm ${user.banExpiresAt ? `đến ${user.banExpiresAt}` : "vĩnh viễn"}.`,
+            reason: user.banReason
         });
-
-        if (activeBan) {
-            return res.status(403).json({
-                error: "Tài khoản của bạn đã bị cấm!",
-                reason: activeBan.reason,
-                banExpiresAt: activeBan.banExpiresAt
-            });
-        }
-
-        next(); // Nếu không bị cấm thì tiếp tục xử lý
-    } catch (error) {
-        res.status(500).json({ error: "Lỗi kiểm tra trạng thái ban!" });
     }
+    
+    next();
 };
+

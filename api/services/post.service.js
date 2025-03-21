@@ -3,6 +3,7 @@ import User from '../models/user.model.js';
 import { SharePost } from '../models/sharedPost.model.js';
 import { uploadImageService } from "./upload.service.js";
 import cloudinary from "../config/cloudinary.js";
+import redisClient from "../config/redisClient.js";
 
 /**
  * Tạo bài viết mới
@@ -199,27 +200,43 @@ export const sharePostService = async (userId, postId, caption) => {
 };
 
 export const getAllPostsService = async () => {
-    // Lấy tất cả bài viết gốc
-    const posts = await Post.find()
-        .populate("user", "username profilePicture") // Lấy thông tin người đăng bài
-        .sort({ createdAt: -1 })
-        .lean();
+    const cacheKey = "all_posts";
 
-    // Lấy tất cả bài viết đã share
-    const sharedPosts = await SharePost.find()
-        .populate("user", "username profilePicture") // Người share
-        .populate("originalPost", "title content image user createdAt") // Thông tin bài gốc
-        .populate({
-            path: "originalPost",
-            populate: { path: "user", select: "username profilePicture" } // Người đăng bài gốc
-        })
-        .sort({ createdAt: -1 })
-        .lean();
+    try {
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            console.log("Lấy dữ liệu từ cache Redis");
+            return JSON.parse(cachedData);
+        }
 
-    // Gộp danh sách và sắp xếp theo thời gian
-    const allPosts = [...posts, ...sharedPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        console.log("Không có cache, truy vấn MongoDB...");
 
-    return allPosts;
+        const posts = await Post.find()
+            .populate("user", "username profilePicture")
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const sharedPosts = await SharePost.find()
+            .populate("user", "username profilePicture")
+            .populate("originalPost", "title content image user createdAt")
+            .populate({
+                path: "originalPost",
+                populate: { path: "user", select: "username profilePicture" }
+            })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const allPosts = [...posts, ...sharedPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        await redisClient.set(cacheKey, JSON.stringify(allPosts), {
+            EX: 600, // Thời gian hết hạn cho cache là 10 phút
+        });
+
+        return allPosts;
+    } catch (error) {
+        console.error("Lỗi Redis hoặc MongoDB:", error);
+        throw new Error("Không thể lấy danh sách bài viết!");
+    }
 };
 
 export const commentPostService = async (userId, postId, text) => {

@@ -79,9 +79,15 @@ const userSchema = new mongoose.Schema(
     posts: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
-      },
+        refPath: "postType",
+      }
     ],
+
+    postType: {
+      type: String,
+      enum: ["Post", "SharePost"],
+      required: false,
+    },
 
     likedPosts: [
       {

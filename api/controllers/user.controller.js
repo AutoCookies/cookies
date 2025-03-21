@@ -89,23 +89,21 @@ export const changeUserPhoneNumber = async (req, res) => {
 
 export const updateProfilePicture = async (req, res) => {
     try {
-        const userId = req.user._id; // Lấy userId từ token đã decode
-        const file = req.file; // Lấy file từ Multer
+        const userId = req.user._id;
+        const imageBuffer = req.file ? req.file.buffer : null;
 
-        if (!file) {
+        if (!imageBuffer) {
             return res.status(400).json({ error: "Không có file nào được tải lên!" });
         }
 
-        const filePath = file.path; // Đường dẫn file tạm
-        console.log(" Đường dẫn file:", filePath);
-
-        const result = await updateProfilePictureService(userId, filePath);
+        const result = await updateProfilePictureService(userId, imageBuffer);
 
         return res.status(200).json(result);
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
 };
+
 
 
 export const getProfilePicture = async (req, res) => {

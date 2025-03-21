@@ -2,3 +2,6 @@
 check that if the user is login or not.
 - And when they logout the token will be deleted immediately.
 - When change the password the attribute passwordChangeAt of User will be updated (in future will giving a willio in oder to SMS OTP)
+
+- When create a post it will add to posts db and user posts will also add that post
+- When a user like a post, that post will be add to likedPost of user

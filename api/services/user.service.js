@@ -69,46 +69,56 @@ export const changeUserPhoneNumberService = async ( userId, newUserPhoneNumber )
     return { message: "Phone number changed successfully" }
 }
 
-export const updateProfilePictureService = async (userId, filePath) => {
+export const updateProfilePictureService = async (userId, imageBuffer) => {
     try {
-        if (!fs.existsSync(filePath)) {
-            throw new Error(`File không tồn tại: ${filePath}`);
+        if (!imageBuffer) {
+            throw new Error("Không có ảnh để upload!");
         }
 
-        console.log("Bắt đầu upload file từ:", filePath);
+        const user = await User.findById(userId);
+        if (!user) throw new Error("Người dùng không tồn tại!");
 
-        const result = await cloudinary.uploader.upload(filePath, {
-            folder: "user_profiles",
-            transformation: [{ width: 500, height: 500, crop: "limit" }]
+        // 🔹 Xóa ảnh cũ trên Cloudinary trước khi upload mới
+        if (user.profilePicture) {
+            // Lấy public_id từ URL
+            const publicId = user.profilePicture.split("/").pop().split(".")[0]; // Lấy phần cuối URL (không có extension)
+            console.log("🔄 Xóa ảnh cũ:", publicId);
+
+            await cloudinary.uploader.destroy(`user_profiles/${publicId}`);
+            console.log("✅ Ảnh cũ đã xóa thành công!");
+        }
+
+        console.log("📤 Bắt đầu upload ảnh từ buffer...");
+
+        // Upload ảnh mới lên Cloudinary
+        const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                { folder: "user_profiles", transformation: [{ width: 500, height: 500, crop: "limit" }] },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(imageBuffer);
         });
 
         if (!result.secure_url) {
             throw new Error("Không thể upload ảnh!");
         }
 
-        console.log("Upload thành công:", result.secure_url);
+        console.log("✅ Upload thành công:", result.secure_url);
 
-        // Xóa file tạm
-        fs.unlink(filePath, (err) => {
-            if (err) console.error("Lỗi khi xóa file:", err);
-            else console.log("🗑 File tạm đã xóa:", filePath);
-        });
+        // Cập nhật ảnh mới vào database
+        user.profilePicture = result.secure_url;
+        await user.save();
 
-        // Cập nhật vào database
-        const user = await User.findByIdAndUpdate(
-            userId, 
-            { profilePicture: result.secure_url }, 
-            { new: true }
-        );
-
-        console.log("Cập nhật profilePicture thành công cho user:", userId);
+        console.log("✅ Cập nhật profilePicture thành công!");
 
         return {
             message: "Ảnh đại diện đã được cập nhật thành công!",
             profilePicture: user.profilePicture
         };
     } catch (error) {
-        console.error("Lỗi trong updateProfilePictureService:", error);
+        console.error("❌ Lỗi trong updateProfilePictureService:", error);
         throw error;
     }
 };

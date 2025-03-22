@@ -62,19 +62,8 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
 
-    followers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-
-    following: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    followerCount: { type: Number, default: 0 },
+    followingCount: { type: Number, default: 0 },
 
     posts: [
       {
@@ -85,10 +74,10 @@ const userSchema = new mongoose.Schema(
 
     likedPosts: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
+        postId: { type: mongoose.Schema.Types.ObjectId, required: true },
+        postType: { type: String, enum: ["Post", "SharePost"], required: true }
+      }
+    ],    
 
     savedPosts: [
       {

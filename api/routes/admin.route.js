@@ -7,20 +7,20 @@ import {
     adminDeletePost,
     getAllPostsForAdmin,
     searchUserByName,
-    banUser
+    banUser,
+    deleteCommnet
 } from '../controllers/admin.controller.js'
-import { protectRoute, isAdmin } from "../middlewares/auth.middleware.js";
-import { checkBanStatus } from '../middlewares/checkBan.middleware.js';
 
 const router = express.Router();
 
-router.get("/users/:id", protectRoute, isAdmin, checkBanStatus, getUserProfile);
-router.get("/users", protectRoute, isAdmin,checkBanStatus, getAllUsers);
-router.delete("/users/:id", protectRoute, isAdmin,checkBanStatus, deleteUser);
-router.post("/users", protectRoute, isAdmin,checkBanStatus, createAccount);
-router.get("/search/user", protectRoute, isAdmin,checkBanStatus, searchUserByName);
-router.get("/posts", protectRoute, isAdmin,checkBanStatus, getAllPostsForAdmin);
-router.delete("/posts/:postId", protectRoute, isAdmin,checkBanStatus, adminDeletePost);
-router.post("/users/:userId/ban", protectRoute, isAdmin,checkBanStatus, banUser);
+router.get("/users/:id", getUserProfile);
+router.get("/users", getAllUsers);
+router.delete("/users/:id", deleteUser);
+router.post("/users", createAccount);
+router.get("/search/user", searchUserByName);
+router.get("/posts", getAllPostsForAdmin);
+router.delete("/posts/:postId", adminDeletePost);
+router.post("/users/:userId/ban", banUser);
+router.delete("/comment/:commentId", deleteCommnet);
 
 export default router;

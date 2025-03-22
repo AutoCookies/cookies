@@ -1,6 +1,10 @@
 import Comment from "../models/comment.model.js";
 import LikeComment from "../models/likeComment.model.js";
 import Post from '../models/post.model.js';
+import User from '../models/user.model.js';
+import redisClient from '../config/redisClient.js';
+import LikePost from "../models/likePost.model.js";
+import {SharePost} from "../models/sharedPost.model.js";
 
 // Like comment
 export const likeCommentService = async (userId, commentId) => {
@@ -21,19 +25,50 @@ export const likeCommentService = async (userId, commentId) => {
         const newLike = new LikeComment({ user: userId, comment: commentId });
         await newLike.save();
 
+        // Tăng số lượt like của comment
+        comment.likeCount += 1;
+        await comment.save();
+
+        // Xóa cache chi tiết của comment
+        await redisClient.del(`comment:${commentId}`);
+
+        // Xóa cache danh sách comment của bài viết liên quan (cho tất cả các trang)
+        const keysToDelete = await redisClient.keys(`comments:${comment.post}:page:*`);
+        if (keysToDelete.length > 0) {
+            await redisClient.del(keysToDelete);
+        }
+
         return { message: "Comment liked successfully" };
     } catch (error) {
         throw new Error(error.message);
     }
 };
 
-// Unlike comment
 export const unlikeCommentService = async (userId, commentId) => {
     try {
+        // Kiểm tra xem comment có tồn tại không
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
+            throw new Error("Comment not found");
+        }
+
         // Xóa bản ghi like
         const like = await LikeComment.findOneAndDelete({ user: userId, comment: commentId });
         if (!like) {
-            throw new Error("Like not found");
+            throw new Error("You haven't liked this comment yet");
+        }
+
+        // Giảm số lượt like của comment (đảm bảo không âm)
+        comment.likeCount = Math.max(0, (comment.likeCount || 0) - 1);
+        await comment.save();
+
+        // Xóa cache chi tiết của comment
+        await redisClient.del(`comment:${commentId}`);
+
+        // Invalidate cache danh sách comment của bài viết (cho tất cả các trang)
+        const keysToDelete = await redisClient.keys(`comments:${comment.post}:page:*`);
+        if (keysToDelete.length > 0) {
+            await redisClient.del(keysToDelete);
         }
 
         return { message: "Comment unliked successfully" };
@@ -42,48 +77,62 @@ export const unlikeCommentService = async (userId, commentId) => {
     }
 };
 
+
 export const likePostService = async (userId, postId) => {
+    // Kiểm tra user tồn tại
     const user = await User.findById(userId);
     if (!user) throw new Error("Người dùng không tồn tại!");
 
-    // Tìm trong Post trước, nếu không có thì tìm trong SharePost
+    // Tìm bài viết trong Post hoặc SharePost
     let post = await Post.findById(postId) || await SharePost.findById(postId);
     if (!post) throw new Error("Bài viết không tồn tại!");
 
-    // Kiểm tra nếu user đã like
-    if (post.likes.includes(userId)) {
+    // Kiểm tra nếu người dùng đã like bài viết
+    const alreadyLiked = await LikePost.findOne({ user: userId, post: postId });
+    if (alreadyLiked) {
         throw new Error("Bạn đã thích bài viết này rồi!");
     }
 
-    // Thêm userId vào danh sách likes
-    post.likes.push(userId);
-    user.likedPosts.push(postId);
+    // Tạo bản ghi like mới trong LikePost
+    const newLike = await LikePost.create({ user: userId, post: postId });
 
+    // Cập nhật số lượt like của bài viết (giả sử bạn đã có trường likesCount)
+    post.likesCount = (post.likesCount || 0) + 1;
     await post.save();
+
+    // Cập nhật danh sách bài viết đã like của user (nếu cần)
+    user.likedPosts.push(postId);
+    await redisClient.del(`post:${postId}`);
     await user.save();
 
     return post;
 };
 
 export const unlikePostService = async (userId, postId) => {
+    // Kiểm tra user tồn tại
     const user = await User.findById(userId);
     if (!user) throw new Error("Người dùng không tồn tại!");
 
-    // Tìm trong Post trước, nếu không có thì tìm trong SharePost
+    // Tìm bài viết từ Post hoặc SharePost
     let post = await Post.findById(postId) || await SharePost.findById(postId);
     if (!post) throw new Error("Bài viết không tồn tại!");
 
-    // Kiểm tra nếu user chưa like
-    if (!post.likes.includes(userId)) {
+    // Tìm và xóa bản ghi like từ model LikePost
+    const like = await LikePost.findOneAndDelete({ user: userId, post: postId });
+    if (!like) {
         throw new Error("Bạn chưa thích bài viết này!");
     }
 
-    // Xóa userId khỏi danh sách likes
-    post.likes = post.likes.filter(id => id.toString() !== userId.toString());
-    user.likedPosts = user.likedPosts.filter(id => id.toString() !== postId.toString());
-
+    // Giảm số lượt like của bài viết (đảm bảo không âm)
+    post.likesCount = Math.max(0, (post.likesCount || 0) - 1);
     await post.save();
+
+    // Xóa bài viết khỏi danh sách likedPosts của user (nếu có)
+    user.likedPosts = user.likedPosts.filter(id => id.toString() !== postId.toString());
     await user.save();
+
+    // Invalidate cache cho bài viết và danh sách bài viết
+    await redisClient.del(`post:${postId}`);
 
     return post;
 };

@@ -12,3 +12,5 @@ User function:
 - Find a user with Name
 
 Một bài post sẽ có commentCount thống kê số comment trong Comment db, khi đó nó sẽ đếm số lượng Comment có PostId trùng với bài Post
+Khi thêm một post sẽ tạo cache cho postId đó, khi sửa, xóa thì sẽ xóa cache. Còn khi get-all thì khởi tạo tất cả cache từ MongoDB
+Tương tự với likeComment cũng vậy

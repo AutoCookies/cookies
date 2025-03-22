@@ -56,18 +56,25 @@ export const changeUserFullnameService = async ( userId, newFullName ) => {
     user.fullName = newFullName;
     await user.save();
 
-    return { message: "Email updated successfully!" };
+    return { message: "Fullname updated successfully!" };
 }
 
-export const changeUserPhoneNumberService = async ( userId, newUserPhoneNumber ) => {
+export const changeUserPhoneNumberService = async (userId, newUserPhoneNumber) => {
     const user = await User.findById(userId);
     if (!user) throw new Error("User does not exist");
+
+    // Kiểm tra số điện thoại có đang được user khác sử dụng không
+    const existingUser = await User.findOne({ phoneNumber: newUserPhoneNumber });
+    if (existingUser && existingUser._id.toString() !== userId) {
+        throw new Error("Phone number is already in use by another user");
+    }
 
     user.phoneNumber = newUserPhoneNumber;
     await user.save();
 
-    return { message: "Phone number changed successfully" }
-}
+    return { message: "Phone number changed successfully" };
+};
+
 
 /**
  * Cập nhật ảnh đại diện cho người dùng
@@ -138,18 +145,27 @@ export const getProfilePictureService = (user) => {
 
 export const searchUserByNameService = async (query, limit = 10) => {
     try {
+        query = query.trim(); // Loại bỏ khoảng trắng thừa
+
+        if (!query) {
+            throw new Error("Tên tìm kiếm không hợp lệ!"); // Tránh lỗi truy vấn rỗng
+        }
+
+        limit = Math.min(limit, 50); // Giới hạn tối đa 50 kết quả để tránh abuse
+
         const users = await User.find({
             $or: [
-                { fullname: { $regex: query, $options: "i" } }, // Tìm theo fullname
-                { username: { $regex: query, $options: "i" } } // Tìm theo username
+                { fullname: { $regex: query, $options: "i" } },
+                { username: { $regex: query, $options: "i" } }
             ]
         })
-        .limit(limit) // Giới hạn số lượng kết quả
-        .select("_id username fullname email avatar"); // Chỉ lấy thông tin cần thiết
+        .limit(limit)
+        .select("_id username fullname email avatar"); 
 
         return users;
     } catch (error) {
         throw new Error("Lỗi khi tìm kiếm người dùng: " + error.message);
     }
 };
+
 

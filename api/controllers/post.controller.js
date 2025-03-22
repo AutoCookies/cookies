@@ -14,6 +14,7 @@ import {
  */
 export const createPost = async (req, res) => {
     try {
+        console.log(`User id: ${req.user._id}`);
         const userId = req.user._id;
         const { title, content } = req.body;
         const imageBuffer = req.file ? req.file.buffer : null;

@@ -1,7 +1,8 @@
 import {
     commentPostService,
     deleteCommentService,
-    editCommentService
+    editCommentService,
+    getCommentsByPostService
 } from '../services/comment.service.js';
 import { catchAsyncErrors } from '../middlewares/catchAsyncError.middleware.js';
 
@@ -17,20 +18,23 @@ export const commentPost = catchAsyncErrors(async (req, res) => {
 });
 
 export const deleteCommnet = catchAsyncErrors(async (req, res) => {
-    const { commentId } = req.params;
-    const { userId } = req.user._id;
-
     try {
+        console.log(`User ID: ${req.user._id}`); // Debug user ID
+        const { commentId } = req.params;
+        const userId = req.user._id; // Lấy userId đúng
+
         const result = await deleteCommentService(commentId, userId);
         res.status(200).json(result);
     } catch (error) {
-        res.status(400).json(error);
+        console.error("Error deleting comment:", error.message); // Log chi tiết lỗi
+        res.status(400).json({ message: error.message });
     }
-})
+});
 
 export const editComment = async (req, res) => {
+    // console.log(`User ID: ${req.user._id}`); // Kiểm tra userId
     const { commentId } = req.params;
-    const { userId } = req.user; // Giả sử userId có sẵn từ middleware xác thực
+    const userId = req.user._id; // Lấy userId từ middleware đúng cách
     const { content } = req.body; // Nội dung mới của comment
 
     try {
@@ -38,5 +42,19 @@ export const editComment = async (req, res) => {
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+};
+
+export const getCommentsByPost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const { page = 1, limit = 10 } = req.query; // Hỗ trợ phân trang
+
+        // Gọi service để lấy comment
+        const data = await getCommentsByPostService(postId, Number(page), Number(limit));
+
+        return res.status(200).json({ message: "Lấy danh sách comment thành công!", data });
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
     }
 };

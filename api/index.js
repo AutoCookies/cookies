@@ -8,6 +8,12 @@ import postRoute from './routes/post.route.js';
 import commentRoute from './routes/comment.route.js';
 import likeRoute from './routes/like.route.js';
 import CookieParser from "cookie-parser";
+import { isAdmin, protectRoute } from "./middlewares/auth.middleware.js";
+import { checkBanStatus } from "./middlewares/checkBan.middleware.js";
+import {  
+     postRateLimiter,
+     commentLimiter,
+} from "./middlewares/rateLimit.middleware.js";
 // import User from "./models/user.model.js";
 
 
@@ -41,11 +47,11 @@ app.use(express.json())
 app.use(CookieParser())
 
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/admin", adminRoutes);
-app.use("/api/v1/posts", postRoute)
-app.use("/api/v1/comments", commentRoute);
-app.use("/api/v1/like", likeRoute);
+app.use("/api/v1/user", protectRoute, checkBanStatus, userRoutes);
+app.use("/api/v1/admin", protectRoute, isAdmin, checkBanStatus, adminRoutes);
+app.use("/api/v1/posts", postRateLimiter, protectRoute, checkBanStatus, postRoute)
+app.use("/api/v1/comments", commentLimiter, protectRoute, checkBanStatus, commentRoute);
+app.use("/api/v1/like", protectRoute, checkBanStatus, likeRoute);
 
 app.listen(ENV_VARS.PORT, () => {
     console.log(`Server running on port ${ENV_VARS.PORT}`);

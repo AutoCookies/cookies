@@ -3,36 +3,22 @@ import mongoose from "mongoose";
 const SharePostSchema = new mongoose.Schema(
     {
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-        originalPost: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
+        originalPost: { type: mongoose.Schema.Types.ObjectId, required: true, refPath: "originalPostModel" },
+        originalPostModel: { type: String, required: true, enum: ["Post", "SharePost"], default: "Post" },
         caption: { type: String, default: "" },
-        createdAt: { type: Date, default: Date.now },
-        comments: [
-            {
-                user: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "User",
-                    required: true,
-                },
-                text: {
-                    type: String,
-                    required: true,
-                },
-                createdAt: {
-                    type: Date,
-                    default: Date.now,
-                },
-            },
-        ],
-        likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-        visibility: {
-            type: String,
-            enum: ["public", "private", "friends"],
-            default: "public",
-        },
-        updatedAt: { type: Date, default: Date.now },
+        commentCount: { type: Number, default: 0 },
+        likesCount: { type: Number, default: 0 },
+        visibility: { type: String, enum: ["public", "private", "friends"], default: "public" }
     },
     { timestamps: true }
 );
 
-export const SharePost = mongoose.model("SharePost", SharePostSchema);
+// Middleware đảm bảo `likes` luôn là mảng rỗng nếu không có dữ liệu
+SharePostSchema.pre("save", function (next) {
+    if (!Array.isArray(this.likes)) {
+        this.likes = [];
+    }
+    next();
+});
 
+export const SharePost = mongoose.model("SharePost", SharePostSchema);

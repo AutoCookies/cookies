@@ -1,3 +1,4 @@
+// Model Post
 import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
@@ -6,10 +7,8 @@ const postSchema = new mongoose.Schema(
         title: { type: String, required: true },
         content: { type: String, required: true },
         image: { type: String, default: null },
-
-        likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
-        commentCount: { type: Number, default: 0 }, 
-
+        likesCount: { type: Number, default: 0 },
+        commentCount: { type: Number, default: 0 },
         visibility: { type: String, enum: ["public", "private", "friends"], default: "public" },
     },
     { timestamps: true }

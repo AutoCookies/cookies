@@ -5,14 +5,12 @@ import {
     unlikePost,
 } from '../controllers/like.controller.js';
 import express from 'express';
-import { protectRoute } from "../middlewares/auth.middleware.js";
-import { checkBanStatus } from "../middlewares/checkBan.middleware.js";
 
 const router = express.Router();
 
-router.post("/like/:commentId", protectRoute, checkBanStatus, likeComment);
-router.post("unlike/:commentId", protectRoute, checkBanStatus, unlikeComment);
-router.post("/:postId/like", protectRoute, checkBanStatus, likePost);
-router.delete("/:postId/like", protectRoute, checkBanStatus, unlikePost);
+router.post("/comment/:commentId/like", likeComment);
+router.delete("/comment/:commentId/unlike", unlikeComment);
+router.post("/post/:postId/like", likePost);
+router.delete("/post/:postId/unlike", unlikePost);
 
 export default router;

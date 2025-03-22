@@ -4,6 +4,7 @@ import { SharePost } from '../models/sharedPost.model.js';
 import { uploadImageService } from "./upload.service.js";
 import cloudinary from "../config/cloudinary.js";
 import redisClient from "../config/redisClient.js";
+import mongoose from 'mongoose';
 
 /**
  * Tạo bài viết mới
@@ -36,9 +37,13 @@ export const createPostService = async (userId, title, content, imageBuffer) => 
 
     user.posts.push(newPost._id);
     await user.save();
-    await redisClient.del('all_posts');
+
+    // Cache bài viết mới ngay lập tức
+    await redisClient.set(`post:${newPost._id}`, JSON.stringify(newPost), { EX: 600 });
+
     return newPost;
 };
+
 
 export const getOwnPostsService = async (userId) => {
     const user = await User.findById(userId);
@@ -53,11 +58,19 @@ export const getOwnPostsService = async (userId) => {
     return posts;
 };
 
-export const updatePostService = async (userId, postId, title, content, imageBuffer) => {
+export const updatePostService = async (userId, postId, title, content, imageBuffer, caption) => {
     const user = await User.findById(userId);
     if (!user) throw new Error("Người dùng không tồn tại!");
 
-    const post = await Post.findById(postId);
+    let post = await Post.findById(postId);
+    let postType = "Post";
+
+    // Nếu không tìm thấy trong Post, kiểm tra trong SharePost
+    if (!post) {
+        post = await SharePost.findById(postId);
+        postType = "SharePost";
+    }
+
     if (!post) throw new Error("Bài viết không tồn tại!");
 
     // Kiểm tra quyền chỉnh sửa bài viết
@@ -65,44 +78,74 @@ export const updatePostService = async (userId, postId, title, content, imageBuf
         throw new Error("Bạn không có quyền chỉnh sửa bài viết này!");
     }
 
-    let imageUrl = post.image; // Giữ ảnh cũ nếu không có ảnh mới
+    if (postType === "Post") {
+        let imageUrl = post.image; // Giữ ảnh cũ nếu không có ảnh mới
 
-    if (imageBuffer) {
-        // 🔹 Xóa ảnh cũ trên Cloudinary trước khi upload ảnh mới
-        if (post.image) {
-            try {
-                // Lấy public_id từ URL ảnh cũ
-                const publicId = post.image.split("/").pop().split(".")[0]; 
-                console.log("Xóa ảnh cũ:", publicId);
+        if (imageBuffer) {
+            // 🔹 Xóa ảnh cũ trên Cloudinary trước khi upload ảnh mới
+            if (post.image) {
+                try {
+                    // Lấy public_id từ URL ảnh cũ
+                    const publicId = post.image.split("/").pop().split(".")[0]; 
+                    console.log("Xóa ảnh cũ:", publicId);
 
-                await cloudinary.uploader.destroy(`post_images/${publicId}`);
-                console.log("Ảnh cũ đã xóa thành công!");
-            } catch (error) {
-                console.error("Lỗi khi xóa ảnh cũ:", error);
+                    await cloudinary.uploader.destroy(`post_images/${publicId}`);
+                    console.log("Ảnh cũ đã xóa thành công!");
+                } catch (error) {
+                    console.error("Lỗi khi xóa ảnh cũ:", error);
+                }
+            }
+
+            // Upload ảnh mới
+            console.log("Uploading new image...");
+            imageUrl = await uploadImageService(imageBuffer);
+            console.log("New image URL:", imageUrl);
+
+            if (!imageUrl) {
+                throw new Error("Lỗi khi tải ảnh lên, vui lòng thử lại!");
             }
         }
 
-        // Upload ảnh mới
-        console.log("Uploading new image...");
-        imageUrl = await uploadImageService(imageBuffer);
-        console.log("New image URL:", imageUrl);
+        // Cập nhật Post
+        post = await Post.findByIdAndUpdate(
+            postId,
+            { 
+                title, 
+                content, 
+                image: imageUrl ?? post.image  
+            },
+            { new: true }
+        );
+
+    } else if (postType === "SharePost") {
+        // Cập nhật SharePost (chỉ cập nhật caption)
+        post = await SharePost.findByIdAndUpdate(
+            postId,
+            { caption },
+            { new: true }
+        );
     }
 
-    // Cập nhật bài viết
-    const updatedPost = await Post.findByIdAndUpdate(
-        postId,
-        { title, content, image: imageUrl },
-        { new: true }
-    );
+    // Xóa cache Redis
+    await redisClient.del(`post:${postId}`);
 
-    return updatedPost;
+    return post;
 };
+
 
 export const deletePostService = async (userId, postId) => {
     const user = await User.findById(userId);
     if (!user) throw new Error("Người dùng không tồn tại!");
 
-    const post = await Post.findById(postId);
+    let post = await Post.findById(postId);
+    let postType = "Post";
+
+    // Nếu không tìm thấy trong Post, kiểm tra trong SharePost
+    if (!post) {
+        post = await SharePost.findById(postId);
+        postType = "SharePost";
+    }
+
     if (!post) throw new Error("Bài viết không tồn tại!");
 
     // Kiểm tra quyền xóa bài viết
@@ -110,8 +153,8 @@ export const deletePostService = async (userId, postId) => {
         throw new Error("Bạn không có quyền xóa bài viết này!");
     }
 
-    // Xóa ảnh trên Cloudinary trước khi xóa bài viết
-    if (post.image) {
+    // Nếu là bài viết gốc (Post) → Xóa ảnh trên Cloudinary trước khi xóa bài viết
+    if (postType === "Post" && post.image) {
         try {
             const publicId = post.image.split("/").pop().split(".")[0];
             console.log("Xóa ảnh cũ trên Cloudinary:", publicId);
@@ -123,45 +166,63 @@ export const deletePostService = async (userId, postId) => {
 
     // Xóa bài viết khỏi danh sách của user
     user.posts = user.posts.filter(id => id.toString() !== postId.toString());
-    await user.save(); // Lưu lại thay đổi
+    await user.save();
 
     // Xóa bài viết
     await post.deleteOne();
+    
+    // Xóa cache Redis liên quan
+    await redisClient.del(`post:${postId}`);
 
     return { message: "Bài viết đã được xóa thành công!" };
 };
 
+
 export const sharePostService = async (userId, postId, caption) => {
-    const post = await Post.findById(postId);
-    if (!post) throw new Error("Bài viết không tồn tại!");
+    let post = await Post.findById(postId);
+    let sharePost = await SharePost.findById(postId);
+    let originalPostId, originalPostModel;
 
-    // Tạo bản ghi chia sẻ
-    const sharedPost = await SharePost.create({
+    if (post) {
+        // Nếu là Post gốc, giữ nguyên ID và model
+        originalPostId = postId;
+        originalPostModel = "Post";
+    } else if (sharePost) {
+        // Nếu là SharePost, cần tìm bài Post gốc
+        originalPostId = sharePost.originalPost;
+        originalPostModel = sharePost.originalPostModel; // Giữ nguyên model gốc
+    } else {
+        throw new Error("Bài viết không tồn tại!");
+    }
+
+    // Tạo SharePost mới
+    const newSharedPost = new SharePost({
         user: userId,
-        originalPost: postId,
-        caption: caption || "",
+        originalPost: originalPostId,
+        originalPostModel: originalPostModel,
+        caption: caption
     });
 
-    // Thêm sharedPost vào danh sách bài viết của user
+    // Lưu vào database
+    await newSharedPost.save();
+
+    // Cập nhật danh sách bài viết của user
     await User.findByIdAndUpdate(userId, {
-        $push: { posts: sharedPost._id }
+        $push: { posts: newSharedPost._id }
     });
 
-    return sharedPost;
+    // Xóa cache Redis để cập nhật dữ liệu mới
+    await redisClient.del(`post:${originalPostId}`);
+
+    return newSharedPost;
 };
 
+
 export const getAllPostsService = async () => {
-    const cacheKey = "all_posts";
-
     try {
-        const cachedData = await redisClient.get(cacheKey);
-        if (cachedData) {
-            console.log("Lấy dữ liệu từ cache Redis");
-            return JSON.parse(cachedData);
-        }
+        console.log("Truy vấn danh sách bài viết...");
 
-        console.log("Không có cache, truy vấn MongoDB...");
-
+        // Lấy danh sách Post từ DB (không cache chung tất cả)
         const posts = await Post.find()
             .populate("user", "username profilePicture")
             .sort({ createdAt: -1 })
@@ -179,9 +240,10 @@ export const getAllPostsService = async () => {
 
         const allPosts = [...posts, ...sharedPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        await redisClient.set(cacheKey, JSON.stringify(allPosts), {
-            EX: 600, // Thời gian hết hạn cho cache là 10 phút
-        });
+        // Chỉ cache từng Post riêng biệt
+        for (const post of allPosts) {
+            await redisClient.set(`post:${post._id}`, JSON.stringify(post), { EX: 600 });
+        }
 
         return allPosts;
     } catch (error) {

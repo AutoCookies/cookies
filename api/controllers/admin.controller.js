@@ -7,8 +7,10 @@ import {
     adminDeletePostService,
     getAllPostsForAdminService,
     searchUserByNameService,
-    banUserService
+    banUserService,
+    deleteCommentService
 } from '../services/admin.service.js';
+import { catchAsyncErrors } from '../middlewares/catchAsyncError.middleware.js';
 
 export const getAllUsers = asyncHandler(async (req, res) => {
     const users = await getAllUserService(req.user);
@@ -96,3 +98,15 @@ export const banUser = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const deleteCommnet = catchAsyncErrors(async (req, res) => {
+    const { commentId } = req.params;
+    const { userId } = req.user._id;
+
+    try {
+        const result = await deleteCommentService(commentId, userId);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(400).json(error);
+    }
+})

@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import BanHistory  from "./banHistory.model.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -63,39 +62,22 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
 
-    followers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-
-    following: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    followerCount: { type: Number, default: 0 },
+    followingCount: { type: Number, default: 0 },
 
     posts: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        refPath: "postType",
+        ref: "Post",
       }
     ],
 
-    postType: {
-      type: String,
-      enum: ["Post", "SharePost"],
-      required: false,
-    },
-
     likedPosts: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
+        postId: { type: mongoose.Schema.Types.ObjectId, required: true },
+        postType: { type: String, enum: ["Post", "SharePost"], required: true }
+      }
+    ],    
 
     savedPosts: [
       {
@@ -129,7 +111,12 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    BanHistory: {
+    isBanned: {
+      type: Boolean,
+      default: false
+    },
+
+    banHistory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "BanHistory",
       default: null
@@ -162,5 +149,5 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 export default User;

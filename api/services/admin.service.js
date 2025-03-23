@@ -143,6 +143,16 @@ export const banUserService = async (userId, adminId, { duration, reason }) => {
         banExpiresAt.setDate(banExpiresAt.getDate() + duration);
     }
 
+    user.banHistory.push({
+        admin: adminId,
+        reason,
+        duration,
+        banExpiresAt
+    });
+
+    user.isBanned = true;
+    await user.save();
+
     const banRecord = new BanHistory({
         user: userId,
         admin: adminId,
@@ -156,5 +166,39 @@ export const banUserService = async (userId, adminId, { duration, reason }) => {
         message: `Người dùng đã bị chặn ${duration > 0 ? `trong ${duration} ngày` : "vĩnh viễn"}!`,
         banRecord
     };
+};
+
+export const deleteCommentService = async (commentId, userId) => {
+    // Tìm comment trong database
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+        throw new Error("Comment not found");
+    }
+
+    // Kiểm tra xem người dùng có quyền xóa comment không (chỉ xóa nếu là người tạo comment hoặc admin)
+    if (comment.user.toString() !== userId && !userHasAdminRights(userId)) {
+        throw new Error("You do not have permission to delete this comment");
+    }
+
+    // Xóa comment khỏi bài viết
+    const post = await Post.findById(comment.post);
+    if (!post) {
+        throw new Error("Post not found");
+    }
+
+    // Xóa comment khỏi mảng comments của post
+    post.comments = post.comments.filter(
+        (commentId) => commentId.toString() !== commentId
+    );
+
+    await post.save();
+
+    // Xóa tất cả các lượt like liên quan đến comment này
+    await LikeComment.deleteMany({ comment: commentId });
+
+    // Xóa comment khỏi database
+    await comment.remove();
+    await redisClient.del('all_posts');
+    return { message: "Comment deleted successfully" };
 };
 

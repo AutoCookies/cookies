@@ -7,19 +7,20 @@ import {
     adminDeletePost,
     getAllPostsForAdmin,
     searchUserByName,
-    banUser
+    banUser,
+    deleteCommnet
 } from '../controllers/admin.controller.js'
-import { protectRoute, isAdmin } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/users/:id", protectRoute, isAdmin, getUserProfile);
-router.get("/users", protectRoute, isAdmin, getAllUsers);
-router.delete("/users/:id", protectRoute, isAdmin, deleteUser);
-router.post("/users", protectRoute, isAdmin, createAccount);
-router.get("/search/user", protectRoute, isAdmin, searchUserByName);
-router.get("/posts", protectRoute, isAdmin, getAllPostsForAdmin);
-router.delete("/posts/:postId", protectRoute, isAdmin, adminDeletePost);
-router.post("/users/:userId/ban", protectRoute, isAdmin, banUser);
+router.get("/users/:id", getUserProfile);
+router.get("/users", getAllUsers);
+router.delete("/users/:id", deleteUser);
+router.post("/users", createAccount);
+router.get("/search/user", searchUserByName);
+router.get("/posts", getAllPostsForAdmin);
+router.delete("/posts/:postId", adminDeletePost);
+router.post("/users/:userId/ban", banUser);
+router.delete("/comment/:commentId", deleteCommnet);
 
 export default router;

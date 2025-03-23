@@ -11,18 +11,17 @@ import {
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/upload.middleware.js";
-import { checkBanStatus } from "../middlewares/checkBan.middleware.js";
 
 const router = express.Router();
 
 router.get("/:id", protectRoute, getUserProfile);
 
-router.put("/change-password", protectRoute, checkBanStatus, changeUserPassword);
-router.put("/change-username", protectRoute, checkBanStatus, changeUserName);
-router.put("/change-fullname", protectRoute, checkBanStatus, changeUserFullname);
-router.put("/change-phone", protectRoute, checkBanStatus, changeUserPhoneNumber);
-router.post("/updateProfilePicture", protectRoute, checkBanStatus, upload.single("profilePicture"), updateProfilePicture);
-router.get("/me/profile-picture", protectRoute, checkBanStatus, getProfilePicture);
-router.get("/search/user", protectRoute, checkBanStatus, searchUserByName);
+router.put("/change-password", changeUserPassword);
+router.put("/change-username", changeUserName);
+router.put("/change-fullname", changeUserFullname);
+router.put("/change-phone", changeUserPhoneNumber);
+router.post("/updateProfilePicture", upload.single("profilePicture"), updateProfilePicture);
+router.get("/me/profile-picture", getProfilePicture);
+router.get("/search/user", searchUserByName);
 
 export default router;

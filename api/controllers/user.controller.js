@@ -75,17 +75,18 @@ export const changeUserFullname = async (req, res) => {
 
 export const changeUserPhoneNumber = async (req, res) => {
     try {
-        const { newUserPhoneNumber } = req.body
+        const { newUserPhoneNumber } = req.body;
         if (!newUserPhoneNumber) {
-            return res.status(400).json({ message: "All the fields are required" })
+            return res.status(400).json({ message: "Phone number is required" });
         }
 
-        const response = await changeUserPhoneNumberService(req.user._id, newUserPhoneNumber)
+        const response = await changeUserPhoneNumberService(req.user._id, newUserPhoneNumber);
+        return res.json(response);
     } catch (error) {
-        console.error("Error in change Phonenumber", error);
-        res.status(400).json({ message: error.message });
+        console.error("Error in changePhoneNumber", error);
+        return res.status(400).json({ message: error.message });
     }
-}
+};
 
 export const updateProfilePicture = async (req, res) => {
     try {
@@ -104,8 +105,6 @@ export const updateProfilePicture = async (req, res) => {
     }
 };
 
-
-
 export const getProfilePicture = async (req, res) => {
     try {
         const result = getProfilePictureService(req.user);  // Lấy từ user đã đăng nhập
@@ -123,17 +122,21 @@ export const getProfilePicture = async (req, res) => {
 
 export const searchUserByName = async (req, res) => {
     try {
-        const { name } = req.query;
+        let { name, limit } = req.query;
+
         if (!name || name.trim() === "") {
             return res.status(400).json({ error: "Vui lòng nhập tên cần tìm!" });
         }
 
-        const users = await searchUserByNameService(name);
+        limit = parseInt(limit) || 10; // Chuyển limit sang số nguyên, mặc định là 10
+
+        const users = await searchUserByNameService(name, limit);
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 
 

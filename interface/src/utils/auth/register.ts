@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import CONFIG from "@/utils/config";
+import ENVVARS from "@/utils/config/config";
 
 interface RegisterData {
   username: string;
@@ -10,7 +10,7 @@ interface RegisterData {
 
 export const registerUser = async (data: RegisterData): Promise<unknown> => {
   try {
-    const response = await axios.post(`${CONFIG.API_BASE_URL}/auth/signup`, data);
+    const response = await axios.post(`${ENVVARS.API_BASE_URL}/auth/signup`, data);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {

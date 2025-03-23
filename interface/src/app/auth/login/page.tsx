@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // Import Link
-import { loginUser } from '@/utils/login';
+import Link from 'next/link';
+import { loginUser } from '@/utils/auth/login';
 
 const Login = () => {
   const router = useRouter();
@@ -17,10 +17,22 @@ const Login = () => {
       setError('');
       try {
         const userData = await loginUser({ email, password });
+
+        if (!userData || !userData.role) {
+          throw new Error("Không xác định được vai trò người dùng.");
+        }
+
         console.log('Đăng nhập thành công', userData);
-        router.push('../home/dashboard');
-      } catch {
-        console.log("Error occurred");
+
+        // Điều hướng dựa trên vai trò của người dùng
+        if (userData.role === 'admin') {
+          router.push('/home/admin/dashboard');
+        } else {
+          router.push('/home/user/postpage');
+        }
+      } catch (error) {
+        setError("Email hoặc mật khẩu không chính xác.");
+        console.log("Lỗi đăng nhập:", error);
       }
     },
     [email, password, router]
@@ -56,13 +68,13 @@ const Login = () => {
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
           >
-            Signin
+            Đăng nhập
           </button>
         </form>
         <p className="text-center mt-4">
-          Don't have an account?{' '}
+          Chưa có tài khoản?{' '}
           <Link href="/auth/register" className="text-blue-500 hover:underline">
-            Signup now
+            Đăng ký ngay
           </Link>
         </p>
       </div>

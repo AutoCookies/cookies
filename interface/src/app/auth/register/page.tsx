@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { registerUser } from '@/utils/register';
+import { registerUser } from '@/utils/auth/register';
 import Link from 'next/link';
 
 interface FormData {

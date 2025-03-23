@@ -74,7 +74,7 @@ export const updatePostService = async (userId, postId, title, content, imageBuf
         if (post.image) {
             try {
                 // Lấy public_id từ URL ảnh cũ
-                const publicId = post.image.split("/").pop().split(".")[0]; 
+                const publicId = post.image.split("/").pop().split(".")[0];
                 console.log("Xóa ảnh cũ:", publicId);
 
                 await cloudinary.uploader.destroy(`post_images/${publicId}`);
@@ -205,7 +205,7 @@ export const getAllPostsService = async () => {
     try {
         const cachedData = await redisClient.get(cacheKey);
         if (cachedData) {
-            console.log("Lấy dữ liệu từ cache Redis");
+            // console.log("📌 Dữ liệu từ cache Redis:", JSON.parse(cachedData));
             return JSON.parse(cachedData);
         }
 
@@ -226,15 +226,18 @@ export const getAllPostsService = async () => {
             .sort({ createdAt: -1 })
             .lean();
 
+        // console.log("✅ Dữ liệu từ Post:", posts);
+        // console.log("✅ Dữ liệu từ SharePost:", sharedPosts);
         const allPosts = [...posts, ...sharedPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         await redisClient.set(cacheKey, JSON.stringify(allPosts), {
             EX: 600, // Thời gian hết hạn cho cache là 10 phút
         });
 
+        // console.log("📝 Tổng số bài viết:", allPosts.length);
         return allPosts;
     } catch (error) {
-        console.error("Lỗi Redis hoặc MongoDB:", error);
+        // console.error("Lỗi Redis hoặc MongoDB:", error);
         throw new Error("Không thể lấy danh sách bài viết!");
     }
 };

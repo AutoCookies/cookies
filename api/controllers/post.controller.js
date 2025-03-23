@@ -129,8 +129,10 @@ export const sharePost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
     try {
         const posts = await getAllPostsService();
+        // console.log("API trả về danh sách bài viết:", posts);
         return res.status(200).json(posts);
     } catch (error) {
+        // console.error("Lỗi trong getAllPosts:", error);
         return res.status(500).json({ error: error.message });
     }
 };

@@ -32,18 +32,35 @@ export const registerUserService = async ({ username, fullName, email, password 
     };
 };
 
+/**
+ * Authenticates a user with the provided email and password.
+ * Generates a JWT token and sets it as an HTTP-only cookie.
+ * 
+ * @param {Object} params - The login parameters.
+ * @param {string} params.email - The user's email.
+ * @param {string} params.password - The user's password.
+ * @param {Response} params.res - The Express.js response object.
+ * @throws {Error} If the response object is missing or authentication fails.
+ * @returns {Object} An object containing user details and the JWT token.
+ */
 export const loginUserService = async ({ email, password, res }) => {
+    // Ensure the response object is provided
     if (!res) {
         throw new Error("Response object (res) is required!");
     }
 
+    // Find the user by email
     const user = await User.findOne({ email });
+    
+    // Verify user existence and password match
     if (!user || !(await user.matchPassword(password))) {
         throw new Error("Wrong email or password!");
     }
 
+    // Generate token and set it as a cookie
     const token = generateTokenAndSetCookie(user._id, res);
 
+    // Return user details and token
     return {
         _id: user._id,
         username: user.username,

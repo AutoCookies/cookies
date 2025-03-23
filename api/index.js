@@ -6,6 +6,7 @@ import userRoutes from './routes/user.route.js';
 import adminRoutes from './routes/admin.route.js';
 import postRoute from './routes/post.route.js';
 import CookieParser from "cookie-parser";
+import cors from 'cors';
 // import User from "./models/user.model.js";
 
 
@@ -37,6 +38,7 @@ const app = express()
 
 app.use(express.json())
 app.use(CookieParser())
+app.use(cors());
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);

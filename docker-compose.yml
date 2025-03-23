@@ -1,0 +1,40 @@
+services:
+  backend:
+    build: ./api
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./api/.env
+    volumes:
+      - ./api:/app
+    depends_on:
+      - mongo
+      - redis
+
+  frontend:
+    build: ./interface
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./interface/.env
+    volumes:
+      - ./interface:/app
+    depends_on:
+      - backend 
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "12971:12971"
+
+volumes:
+  mongo_data:

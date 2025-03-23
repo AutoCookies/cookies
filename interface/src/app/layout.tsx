@@ -14,21 +14,24 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Cookies",
-  description: "An Social Webapp for everyone, created by a GenZ dev :)))",
+  description: "A Social Webapp for everyone, created by a GenZ dev :)))",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <header className="nav">
-
-      </header>
+      <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <header className="nav">
+        </header>
+        <main className="container mx-auto">{children}</main>
       </body>
     </html>
   );

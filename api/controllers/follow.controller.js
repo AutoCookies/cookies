@@ -1,5 +1,5 @@
 import asyncHandler from "express-async-handler";
-import { followUserService, unfollowUserService } from "../services/followService.js";
+import { followUserService, unfollowUserService } from "../services/follow.service.js";
 
 /**
  * @route   POST /user/:id/follow

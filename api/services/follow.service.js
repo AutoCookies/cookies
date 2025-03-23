@@ -1,5 +1,5 @@
-import FollowUser from "../models/FollowUser.js";
-import User from "../models/User.js";
+import FollowUser from "../models/followUser.model.js";
+import User from "../models/User.model.js";
 
 export const followUserService = async (userId, targetUserId) => {
     if (userId === targetUserId) {

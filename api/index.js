@@ -15,37 +15,42 @@ import {
      postRateLimiter,
      commentLimiter,
 } from "./middlewares/rateLimit.middleware.js";
+import cors from 'cors';
 // import User from "./models/user.model.js";
 
 
 const app = express()
 
-const createAdminIfNotExists = async () => {
-    try {
-        const adminExists = await User.findOne({ role: "admin" });
+// const createAdminIfNotExists = async () => {
+//     try {
+//         const adminExists = await User.findOne({ role: "admin" });
 
-        if (!adminExists) {
-            console.log("Không tìm thấy admin, đang tạo tài khoản admin mặc định...");
+//         if (!adminExists) {
+//             console.log("Không tìm thấy admin, đang tạo tài khoản admin mặc định...");
 
-            const adminUser = await User.create({
-                username: "admin",
-                fullName: "Administrator",
-                email: "admin@example.com",
-                password: "admin123", 
-                role: "admin",
-            });
+//             const adminUser = await User.create({
+//                 username: "admin",
+//                 fullName: "Administrator",
+//                 email: "admin@example.com",
+//                 password: "admin123", 
+//                 role: "admin",
+//             });
 
-            console.log(`Admin được tạo: ${adminUser.email}`);
-        } else {
-            console.log("Admin đã tồn tại.");
-        }
-    } catch (error) {
-        console.error("Lỗi khi tạo admin:", error);
-    }
-};
+//             console.log(`Admin được tạo: ${adminUser.email}`);
+//         } else {
+//             console.log("Admin đã tồn tại.");
+//         }
+//     } catch (error) {
+//         console.error("Lỗi khi tạo admin:", error);
+//     }
+// };
 
 app.use(express.json())
 app.use(CookieParser())
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+}));
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", protectRoute, checkBanStatus, userRoutes);
@@ -58,7 +63,7 @@ app.use("/api/v1/follow", protectRoute, checkBanStatus, followRoute);
 app.listen(ENV_VARS.PORT, () => {
     console.log(`Server running on port ${ENV_VARS.PORT}`);
     connectDB()
-    .then(() => {
-        createAdminIfNotExists();
-    });
+    // .then(() => {
+    //     createAdminIfNotExists();
+    // });
 });

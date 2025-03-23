@@ -1,5 +1,5 @@
 import express from "express";
-import { followUser, unfollowUser } from "../controllers/followController.js";
+import { followUser, unfollowUser } from "../controllers/follow.controller.js";
 
 const router = express.Router();
 

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import '../../../styles/signin.css'
+import styles from "../../../styles/auth/signin.module.css";
 import Link from "next/link";
+import { ENV_VARS } from "../../../config/envVars";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -18,16 +19,26 @@ export default function SignIn() {
     setError("");
 
     try {
-      const res = await fetch("/api/v1/auth/login", {
+      const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Đăng nhập thất bại!");
 
-      router.push("/dashboard"); // Chuyển hướng sau khi đăng nhập thành công
+      if (!res.ok) {
+        throw new Error(data.message || "Đăng nhập thất bại!");
+      }
+
+      console.log("User data:", data);
+
+      if (data.role === "admin") {
+        router.push("/dashboard");
+      } else {
+        router.push("/home/postPage");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -36,15 +47,23 @@ export default function SignIn() {
   };
 
   return (
-    <div className="signin-container">
+    <div className={styles.signinContainer}>
+      {loading && (
+        <div className={styles.loadingOverlay}>
+          <div className={styles.spinner}></div>
+        </div>
+      )}
+
       <h2>Sign In</h2>
-      <form onSubmit={handleSignIn} className="signin-form">
+      <form onSubmit={handleSignIn} className={styles.signinForm}>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className={styles.inputField}
+          disabled={loading}
         />
         <input
           type="password"
@@ -52,12 +71,20 @@ export default function SignIn() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          className={styles.inputField}
+          disabled={loading}
         />
-        {error && <p className="error-message">{error}</p>}
-        <button type="submit" disabled={loading}>
+        {error && (
+          <p className={styles.errorMessage} aria-live="polite">
+            {error}
+          </p>
+        )}
+        <button type="submit" disabled={loading} className={styles.submitButton}>
           {loading ? "Signing in..." : "Sign In"}
         </button>
-        <p>Don't have an account? <Link href="/auth/signup">Sign Up</Link></p>
+        <p>
+          Don't have an account? <Link href="/auth/signup">Sign Up</Link>
+        </p>
       </form>
     </div>
   );

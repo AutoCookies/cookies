@@ -1,0 +1,55 @@
+/* Header Style */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(45deg, #ff80ab, #f8bbd0); /* Màu gradient nhẹ nhàng như hoa anh đào */
+    padding: 10px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 10; /* Đảm bảo header nằm trên các phần tử khác */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo */
+.logo h1 {
+    font-size: 1.5rem;
+    color: white;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Thanh tìm kiếm */
+.searchBar input {
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    width: 250px;
+    font-size: 1rem;
+}
+
+/* Các biểu tượng điều hướng */
+.nav {
+    display: flex;
+    gap: 20px;
+}
+
+.iconButton {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.2s ease;
+}
+
+.iconButton:hover {
+    transform: scale(1.1);
+}
+
+.mainContent {
+    margin-top: 70px; /* Khoảng cách dưới header */
+    padding: 20px;
+}

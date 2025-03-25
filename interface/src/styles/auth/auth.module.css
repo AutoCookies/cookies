@@ -1,0 +1,116 @@
+.authLayout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: url("/assets/cherry-blossom-valley-stockcake.jpg") no-repeat center center/cover;
+    color: #333;
+    position: relative;
+    overflow: hidden; /* Ngăn hiệu ứng tràn ra ngoài */
+}
+
+/* Hiệu ứng hoa anh đào */
+.sakuraPetal {
+    position: fixed;
+    width: 15px;
+    height: 20px;
+    background: radial-gradient(circle at 50% 40%, #ff80ab, #d81b60);
+    border-radius: 50%;
+    opacity: 0.8;
+    transform-origin: center;
+    animation: sakuraFall linear infinite;
+}
+
+.sakuraPetal::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: 50%;
+    transform: rotate(45deg);
+}
+
+/* Cánh hoa rơi ngẫu nhiên */
+.sakuraPetal:nth-child(1) { left: 10%; animation-duration: 6s; }
+.sakuraPetal:nth-child(2) { left: 25%; animation-duration: 7s; }
+.sakuraPetal:nth-child(3) { left: 50%; animation-duration: 5s; }
+.sakuraPetal:nth-child(4) { left: 75%; animation-duration: 8s; }
+.sakuraPetal:nth-child(5) { left: 90%; animation-duration: 6.5s; }
+
+@keyframes sakuraFall {
+    0% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translate(15px, 25vh) rotate(45deg); }
+    50% { transform: translate(-15px, 50vh) rotate(90deg); }
+    75% { transform: translate(10px, 75vh) rotate(135deg); }
+    100% { transform: translate(-10px, 100vh) rotate(180deg); }
+}
+
+/* Nội dung chính */
+.authContent {
+    background: rgba(255, 255, 255, 0.85); /* Nền trắng trong suốt để dễ đọc */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Footer */
+.authFooter {
+    margin-top: 30px;
+    padding: 15px 20px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #444;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-top: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.authFooter p {
+    margin: 5px 0;
+}
+
+/* Button Styles */
+.buttonContainer {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn {
+    background: #ff4081;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: #d81b60;
+    transform: scale(1.05);
+}
+
+.btnSecondary {
+    background: white;
+    color: #ff4081;
+    border: 2px solid #ff4081;
+}
+
+.btnSecondary:hover {
+    background: #ff4081;
+    color: white;
+}

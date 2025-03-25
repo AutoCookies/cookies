@@ -1,0 +1,64 @@
+/* Container chính */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Tiêu đề */
+.title {
+  font-size: 2.5rem;
+  color: #d81b60;
+  margin-bottom: 10px;
+}
+
+/* Phần phụ đề */
+.subtitle {
+  font-size: 1.5rem;
+  color: #880e4f;
+  margin-bottom: 20px;
+}
+
+/* Container chứa nút */
+.buttonContainer {
+  display: flex;
+  gap: 15px;
+}
+
+/* Style nút bấm */
+.btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* Nút chính */
+.primaryBtn {
+  background-color: #d81b60;
+  color: white;
+}
+
+.primaryBtn:hover {
+  background-color: #c2185b;
+  transform: scale(1.05);
+}
+
+/* Nút phụ */
+.secondaryBtn {
+  background-color: white;
+  color: #d81b60;
+  border: 2px solid #d81b60;
+}
+
+.secondaryBtn:hover {
+  background-color: #f8bbd0;
+  transform: scale(1.05);
+}

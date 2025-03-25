@@ -1,0 +1,98 @@
+.signinContainer {
+  position: relative;
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+  background: #ffe6f2;
+  /* 🌸 Màu nền hồng nhạt */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(255, 182, 193, 0.5);
+  overflow: hidden;
+}
+
+.signinForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputField {
+  padding: 12px;
+  margin: 10px 0;
+  border: 2px solid #ffb6c1;
+  /* Màu viền hồng nhạt */
+  border-radius: 10px;
+  font-size: 16px;
+  background: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: #ff69b4;
+  /* Hồng đậm hơn khi focus */
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+.submitButton {
+  background: #ff69b4;
+  /* Hồng sakura */
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
+}
+
+.submitButton:hover {
+  background: #ff1493;
+  /* Hồng đậm khi hover */
+}
+
+.submitButton:disabled {
+  background: #ffc0cb;
+  /* Hồng nhạt khi bị disable */
+  cursor: not-allowed;
+}
+
+/* 🔥 Loading overlay */
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 240, 245, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+/* 🔄 Spinner animation */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 5px solid #ff69b4;
+  border-top: 5px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorMessage {
+  color: red;
+  margin: 10px 0;
+  font-weight: bold;
+}

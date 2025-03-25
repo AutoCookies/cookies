@@ -1,0 +1,78 @@
+/* postCard.module.css */
+.post-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px; /* Tăng padding để không gian rộng rãi hơn */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: box-shadow 0.3s ease;
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.post-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.post-card-header img {
+  width: 50px; /* Tăng kích thước avatar */
+  height: 50px; /* Tăng kích thước avatar */
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.username {
+  font-weight: bold;
+  font-size: 18px; /* Tăng kích thước chữ của username */
+  color: #222; /* Màu đậm cho tên người dùng */
+}
+
+.post-card-body h3 {
+  font-size: 24px; /* Tăng kích thước tiêu đề */
+  margin: 15px 0; /* Thêm khoảng cách giữa tiêu đề và nội dung */
+  color: #333; /* Màu chữ đậm cho tiêu đề */
+}
+
+.post-card-body p {
+  font-size: 16px; /* Tăng kích thước chữ của nội dung */
+  color: #555; /* Màu chữ nhẹ nhưng dễ đọc */
+  line-height: 1.6;
+}
+
+.post-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+  object-fit: cover;
+}
+
+/* postCard.module.css */
+.post-card-footer {
+  display: flex;
+  justify-content: flex-start; /* Căn trái các mục */
+  gap: 20px; /* Khoảng cách giữa các mục like và comment */
+  font-size: 16px;
+  color: #777;
+  margin-top: 15px; /* Thêm khoảng cách trên cho footer */
+}
+
+.actions p {
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-block; /* Đảm bảo chúng nằm trên cùng một hàng */
+  margin: 5px;
+}
+
+.actions p:hover {
+  color: #F8BBD0; /* Thêm màu hồng nhẹ khi hover, phù hợp với chủ đề hoa anh đào */
+  text-decoration: underline;
+}
+

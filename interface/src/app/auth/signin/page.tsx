@@ -17,7 +17,7 @@ export default function SignIn() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
     try {
       const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/login`, {
         method: "POST",
@@ -25,15 +25,18 @@ export default function SignIn() {
         body: JSON.stringify({ email, password }),
         credentials: "include",
       });
-
+  
       const data = await res.json();
-
+  
       if (!res.ok) {
         throw new Error(data.message || "Đăng nhập thất bại!");
       }
-
+  
       console.log("User data:", data);
-
+  
+      // Lưu token vào localStorage hoặc cookie
+      localStorage.setItem("token", data.token);
+  
       if (data.role === "admin") {
         router.push("/dashboard");
       } else {
@@ -44,7 +47,7 @@ export default function SignIn() {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <div className={styles.signinContainer}>

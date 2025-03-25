@@ -1,20 +1,79 @@
-import styles from "../../styles/home/home.module.css"; // Import CSS Modules
+"use client";
+import styles from "../../styles/home/home.module.css";
+import { ENV_VARS } from "@/config/envVars";
+import React, { useState, useEffect } from 'react';
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
+
+    // State để lưu ảnh profile
+    const [profileImage, setProfileImage] = useState<string | null>(null);
+
+    const fetchUserProfile = async () => {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            console.error("Token không tồn tại trong localStorage!");
+            return;
+        }
+
+        console.log("Token đã lấy được:", token); // In ra token để kiểm tra
+
+        try {
+            const response = await fetch(`${ENV_VARS.API_ROUTE}/user/me/profile-picture`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("User Profile:", data);
+
+                // Cập nhật profile image nếu có
+                setProfileImage(data.profilePicture || "/default-profile.jpg");
+            } else {
+                console.error("Không thể lấy thông tin profile, Status:", response.status);
+            }
+        } catch (error) {
+            console.error("Có lỗi khi fetch dữ liệu:", error);
+        }
+    };
+
+    // Gọi hàm fetchUserProfile khi component mount
+    useEffect(() => {
+        fetchUserProfile();
+    }, []);
+
     return (
         <div>
             {/* Header */}
             <header className={styles.header}>
                 <div className={styles.logo}>
-                    <h1>Cherry Blossom</h1>
+                    <h1>AutoCookies</h1>
                 </div>
                 <div className={styles.searchBar}>
-                    <input type="text" placeholder="Tìm kiếm..." />
+                    <input type="text" placeholder="Searching..." />
                 </div>
                 <div className={styles.nav}>
-                    <button className={styles.iconButton}>🛎️</button> {/* Example for notification */}
-                    <button className={styles.iconButton}>💬</button> {/* Example for messages */}
-                    <button className={styles.iconButton}>👤</button> {/* Example for user profile */}
+                    {/* Thay thế icon notification bằng file SVG */}
+                    <button className={styles.iconButton}>
+                        <img src="/svg/bell-svgrepo-com.svg" alt="Notification" className={styles.iconSVG} />
+                    </button>
+                    {/* Thay thế icon messages bằng file SVG */}
+                    <button className={styles.iconButton}>
+                        <img src="/svg/comment-svgrepo-com.svg" alt="Messages" className={styles.iconSVG} />
+                    </button>
+                    
+                    {/* Hiển thị ảnh profile nếu có, nếu không thì hiển thị icon SVG */}
+                    <button className={styles.iconButton} onClick={fetchUserProfile}>
+                        {profileImage ? (
+                            <img src={profileImage} alt="User Profile" className={styles.profileImage} />
+                        ) : (
+                            <img src="/svg/id-card-svgrepo-com.svg" alt="Default Profile" className={styles.iconSVG} />
+                        )}
+                    </button> 
                 </div>
             </header>
 

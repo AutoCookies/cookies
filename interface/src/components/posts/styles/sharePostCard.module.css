@@ -1,0 +1,139 @@
+/* sharePostCard.module.css */
+.share-post-card {
+  width: 100%;
+  max-width: 600px;
+  margin: 15px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f4e1e1; /* Màu hồng nhạt, phù hợp với chủ đề hoa anh đào */
+  transition: all 0.3s ease;
+}
+
+.share-post-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px); /* Tạo hiệu ứng nhẹ khi hover */
+}
+
+.share-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.share-user {
+  font-weight: bold;
+  color: #000000; /* Màu hồng nhẹ tạo sự tương phản tốt với background */
+  font-size: 20px;
+}
+
+.share-avatar {
+  border-radius: 90px;
+  width: 50px;
+  height: 50px;
+}
+
+.share-caption {
+  font-size: 0.9rem;
+  color: #000000;
+  margin-top: 8px;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+.share-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #777;
+  border-top: 1px solid #f1f1f1;
+  padding-top: 12px;
+  margin-top: 16px;
+}
+
+.share-footer p {
+  margin: 0;
+}
+
+.share-footer strong {
+  font-weight: bold;
+  color: #333;
+}
+
+.post-card {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #f1f1f1;
+}
+
+.post-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.post-username {
+  font-weight: bold;
+  color: #333;
+}
+
+.post-card-body {
+  margin-top: 12px;
+}
+
+.post-card-body h3 {
+  font-size: 1.3rem;
+  font-weight: 700; /* Đậm hơn để nổi bật */
+  margin-bottom: 10px;
+  color: #333;
+  text-transform: capitalize;
+  letter-spacing: 0.5px; /* Thêm khoảng cách giữa các chữ */
+}
+
+.post-card-body p {
+  font-size: 1.1rem;
+  line-height: 1.8; /* Cải thiện khoảng cách giữa các dòng */
+  color: #444;
+  margin-bottom: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Thêm hiệu ứng đổ bóng nhẹ cho chữ */
+}
+
+.post-card-body p:hover {
+  color: #F8BBD0; /* Màu hồng nhẹ khi hover */
+}
+
+.post-image {
+  max-width: 100%;
+  margin-top: 10px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.post-card-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.actions p {
+  margin: 0;
+  cursor: pointer;
+}
+
+.actions p:hover {
+  color: #F8BBD0; /* Màu hồng nhẹ phù hợp với chủ đề hoa anh đào */
+  font-weight: bold;
+}

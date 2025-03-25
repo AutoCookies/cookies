@@ -63,7 +63,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                     </button>
                     {/* Thay thế icon messages bằng file SVG */}
                     <button className={styles.iconButton}>
-                        <img src="/svg/comment-svgrepo-com.svg" alt="Messages" className={styles.iconSVG} />
+                        <img src="/svg/information-svgrepo-com.svg" alt="Messages" className={styles.iconSVG} />
                     </button>
                     
                     {/* Hiển thị ảnh profile nếu có, nếu không thì hiển thị icon SVG */}
@@ -71,7 +71,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                         {profileImage ? (
                             <img src={profileImage} alt="User Profile" className={styles.profileImage} />
                         ) : (
-                            <img src="/svg/id-card-svgrepo-com.svg" alt="Default Profile" className={styles.iconSVG} />
+                            <img src="/svg/personal-svgrepo-com.svg" alt="Default Profile" className={styles.iconSVG} />
                         )}
                     </button> 
                 </div>

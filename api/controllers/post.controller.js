@@ -85,9 +85,11 @@ export const sharePost = async (req, res) => {
     try {
         const userId = req.user._id;
         const { postId } = req.params;
-        const { caption } = req.body;
+        const { caption, visibility = "public" } = req.body;
 
-        const sharedPost = await sharePostService(userId, postId, caption);
+        console.log("📤 Dữ liệu nhận từ frontend:", { caption, visibility });
+
+        const sharedPost = await sharePostService(userId, postId, caption, visibility);
 
         return res.status(201).json({
             message: "Bài viết đã được chia sẻ!",
@@ -97,6 +99,7 @@ export const sharePost = async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
 };
+
 
 export const getAllPosts = async (req, res) => {
     try {

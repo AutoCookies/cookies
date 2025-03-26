@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styles from "./styles/postCard.module.css";
-import { ENV_VARS } from "../../config/envVars";
+import { handleLike } from "@/utils/posts/handleLike";
+import { handleShare } from "@/utils/posts/handleSharePosts";
+import SharePostModal from "@/components/posts/sharePostModal";
 
 interface PostProps {
   postId: string;
@@ -15,6 +17,7 @@ interface PostProps {
     profilePicture: string;
   };
   onLike: () => void;
+  onShare: () => void;
 }
 
 const PostCard: React.FC<PostProps> = ({
@@ -27,30 +30,23 @@ const PostCard: React.FC<PostProps> = ({
   isLiked,
   user,
   onLike,
+  onShare
 }) => {
   const [liked, setLiked] = useState(isLiked);
+  const [showShareModal, setShowShareModal] = useState(false);
 
-  const handleLike = async () => {
-    try {
-      console.log(`Like bài viết: ${postId}`);
-
-      const response = await fetch(`${ENV_VARS.API_ROUTE}/likes/post/${postId}/like`, {
-        method: liked ? "DELETE" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Không thể like bài viết!");
-      }
-
-      console.log("Like thành công!");
-
+  const handleLikePost = () => {
+    handleLike(postId, liked, () => {
       setLiked((prev) => !prev);
       onLike();
-    } catch (error) {
-      console.error("Lỗi khi like bài viết:", error);
-    }
+    });
+  };
+
+  const handleSharePost = (caption: string, visibility: "public" | "private" | "friends") => {
+    handleShare(postId, caption, visibility, () => {
+      console.log("Đã cập nhật UI sau khi chia sẻ!");
+      onShare(); 
+    });
   };
 
   return (
@@ -85,7 +81,7 @@ const PostCard: React.FC<PostProps> = ({
           </p>
         </div>
         <div className={styles.buttons}>
-          <button className={styles["icon-button"]} onClick={handleLike}>
+          <button className={styles["icon-button"]} onClick={handleLikePost}>
             <img
               src="/svg/like-svgrepo-com.svg"
               alt="Like"
@@ -95,11 +91,20 @@ const PostCard: React.FC<PostProps> = ({
           <button className={styles["icon-button"]}>
             <img src="/svg/information-svgrepo-com.svg" alt="Comment" />
           </button>
-          <button className={styles["icon-button"]}>
+          <button className={styles["icon-button"]} onClick={() => setShowShareModal(true)}>
             <img src="/svg/forward-svgrepo-com.svg" alt="Share" />
           </button>
         </div>
       </div>
+
+      {/* Hiển thị modal khi nhấn Share */}
+      {showShareModal && (
+        <SharePostModal
+          postId={postId}
+          onClose={() => setShowShareModal(false)}
+          onShare={handleSharePost}
+        />
+      )}
     </div>
   );
 };

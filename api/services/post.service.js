@@ -178,41 +178,32 @@ export const deletePostService = async (userId, postId) => {
 };
 
 
-export const sharePostService = async (userId, postId, caption) => {
+export const sharePostService = async (userId, postId, caption, visibility) => {
     let post = await Post.findById(postId);
     let sharePost = await SharePost.findById(postId);
     let originalPostId, originalPostModel;
 
     if (post) {
-        // Nếu là Post gốc, giữ nguyên ID và model
         originalPostId = postId;
         originalPostModel = "Post";
     } else if (sharePost) {
-        // Nếu là SharePost, cần tìm bài Post gốc
         originalPostId = sharePost.originalPost;
-        originalPostModel = sharePost.originalPostModel; // Giữ nguyên model gốc
+        originalPostModel = sharePost.originalPostModel;
     } else {
         throw new Error("Bài viết không tồn tại!");
     }
 
-    // Tạo SharePost mới
+    console.log("🔄 Tạo SharePost với visibility:", visibility);
+
     const newSharedPost = new SharePost({
         user: userId,
         originalPost: originalPostId,
         originalPostModel: originalPostModel,
-        caption: caption
+        caption: caption,
+        visibility: visibility 
     });
 
-    // Lưu vào database
     await newSharedPost.save();
-
-    // Cập nhật danh sách bài viết của user
-    await User.findByIdAndUpdate(userId, {
-        $push: { posts: newSharedPost._id }
-    });
-
-    // Xóa cache Redis để cập nhật dữ liệu mới
-    await redisClient.del(`post:${originalPostId}`);
 
     return newSharedPost;
 };

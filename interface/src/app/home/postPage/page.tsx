@@ -62,11 +62,12 @@ export default function PostPage() {
                     isLiked: post.originalPost.isLiked,
                   }}
                   onLike={() => fetchPosts()}
+                  onShare={() => fetchPosts()}
                 />
               ) : (
                 <PostCard
                   postId={post._id}
-                  title={post.title}
+                  title={post.title} 
                   content={post.content}
                   image={post.image}
                   likesCount={post.likesCount}
@@ -74,6 +75,7 @@ export default function PostPage() {
                   isLiked={post.isLiked}
                   user={post.user}
                   onLike={() => fetchPosts()}
+                  onShare={() => fetchPosts()}
                 />
               )
             ) : (

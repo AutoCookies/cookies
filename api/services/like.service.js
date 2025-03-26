@@ -151,4 +151,22 @@ export const unlikePostService = async (userId, postId) => {
     return post;
 };
 
+/**
+ * Kiểm tra danh sách postId nào đã được user like.
+ * @param {string} userId - ID của user.
+ * @param {string[]} postIds - Danh sách postId cần kiểm tra.
+ * @returns {Promise<string[]>} - Trả về danh sách postId đã like.
+ */
+export const checkUserLikedPostsService = async (userId, postIds) => {
+    if (!userId || !postIds || postIds.length === 0) return [];
 
+    try {
+        // Truy vấn nhanh bằng $in
+        const likedPosts = await LikePost.find({ user: userId, post: { $in: postIds } }).select("post");
+
+        return likedPosts.map((like) => like.post.toString());
+    } catch (error) {
+        console.error("Lỗi khi kiểm tra bài viết đã like:", error);
+        throw new Error("Không thể kiểm tra trạng thái like.");
+    }
+};

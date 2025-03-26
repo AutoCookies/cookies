@@ -137,3 +137,36 @@
   color: #F8BBD0; /* Màu hồng nhẹ phù hợp với chủ đề hoa anh đào */
   font-weight: bold;
 }
+
+.buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.icon-button img {
+  width: 30px;
+  height: 30px;
+}
+
+.icon-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.liked {
+  filter: invert(39%) sepia(85%) saturate(1000%) hue-rotate(290deg);
+}

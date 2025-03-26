@@ -4,7 +4,7 @@ import { SharePost } from '../models/sharedPost.model.js';
 import { uploadImageService } from "./upload.service.js";
 import cloudinary from "../config/cloudinary.js";
 import redisClient from "../config/redisClient.js";
-import mongoose from 'mongoose';
+import LikePost from "../models/likePost.model.js";
 
 /**
  * Tạo bài viết mới
@@ -218,16 +218,17 @@ export const sharePostService = async (userId, postId, caption) => {
 };
 
 
-export const getAllPostsService = async () => {
+export const getAllPostsService = async (userId) => {
     try {
         console.log("Truy vấn danh sách bài viết...");
 
-        // Lấy danh sách Post từ DB (không cache chung tất cả)
+        // Lấy danh sách tất cả bài Post
         const posts = await Post.find()
             .populate("user", "username profilePicture")
             .sort({ createdAt: -1 })
             .lean();
 
+        // Lấy danh sách tất cả SharePost
         const sharedPosts = await SharePost.find()
             .populate("user", "username profilePicture")
             .populate("originalPost", "title content image user createdAt")
@@ -238,17 +239,28 @@ export const getAllPostsService = async () => {
             .sort({ createdAt: -1 })
             .lean();
 
+        // Gộp tất cả bài viết
         const allPosts = [...posts, ...sharedPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        // Chỉ cache từng Post riêng biệt
-        for (const post of allPosts) {
-            await redisClient.set(`post:${post._id}`, JSON.stringify(post), { EX: 600 });
+        // Nếu có userId, kiểm tra bài viết nào user đã like
+        let userLikedPosts = [];
+        if (userId) {
+            userLikedPosts = await LikePost.find({ user: userId }).distinct("post"); // Lấy danh sách ID của các bài đã like
         }
 
-        return allPosts;
+        // console.log(`User Liked Posts ${userLikedPosts}`)
+
+        // Gán thêm isLiked vào từng post
+        const postsWithLikeStatus = allPosts.map(post => ({
+            ...post,
+            isLiked: userLikedPosts.map(id => id.toString()).includes(post._id.toString()),
+        }));        
+
+        return postsWithLikeStatus;
     } catch (error) {
         console.error("Lỗi Redis hoặc MongoDB:", error);
         throw new Error("Không thể lấy danh sách bài viết!");
     }
 };
+
 

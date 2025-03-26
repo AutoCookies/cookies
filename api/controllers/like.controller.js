@@ -3,6 +3,7 @@ import {
     unlikeCommentService,
     likePostService,
     unlikePostService,
+    checkUserLikedPostsService
 } from '../services/like.service.js';
 import { catchAsyncErrors } from '../middlewares/catchAsyncError.middleware.js';
 
@@ -52,5 +53,29 @@ export const unlikePost = async (req, res) => {
         return res.status(200).json({ message: "Đã bỏ thích bài viết!", post });
     } catch (error) {
         return res.status(400).json({ message: error.message });
+    }
+};
+
+/**
+ * API kiểm tra danh sách postId đã like của user.
+ * @route POST /api/likes/check
+ * @access Private (cần đăng nhập)
+ */
+export const checkUserLikedPosts = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        if (!userId) return res.status(401).json({ message: "Bạn chưa đăng nhập." });
+
+        const { postIds } = req.body;
+        if (!Array.isArray(postIds) || postIds.length === 0) {
+            return res.json({ likedPostIds: [] });
+        }
+
+        const likedPostIds = await checkUserLikedPostsService(userId, postIds);
+
+        res.json({ likedPostIds });
+    } catch (error) {
+        console.error("Lỗi API check likes:", error);
+        res.status(500).json({ message: "Không thể kiểm tra trạng thái like." });
     }
 };

@@ -45,7 +45,12 @@
     cursor: pointer;
     color: white;
     transition: transform 0.2s ease;
-    padding: 8px; /* Giảm padding để icon nhỏ hơn */
+    padding: 8px;
+}
+
+.iconButton img {
+    width: 30px;
+    height: 30px;
 }
 
 .iconButton:hover {
@@ -60,8 +65,8 @@
 
 /* Các ảnh profile */
 .profileImage {
-    width: 28px; /* Giảm kích thước ảnh profile */
-    height: 28px;
+    width: 40px; /* Giảm kích thước ảnh profile */
+    height: 40px;
     border-radius: 50%;
 }
 

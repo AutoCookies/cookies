@@ -65,14 +65,40 @@
 }
 
 .actions p {
-  cursor: pointer;
   font-weight: bold;
   display: inline-block; /* Đảm bảo chúng nằm trên cùng một hàng */
   margin: 5px;
 }
 
-.actions p:hover {
-  color: #F8BBD0; /* Thêm màu hồng nhẹ khi hover, phù hợp với chủ đề hoa anh đào */
-  text-decoration: underline;
+.buttons {
+  display: flex;
+  gap: 6px; /* Giảm khoảng cách giữa các nút */
 }
 
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px; /* Giảm padding để nút nhỏ hơn */
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  width: 28px; /* Giảm kích thước tổng thể của button */
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.icon-button img {
+  width: 30px;
+  height: 30px;
+}
+
+.icon-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.liked {
+  filter: invert(39%) sepia(85%) saturate(1000%) hue-rotate(290deg);
+}

@@ -1,103 +1,241 @@
+/* Sakura-themed Comment Bubble */
 .comment-bubble {
   display: flex;
   align-items: flex-start;
-  background-color: #fceef6;
-  /* Màu hồng nhạt giống màu cánh hoa anh đào */
-  border-radius: 15px;
-  padding: 12px;
-  margin: 10px 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff0f5; /* Màu trắng hồng nhạt như cánh hoa anh đào */
+  border-radius: 18px 18px 18px 4px; /* Độ cong góc không đều tạo cảm giác tự nhiên */
+  padding: 12px 15px;
+  margin: 12px 0;
+  box-shadow: 0 3px 6px rgba(255, 182, 193, 0.2); /* Shadow màu hồng nhạt */
   max-width: 80%;
   transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid #ffdbeb; /* Viền hồng rất nhạt */
 }
 
+/* Hiệu ứng giống như cánh hoa rơi khi hover */
 .comment-bubble:hover {
-  background-color: #f9d6e0;
-  /* Màu hồng đậm hơn khi hover */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: #ffe6ee;
+  box-shadow: 0 5px 15px rgba(255, 182, 193, 0.3);
+  transform: translateY(-2px);
 }
 
+/* Avatar với hiệu ứng khung ảnh Nhật Bản */
 .comment-avatar {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 12px;
-  border: 2px solid #f8b0d4;
-  /* Đường viền màu hồng nhẹ */
+  border: 2px solid #ffb6c1; /* Màu hồng sakura */
+  padding: 2px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* Phần nội dung comment */
 .comment-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  flex-grow: 1;
 }
 
+/* Tên người dùng với phong cách Nhật Bản */
 .comment-content strong {
   font-size: 14px;
-  color: #5d3a6d;
-  /* Màu tím nhạt, gợi liên tưởng đến hoa anh đào */
+  color: #d23669; /* Màu hồng đậm kiểu Nhật */
   margin-bottom: 4px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
+/* Nội dung comment */
 .comment-content p {
-  font-size: 13px;
-  color: #6e4e80;
-  /* Màu tím đậm hơn */
-  line-height: 1.4;
+  font-size: 14px;
+  color: #5a3d5a; /* Màu tím nhạt phối với hồng */
+  line-height: 1.5;
+  margin: 6px 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* Thời gian đăng */
 .comment-content small {
-  font-size: 12px;
-  color: #9b7a92;
-  /* Màu xám nhạt cho ngày giờ */
-  margin-top: 4px;
+  font-size: 11px;
+  color: #c397d8; /* Màu tím sakura nhạt */
+  margin-top: 2px;
+  font-style: italic;
 }
 
+/* Khu vực like */
 .like-section {
   display: flex;
   align-items: center;
-  margin-top: 5px;
+  margin-top: 8px;
 }
 
+/* Nút like */
 .like-button {
   background: none;
   border: none;
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.like-button:hover {
+  background-color: #ffebf1;
+}
+
+/* Icon like */
+.like-icon, .liked-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  transition: all 0.3s ease;
 }
 
 .like-icon {
-  width: 20px;
-  /* Kích thước vừa phải cho icon like */
-  height: 20px;
-  margin-right: 5px;
-  transition: transform 0.2s ease, fill 0.2s ease;
-  color: #6e4e80;
-  /* Màu xám đậm cho nút like ban đầu */
+  color: #c3aed6; /* Màu tím nhạt */
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
 }
 
 .liked-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
-  transform: scale(1.2);
-  /* Tăng kích thước khi liked */
-  color: #ff4081;
-  /* Màu sắc khi liked (hồng đậm) */
+  color: #ff4081; /* Màu hồng đậm khi liked */
+  transform: scale(1.1);
+  filter: drop-shadow(0 1px 2px rgba(255,64,129,0.3));
 }
 
-.liked {
-  color: #ff0055;
-  /* Đổi màu khi liked */
-}
-
+/* Số lượng like */
 .like-count {
+  font-size: 13px;
+  color: #d23669; /* Màu hồng đậm */
+  margin-left: 4px;
+  font-weight: 500;
+}
+
+/* Menu dropdown */
+.comment-menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.more-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 8px;
+  color: #c3aed6;
+  transition: all 0.2s ease;
+}
+
+.more-button:hover {
+  color: #d23669;
+  transform: rotate(90deg);
+}
+
+.menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid #ffdbeb;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(255, 182, 193, 0.3);
+  z-index: 10;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.menu-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #5a3d5a;
+  transition: all 0.2s ease;
+}
+
+.menu-dropdown button:hover {
+  background-color: #fff0f5;
+  color: #d23669;
+}
+
+/* Phần chỉnh sửa comment */
+.edit-container {
+  margin: 8px 0;
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid #ffdbeb;
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
   font-size: 14px;
-  font-weight: bold;
-  color: #6e4e80;
-  /* Màu xám đậm cho số lượng lượt like */
-  margin-left: 5px;
+  color: #5a3d5a;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.edit-textarea:focus {
+  outline: none;
+  border-color: #ffb6c1;
+  box-shadow: 0 0 0 2px rgba(255, 182, 193, 0.2);
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.edit-buttons button {
+  padding: 6px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.edit-buttons button:first-child {
+  background-color: #ffb6c1;
+  color: white;
+  border: none;
+}
+
+.edit-buttons button:first-child:hover {
+  background-color: #ff4081;
+}
+
+.edit-buttons button:last-child {
+  background: none;
+  border: 1px solid #ffdbeb;
+  color: #d23669;
+}
+
+.edit-buttons button:last-child:hover {
+  background-color: #ffebf1;
+}
+
+/* Hiệu ứng sakura decor (tùy chọn) */
+.comment-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 20px;
+  width: 20px;
+  height: 10px;
+  background-color: #fff0f5;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
 }

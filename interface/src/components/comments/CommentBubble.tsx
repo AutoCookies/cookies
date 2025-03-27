@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import styles from "./styles/commentBubble.module.css"; // Thêm CSS tùy chỉnh
-import { handleLikeComment } from "@/utils/comments/handleLikeComments"; // Nhập hàm handleLikeComment
+import styles from "./styles/commentBubble.module.css";
+import { handleLikeComment } from "@/utils/comments/handleLikeComments";
 
 interface CommentProps {
   id: string;
@@ -13,31 +13,54 @@ interface CommentProps {
     profilePicture: string;
   };
   isLiked: boolean;
-  onLikeChange: () => void; // Hàm callback để thông báo cho component cha khi thay đổi trạng thái like
+  onLikeChange: () => void;
+  onDeleteComment: () => void; // Add delete handler
+  onEditComment: () => void; // Add edit handler
 }
 
-export const CommentBubble: React.FC<CommentProps> = ({ id, content, createdAt, likeCount, user, isLiked, onLikeChange }) => {
-  const [liked, setLiked] = useState(isLiked); // Trạng thái của nút like
+export const CommentBubble: React.FC<CommentProps> = ({
+  id,
+  content,
+  createdAt,
+  likeCount,
+  user,
+  isLiked,
+  onLikeChange,
+  onDeleteComment,
+  onEditComment
+}) => {
+  const [liked, setLiked] = useState(isLiked);
+  const [showMenu, setShowMenu] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(content);
 
   const handleLikeClick = async () => {
     try {
-      console.log("isLiked state before click:", liked); // Log trạng thái liked trước khi click
-      // Gọi API để like comment
       const data = await handleLikeComment(id, liked);
-
-      // Nếu like thành công, cập nhật trạng thái liked
       if (data) {
-        setLiked((prevLiked) => !prevLiked); // Chuyển đổi trạng thái liked
-        onLikeChange(); // Gọi callback để fetch lại comment từ component cha
+        setLiked(prev => !prev);
+        onLikeChange();
       }
     } catch (error) {
-      console.error("Lỗi khi like bình luận:", error);
+      console.error("Error liking comment:", error);
     }
   };
 
-  useEffect(() => {
-    console.log("isLiked prop in CommentBubble:", isLiked); // Log giá trị isLiked mỗi khi prop thay đổi
-  }, [isLiked]);
+  const handleDelete = async () => {
+    try {
+      await onDeleteComment();
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
+  const handleEdit = async () => {
+    try {
+      await onEditComment();
+    } catch (error) {
+      console.error("Error editing comment:", error);
+    }
+  };
 
   return (
     <div className={styles["comment-bubble"]}>
@@ -47,11 +70,52 @@ export const CommentBubble: React.FC<CommentProps> = ({ id, content, createdAt, 
         className={styles["comment-avatar"]}
       />
       <div className={styles["comment-content"]}>
-        <strong>{user.username}</strong>
-        <p>{content}</p>
+        <div className={styles["comment-header"]}>
+          <strong>{user.username}</strong>
+          <div className={styles["comment-menu"]}>
+            <button
+              className={styles["more-button"]}
+              onClick={() => setShowMenu(!showMenu)}
+            >
+              ⋮
+            </button>
+            {showMenu && (
+              <div className={styles["menu-dropdown"]}>
+                <button onClick={() => {
+                  setIsEditing(true);
+                  setShowMenu(false);
+                }}>
+                  Edit
+                </button>
+                <button onClick={handleDelete}>
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {isEditing ? (
+          <div className={styles["edit-container"]}>
+            <textarea
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              className={styles["edit-textarea"]}
+            />
+            <div className={styles["edit-buttons"]}>
+              <button onClick={handleEdit}>Save</button>
+              <button onClick={() => {
+                setIsEditing(false);
+                setEditedContent(content);
+              }}>Cancel</button>
+            </div>
+          </div>
+        ) : (
+          <p>{content}</p>
+        )}
+
         <small>{new Date(createdAt).toLocaleString()}</small>
 
-        {/* Nút Like */}
         <div className={styles["like-section"]}>
           <button
             className={`${styles["like-button"]} ${liked ? styles.liked : ""}`}

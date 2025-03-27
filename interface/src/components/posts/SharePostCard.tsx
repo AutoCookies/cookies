@@ -3,6 +3,7 @@ import styles from "./styles/sharePostCard.module.css";
 import SharePostModal from "./sharePostModal";
 import { handleLike } from "@/utils/posts/handleLike";
 import { handleShare } from "@/utils/posts/handleSharePosts";
+import CommentSection from "../comments/commentSection"; // Thêm import CommentSection
 
 interface SharePostProps {
   sharePostId: string;
@@ -29,6 +30,7 @@ interface SharePostProps {
   };
   onLike: () => void;
   onShare: () => void;
+  currentUserId: string; // Thêm currentUserId
 }
 
 const SharePostCard: React.FC<SharePostProps> = ({
@@ -41,22 +43,28 @@ const SharePostCard: React.FC<SharePostProps> = ({
   originalPost,
   onLike,
   onShare,
+  currentUserId,
 }) => {
   const [liked, setLiked] = useState(isLiked);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showComments, setShowComments] = useState(false); // Thêm state cho comment section
 
   const handleLikeSharePost = () => {
     handleLike(sharePostId, liked, () => {
       setLiked((prev) => !prev);
-      onLike(); // Cập nhật lại danh sách bài viết
+      onLike();
     });
   };
 
   const handleSharePost = (caption: string, visibility: "public" | "private" | "friends") => {
     handleShare(sharePostId, caption, visibility, () => {
       console.log("Cập nhật UI sau khi chia sẻ!", visibility);
-      onShare(); // Cập nhật danh sách bài viết
+      onShare();
     });
+  };
+
+  const toggleComments = () => {
+    setShowComments((prev) => !prev); // Toggle hiển thị comment section
   };
 
   return (
@@ -120,14 +128,28 @@ const SharePostCard: React.FC<SharePostProps> = ({
               className={liked ? styles.liked : ""}
             />
           </button>
-          <button className={styles["icon-button"]}>
+          <button 
+            className={styles["icon-button"]} 
+            onClick={toggleComments}
+            aria-label={showComments ? "Hide comments" : "Show comments"}
+          >
             <img src="/svg/information-svgrepo-com.svg" alt="Comment" />
           </button>
-          <button className={styles["icon-button"]}>
-            <img src="/svg/forward-svgrepo-com.svg" alt="Share" onClick={() => setShowShareModal(true)} />
+          <button 
+            className={styles["icon-button"]}
+            onClick={() => setShowShareModal(true)}
+          >
+            <img src="/svg/forward-svgrepo-com.svg" alt="Share" />
           </button>
         </div>
       </div>
+
+      {/* Hiển thị comment section khi nhấn nút comment */}
+      {showComments && (
+        <CommentSection 
+          postId={sharePostId} 
+        />
+      )}
 
       {/* Hiển thị modal khi nhấn Share */}
       {showShareModal && (
@@ -137,7 +159,6 @@ const SharePostCard: React.FC<SharePostProps> = ({
           onShare={handleSharePost}
         />
       )}
-
     </div>
   );
 };

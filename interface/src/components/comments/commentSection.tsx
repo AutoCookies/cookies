@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getPostComments } from "@/utils/comments/getPostComment";
-import {CommentBubble} from "./commentBubble"; // Đảm bảo tên đúng
+import {CommentBubble} from "./CommentBubble"; // Đảm bảo tên đúng
 
 interface Comment {
   id: string;
@@ -37,6 +37,14 @@ const CommentSection = ({ postId }: { postId: string }) => {
     fetchComments(); // Fetch lại bình luận sau khi like
   };
 
+  const handleDeleteChange = () => {
+    fetchComments();
+  }
+
+  const handleEditChange = () => {
+    fetchComments()
+  }
+
   useEffect(() => {
     console.log("Fetching comments for post:", postId); // Debug: log khi bắt đầu fetch comments
     fetchComments();
@@ -59,6 +67,8 @@ const CommentSection = ({ postId }: { postId: string }) => {
               likeCount={comment.likeCount}
               isLiked={comment.isLiked}
               onLikeChange={handleLikeChange} // Truyền callback vào CommentBubble
+              onDeleteComment={handleDeleteChange}
+              onEditComment={handleEditChange}
             />
           );
         })

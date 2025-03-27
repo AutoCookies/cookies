@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getPostComments } from "@/utils/comments/getPostComment";
-import {CommentBubble} from "./CommentBubble"; // Đảm bảo tên đúng
+import { CommentBubble } from "./CommentBubble";
+import { handleAddComment } from "@/utils/comments/handleAddComments";
+import styles from './styles/commentSection.module.css'; // Sửa import
 
 interface Comment {
   id: string;
@@ -15,63 +17,85 @@ interface Comment {
   isLiked: boolean;
 }
 
-const CommentSection = ({ postId }: { postId: string }) => {
+const CommentSection = ({ postId, currentUserId }: { 
+  postId: string;
+  currentUserId: string;
+}) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchComments = async () => {
     try {
-        const fetchedComments = await getPostComments(postId);
-        console.log("Fetched comments:", fetchedComments); // Log dữ liệu để kiểm tra
-        setComments(fetchedComments);
+      setLoading(true);
+      const fetchedComments = await getPostComments(postId);
+      setComments(fetchedComments);
     } catch (error) {
-        console.error("Failed to fetch comments", error);
+      console.error("Failed to fetch comments", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
-  // Hàm callback để fetch lại bình luận khi like
-  const handleLikeChange = () => {
-    console.log("Like changed, refetching comments...");
-    fetchComments(); // Fetch lại bình luận sau khi like
   };
 
-  const handleDeleteChange = () => {
-    fetchComments();
-  }
-
-  const handleEditChange = () => {
-    fetchComments()
-  }
+  const handleAddNewComment = async () => {
+    if (!newComment.trim()) return;
+    
+    try {
+      setIsSubmitting(true);
+      await handleAddComment({
+        postId,
+        content: newComment
+      });
+      setNewComment(""); // Xóa nội dung input sau khi gửi
+      await fetchComments(); // Làm mới danh sách comment
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
-    console.log("Fetching comments for post:", postId); // Debug: log khi bắt đầu fetch comments
     fetchComments();
   }, [postId]);
 
   return (
-    <div>
+    <div className={styles.commentSection}> {/* Áp dụng className từ CSS Module */}
+      <div className={styles.commentInputContainer}>
+        <textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Write a comment..."
+          className={styles.commentInput} // Dùng styles.commentInput
+          disabled={isSubmitting}
+        />
+        <button
+          onClick={handleAddNewComment}
+          disabled={!newComment.trim() || isSubmitting}
+          className={styles.commentSubmitButton} // Dùng styles.commentSubmitButton
+        >
+          {isSubmitting ? "Posting..." : "Post Comment"}
+        </button>
+      </div>
+
       {loading ? (
         <p>Loading comments...</p>
       ) : comments.length > 0 ? (
-        comments.map((comment) => {
-          console.log(`Comment section ${comment.id} isLiked:`, comment.isLiked);
-          return (
-            <CommentBubble
-              key={comment.id} // Đảm bảo rằng mỗi component có key duy nhất
-              id={comment.id}
-              user={comment.user}
-              content={comment.content}
-              createdAt={comment.createdAt}
-              likeCount={comment.likeCount}
-              isLiked={comment.isLiked}
-              onLikeChange={handleLikeChange} // Truyền callback vào CommentBubble
-              onDeleteComment={handleDeleteChange}
-              onEditComment={handleEditChange}
-            />
-          );
-        })
+        comments.map((comment) => (
+          <CommentBubble
+            key={comment.id}
+            id={comment.id}
+            user={comment.user}
+            content={comment.content}
+            createdAt={comment.createdAt}
+            likeCount={comment.likeCount}
+            isLiked={comment.isLiked}
+            onLikeChange={fetchComments}
+            onDeleteComment={fetchComments}
+            onEditComment={fetchComments}
+          />
+        ))
       ) : (
         <p>No comments yet.</p>
       )}

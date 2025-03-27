@@ -1,8 +1,85 @@
+/* commentSection.module.css */
+
+/* Tổng quan phần bình luận */
 .commentSection {
-    padding: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    background: white;
-    border-radius: 10px;
-  }
-  
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Container chứa input */
+.commentInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Ô nhập bình luận */
+.commentInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.commentInput:focus {
+  border-color: #007bff;
+}
+
+/* Nút đăng bình luận */
+.commentSubmitButton {
+  align-self: flex-end;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.commentSubmitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.commentSubmitButton:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+/* Hiển thị danh sách comment */
+.commentList {
+  margin-top: 10px;
+}
+
+.commentBubble {
+  padding: 10px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.commentBubble p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* Loading & trạng thái không có bình luận */
+.loadingText,
+.noComments {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}

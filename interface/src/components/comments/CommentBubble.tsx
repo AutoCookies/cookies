@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "./styles/commentBubble.module.css";
 import { handleLikeComment } from "@/utils/comments/handleLikeComments";
+import {jwtDecode} from "jwt-decode";
 
 interface CommentProps {
   id: string;
@@ -14,8 +15,8 @@ interface CommentProps {
   };
   isLiked: boolean;
   onLikeChange: () => void;
-  onDeleteComment: () => void; // Add delete handler
-  onEditComment: () => void; // Add edit handler
+  onDeleteComment: () => void;
+  onEditComment: () => void;
 }
 
 export const CommentBubble: React.FC<CommentProps> = ({
@@ -27,18 +28,24 @@ export const CommentBubble: React.FC<CommentProps> = ({
   isLiked,
   onLikeChange,
   onDeleteComment,
-  onEditComment
+  onEditComment,
 }) => {
   const [liked, setLiked] = useState(isLiked);
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
 
+  // Khúc này là để lấy token ra
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode<{ userId: string }>(token);
+  console.log("User ID:", decoded.userId);
+  const currentUserId = decoded?.userId;
+
   const handleLikeClick = async () => {
     try {
       const data = await handleLikeComment(id, liked);
       if (data) {
-        setLiked(prev => !prev);
+        setLiked((prev) => !prev);
         onLikeChange();
       }
     } catch (error) {
@@ -55,46 +62,52 @@ export const CommentBubble: React.FC<CommentProps> = ({
   };
 
   const handleEdit = async () => {
-    try {
-      await onEditComment();
-    } catch (error) {
-      console.error("Error editing comment:", error);
-    }
+    console.log("This is method")
   };
 
   return (
     <div className={styles["comment-bubble"]}>
+      {/* Avatar người dùng */}
       <img
         src={user.profilePicture || "/default-avatar.jpg"}
         alt="User Avatar"
         className={styles["comment-avatar"]}
       />
+      
       <div className={styles["comment-content"]}>
+        {/* Tên người dùng và Menu tùy chọn */}
         <div className={styles["comment-header"]}>
           <strong>{user.username}</strong>
-          <div className={styles["comment-menu"]}>
-            <button
-              className={styles["more-button"]}
-              onClick={() => setShowMenu(!showMenu)}
-            >
-              ⋮
-            </button>
-            {showMenu && (
-              <div className={styles["menu-dropdown"]}>
-                <button onClick={() => {
-                  setIsEditing(true);
-                  setShowMenu(false);
-                }}>
-                  Edit
-                </button>
-                <button onClick={handleDelete}>
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
+
+          {/* Kiểm tra nếu đây là comment của user hiện tại thì mới hiển thị menu */}
+          {user.id === currentUserId && (
+            <div className={styles["comment-menu"]}>
+              <button
+                className={styles["more-button"]}
+                onClick={() => setShowMenu((prev) => !prev)}
+              >
+                ⋮
+              </button>
+
+              {/* Menu Xem Thêm */}
+              {showMenu && (
+                <div className={styles["menu-dropdown"]}>
+                  <button onClick={() => {
+                    setIsEditing(true);
+                    setShowMenu(false);
+                  }}>
+                    Chỉnh sửa
+                  </button>
+                  <button onClick={handleDelete} className={styles["delete-button"]}>
+                    Xóa
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
+        {/* Hiển thị nội dung comment */}
         {isEditing ? (
           <div className={styles["edit-container"]}>
             <textarea
@@ -103,19 +116,21 @@ export const CommentBubble: React.FC<CommentProps> = ({
               className={styles["edit-textarea"]}
             />
             <div className={styles["edit-buttons"]}>
-              <button onClick={handleEdit}>Save</button>
+              <button onClick={handleEdit}>Lưu</button>
               <button onClick={() => {
                 setIsEditing(false);
                 setEditedContent(content);
-              }}>Cancel</button>
+              }}>Hủy</button>
             </div>
           </div>
         ) : (
           <p>{content}</p>
         )}
 
+        {/* Hiển thị thời gian */}
         <small>{new Date(createdAt).toLocaleString()}</small>
 
+        {/* Nút like */}
         <div className={styles["like-section"]}>
           <button
             className={`${styles["like-button"]} ${liked ? styles.liked : ""}`}

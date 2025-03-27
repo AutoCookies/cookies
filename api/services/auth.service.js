@@ -64,3 +64,17 @@ export const logoutUserService = async (req, res) => {
     });
 };
 
+/**
+ * Lấy thông tin user từ database dựa vào userId.
+ * @param {string} userId 
+ * @returns {Promise<Object>} Thông tin user (_id, name, role, email)
+ */
+export const getUserInfoService = async (userId) => {
+    const user = await User.findById(userId).select("_id name role email");
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return user;
+};

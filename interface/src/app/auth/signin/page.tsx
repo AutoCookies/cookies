@@ -17,7 +17,7 @@ export default function SignIn() {
     e.preventDefault();
     setLoading(true);
     setError("");
-  
+
     try {
       const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/login`, {
         method: "POST",
@@ -25,19 +25,31 @@ export default function SignIn() {
         body: JSON.stringify({ email, password }),
         credentials: "include",
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         throw new Error(data.message || "Đăng nhập thất bại!");
       }
-  
+
       console.log("User data:", data);
-  
+
+      // Gọi API để lấy thông tin userId
+      const userRes = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
+        method: "GET",
+        credentials: "include", // Quan trọng
+      });
+
+      const userData = await userRes.json();
+
+      if (!userRes.ok) {
+        throw new Error("Không thể lấy thông tin user!");
+      }
+
       // Lưu token vào localStorage hoặc cookie
-      localStorage.setItem("token", data.token);
-  
-      if (data.role === "admin") {
+      // localStorage.setItem("token", data.token);
+
+      if (userData.role === "admin") {
         router.push("/dashboard");
       } else {
         router.push("/home/postPage");
@@ -47,7 +59,7 @@ export default function SignIn() {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   return (
     <div className={styles.signinContainer}>

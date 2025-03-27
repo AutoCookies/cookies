@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styles from "./styles/commentBubble.module.css"; // Thêm CSS tùy chỉnh
-import { handleLikeComment } from "@/utils/comments/handleLikeComments"; // Nhập hàm handleLikeComment
+import React from "react";
+import styles from "./styles/commentBubble.module.css";
 
 interface CommentProps {
   user?: {
@@ -40,5 +39,3 @@ const CommentBubble: React.FC<CommentProps> = ({ user, content, likeCount, creat
     </div>
   );
 };
-
-export default CommentBubble;

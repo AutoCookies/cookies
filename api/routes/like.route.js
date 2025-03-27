@@ -10,7 +10,7 @@ import express from 'express';
 const router = express.Router();
 
 router.post("/comment/:commentId/like", likeComment);
-router.delete("/comment/:commentId/unlike", unlikeComment);
+router.delete("/comment/:commentId/like", unlikeComment);
 router.post("/post/:postId/like", likePost);
 router.delete("/post/:postId/like", unlikePost);
 router.post("/check", checkUserLikedPosts);

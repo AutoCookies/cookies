@@ -1,0 +1,103 @@
+.comment-bubble {
+  display: flex;
+  align-items: flex-start;
+  background-color: #fceef6;
+  /* Màu hồng nhạt giống màu cánh hoa anh đào */
+  border-radius: 15px;
+  padding: 12px;
+  margin: 10px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 80%;
+  transition: all 0.3s ease;
+}
+
+.comment-bubble:hover {
+  background-color: #f9d6e0;
+  /* Màu hồng đậm hơn khi hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 2px solid #f8b0d4;
+  /* Đường viền màu hồng nhẹ */
+}
+
+.comment-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.comment-content strong {
+  font-size: 14px;
+  color: #5d3a6d;
+  /* Màu tím nhạt, gợi liên tưởng đến hoa anh đào */
+  margin-bottom: 4px;
+}
+
+.comment-content p {
+  font-size: 13px;
+  color: #6e4e80;
+  /* Màu tím đậm hơn */
+  line-height: 1.4;
+}
+
+.comment-content small {
+  font-size: 12px;
+  color: #9b7a92;
+  /* Màu xám nhạt cho ngày giờ */
+  margin-top: 4px;
+}
+
+.like-section {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.like-button {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.like-icon {
+  width: 20px;
+  /* Kích thước vừa phải cho icon like */
+  height: 20px;
+  margin-right: 5px;
+  transition: transform 0.2s ease, fill 0.2s ease;
+  color: #6e4e80;
+  /* Màu xám đậm cho nút like ban đầu */
+}
+
+.liked-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  transform: scale(1.2);
+  /* Tăng kích thước khi liked */
+  color: #ff4081;
+  /* Màu sắc khi liked (hồng đậm) */
+}
+
+.liked {
+  color: #ff0055;
+  /* Đổi màu khi liked */
+}
+
+.like-count {
+  font-size: 14px;
+  font-weight: bold;
+  color: #6e4e80;
+  /* Màu xám đậm cho số lượng lượt like */
+  margin-left: 5px;
+}

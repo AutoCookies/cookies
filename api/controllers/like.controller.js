@@ -6,22 +6,33 @@ import {
     checkUserLikedPostsService
 } from '../services/like.service.js';
 import { catchAsyncErrors } from '../middlewares/catchAsyncError.middleware.js';
+import mongoose from 'mongoose';
 
 export const likeComment = catchAsyncErrors(async (req, res) => {
     const { commentId } = req.params;
-    const userId = req.user._id; // Giả sử thông tin người dùng đã được xác thực và có trong req.user
+    const userId = req.user._id;
 
-    // Gọi service để like comment
-    const result = await likeCommentService(userId, commentId);
+    // Kiểm tra nếu commentId không hợp lệ
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+        return res.status(400).json({ error: "Invalid comment ID" });
+    }
 
-    // Trả về kết quả cho client
-    res.status(200).json(result);
+    try {
+        // Gọi service để like comment
+        const result = await likeCommentService(userId, commentId);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
+
 
 // Controller để unlike comment
 export const unlikeComment = catchAsyncErrors(async (req, res) => {
     const { commentId } = req.params;
-    const userId = req.user._id; // Giả sử thông tin người dùng đã được xác thực và có trong req.user
+    const userId = req.user._id;
+
+    console.log(`CommentId trong api: ${commentId}`)
 
     // Gọi service để unlike comment
     const result = await unlikeCommentService(userId, commentId);

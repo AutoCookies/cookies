@@ -102,3 +102,9 @@
 .liked {
   filter: invert(39%) sepia(85%) saturate(1000%) hue-rotate(290deg);
 }
+
+.comment-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}

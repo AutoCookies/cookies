@@ -32,4 +32,3 @@ export const handleLikeComment = async (commentId: string, isLiked: boolean) => 
         throw error; // Re-throwing the error to handle it in the caller function
     }
 };
-

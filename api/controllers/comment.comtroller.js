@@ -48,13 +48,9 @@ export const editComment = async (req, res) => {
 export const getCommentsByPost = async (req, res) => {
     try {
         const { postId } = req.params;
-<<<<<<< HEAD
         const userId = req.user._id;
         console.log(`User ID: ${userId}`);
-        const { page = 1, limit = 10 } = req.query; // Hỗ trợ phân trang
-=======
         const { page = 1, limit = 10 } = req.query;
->>>>>>> 1e15c31a57e1dad11d0cbd8d89b55ceac3f03127
 
         // Gọi service để lấy comment
         const data = await getCommentsByPostService(postId, userId, Number(page), Number(limit));

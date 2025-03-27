@@ -139,7 +139,7 @@ export const editCommentService = async (commentId, userId, newContent) => {
 };
 
 
-export const getCommentsByPostService = async (postId, page = 1, limit = 10) => {
+export const getCommentsByPostService = async (postId, userId, page = 1, limit = 10) => {
     const cacheKey = `comments:${postId}:page:${page}`;
 
     // 1️⃣ Kiểm tra cache trước
@@ -149,26 +149,57 @@ export const getCommentsByPostService = async (postId, page = 1, limit = 10) => 
         return JSON.parse(cachedData);
     }
 
+    // 2️⃣ Kiểm tra sự tồn tại của Post
     const post = await Post.findById(postId) || await SharePost.findById(postId);
     if (!post) throw new Error("Post or SharePost not found");
 
+    // 3️⃣ Lấy danh sách comment
     const comments = await Comment.find({ post: postId })
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
-        .populate("user", "_id username avatar");
+        .populate("user", "_id username profilePicture");
 
     const totalComments = await Comment.countDocuments({ post: postId });
+
+    // 4️⃣ Lấy danh sách ID comment mà người dùng đã thích
+    let userLikeComment = [];
+    if (userId) {
+        userLikeComment = await LikeComment.find({ user: userId }).distinct("comment");
+        // console.log("User liked comments:", userLikeComment);  // Debug log
+    }
+
+    // console.log(`userLikeComment: ${userLikeComment.length}`);
+
+    // 5️⃣ Tính trạng thái "isLiked" cho từng comment
+    const commentsWithLikeStatus = comments.map(comment => {
+        const isLiked = userLikeComment.some(likedCommentId => {
+            const match = likedCommentId.toString() === comment._id.toString();
+            // if (match) {
+            //     console.log(`Match found! Comment ID: ${comment._id}, Liked Comment ID: ${likedCommentId}`);
+            // }
+            return match;
+        });
+
+        return {
+            ...comment.toObject(),
+            isLiked, // Thêm trạng thái isLiked cho mỗi comment
+        };
+    });
 
     const result = {
         totalComments,
         currentPage: page,
         totalPages: Math.ceil(totalComments / limit),
-        comments,
+        comments: commentsWithLikeStatus,
     };
 
+    // Lưu kết quả vào cache
     await redisClient.set(cacheKey, JSON.stringify(result), { EX: 600 });
 
     return result;
 };
+
+
+
 

@@ -4,7 +4,7 @@ import { SharePost } from '../models/sharedPost.model.js';
 import { uploadImageService } from "./upload.service.js";
 import cloudinary from "../config/cloudinary.js";
 import redisClient from "../config/redisClient.js";
-import mongoose from 'mongoose';
+import LikePost from "../models/likePost.model.js";
 
 /**
  * Tạo bài viết mới
@@ -178,56 +178,48 @@ export const deletePostService = async (userId, postId) => {
 };
 
 
-export const sharePostService = async (userId, postId, caption) => {
+export const sharePostService = async (userId, postId, caption, visibility) => {
     let post = await Post.findById(postId);
     let sharePost = await SharePost.findById(postId);
     let originalPostId, originalPostModel;
 
     if (post) {
-        // Nếu là Post gốc, giữ nguyên ID và model
         originalPostId = postId;
         originalPostModel = "Post";
     } else if (sharePost) {
-        // Nếu là SharePost, cần tìm bài Post gốc
         originalPostId = sharePost.originalPost;
-        originalPostModel = sharePost.originalPostModel; // Giữ nguyên model gốc
+        originalPostModel = sharePost.originalPostModel;
     } else {
         throw new Error("Bài viết không tồn tại!");
     }
 
-    // Tạo SharePost mới
+    console.log("🔄 Tạo SharePost với visibility:", visibility);
+
     const newSharedPost = new SharePost({
         user: userId,
         originalPost: originalPostId,
         originalPostModel: originalPostModel,
-        caption: caption
+        caption: caption,
+        visibility: visibility 
     });
 
-    // Lưu vào database
     await newSharedPost.save();
-
-    // Cập nhật danh sách bài viết của user
-    await User.findByIdAndUpdate(userId, {
-        $push: { posts: newSharedPost._id }
-    });
-
-    // Xóa cache Redis để cập nhật dữ liệu mới
-    await redisClient.del(`post:${originalPostId}`);
 
     return newSharedPost;
 };
 
 
-export const getAllPostsService = async () => {
+export const getAllPostsService = async (userId) => {
     try {
         console.log("Truy vấn danh sách bài viết...");
 
-        // Lấy danh sách Post từ DB (không cache chung tất cả)
+        // Lấy danh sách tất cả bài Post
         const posts = await Post.find()
             .populate("user", "username profilePicture")
             .sort({ createdAt: -1 })
             .lean();
 
+        // Lấy danh sách tất cả SharePost
         const sharedPosts = await SharePost.find()
             .populate("user", "username profilePicture")
             .populate("originalPost", "title content image user createdAt")
@@ -238,17 +230,28 @@ export const getAllPostsService = async () => {
             .sort({ createdAt: -1 })
             .lean();
 
+        // Gộp tất cả bài viết
         const allPosts = [...posts, ...sharedPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        // Chỉ cache từng Post riêng biệt
-        for (const post of allPosts) {
-            await redisClient.set(`post:${post._id}`, JSON.stringify(post), { EX: 600 });
+        // Nếu có userId, kiểm tra bài viết nào user đã like
+        let userLikedPosts = [];
+        if (userId) {
+            userLikedPosts = await LikePost.find({ user: userId }).distinct("post"); // Lấy danh sách ID của các bài đã like
         }
 
-        return allPosts;
+        // console.log(`User Liked Posts ${userLikedPosts}`)
+
+        // Gán thêm isLiked vào từng post
+        const postsWithLikeStatus = allPosts.map(post => ({
+            ...post,
+            isLiked: userLikedPosts.map(id => id.toString()).includes(post._id.toString()),
+        }));        
+
+        return postsWithLikeStatus;
     } catch (error) {
         console.error("Lỗi Redis hoặc MongoDB:", error);
         throw new Error("Không thể lấy danh sách bài viết!");
     }
 };
+
 

@@ -55,9 +55,9 @@ app.use(cors({
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", protectRoute, checkBanStatus, userRoutes);
 app.use("/api/v1/admin", protectRoute, isAdmin, checkBanStatus, adminRoutes);
-app.use("/api/v1/posts", postRateLimiter, protectRoute, checkBanStatus, postRoute)
-app.use("/api/v1/comments", commentLimiter, protectRoute, checkBanStatus, commentRoute);
-app.use("/api/v1/like", protectRoute, checkBanStatus, likeRoute);
+app.use("/api/v1/posts", protectRoute, checkBanStatus, postRoute)
+app.use("/api/v1/comments", protectRoute, checkBanStatus, commentRoute);
+app.use("/api/v1/likes", protectRoute, checkBanStatus, likeRoute);
 app.use("/api/v1/follow", protectRoute, checkBanStatus, followRoute);
 
 app.listen(ENV_VARS.PORT, () => {

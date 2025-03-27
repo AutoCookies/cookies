@@ -48,10 +48,12 @@ export const editComment = async (req, res) => {
 export const getCommentsByPost = async (req, res) => {
     try {
         const { postId } = req.params;
-        const { page = 1, limit = 10 } = req.query; // Hỗ trợ phân trang
+        const userId = req.user._id;
+        console.log(`User ID: ${userId}`);
+        const { page = 1, limit = 10 } = req.query;
 
         // Gọi service để lấy comment
-        const data = await getCommentsByPostService(postId, Number(page), Number(limit));
+        const data = await getCommentsByPostService(postId, userId, Number(page), Number(limit));
 
         return res.status(200).json({ message: "Lấy danh sách comment thành công!", data });
     } catch (error) {

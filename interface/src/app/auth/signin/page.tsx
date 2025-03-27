@@ -35,7 +35,7 @@ export default function SignIn() {
       console.log("User data:", data);
   
       // Lưu token vào localStorage hoặc cookie
-      localStorage.setItem("token", data.token);
+      // localStorage.setItem("token", data.token);
   
       if (data.role === "admin") {
         router.push("/dashboard");

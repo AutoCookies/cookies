@@ -2,7 +2,8 @@ import asyncHandler from "express-async-handler";
 import {
     registerUserService,
     loginUserService,
-    logoutUserService
+    logoutUserService,
+    getUserInfoService
 } from "../services/auth.service.js";
 import { loginRateLimiter } from "../middlewares/rateLimit.middleware.js";
 
@@ -31,4 +32,16 @@ export const logoutUser = async (req, res) => {
     return res.status(200).json({ message: "Đăng xuất thành công!" });
 };
 
-
+/**
+ * Controller để lấy thông tin user từ token.
+ * @route GET /auth/me
+ * @access Private (Yêu cầu token hợp lệ)
+ */
+export const getAuthUser = async (req, res) => {
+    try {
+        const user = await getUserInfoService(req.user._id);
+        res.json(user);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};

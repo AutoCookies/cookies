@@ -1,0 +1,8 @@
+.commentSection {
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 10px;
+  }
+  

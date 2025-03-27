@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import styles from "./styles/sharePostModal.module.css";
 
 interface SharePostModalProps {
@@ -16,18 +17,17 @@ const SharePostModal: React.FC<SharePostModalProps> = ({ postId, onClose, onShar
     onClose();
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <h3>Chia sẻ bài viết</h3>
         <textarea
-          className={styles.textarea} 
+          className={styles.textarea}
           placeholder="Thêm caption..."
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
         />
         
-        {/* Thêm phần chọn visibility */}
         <select
           className={styles.select}
           value={visibility}
@@ -43,7 +43,8 @@ const SharePostModal: React.FC<SharePostModalProps> = ({ postId, onClose, onShar
           <button className={styles.shareButton} onClick={handleSubmit}>Chia sẻ</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body // Gắn modal vào thẳng `body` để không bị giới hạn trong SharePostCard
   );
 };
 

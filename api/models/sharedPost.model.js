@@ -13,7 +13,6 @@ const SharePostSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Middleware đảm bảo `likes` luôn là mảng rỗng nếu không có dữ liệu
 SharePostSchema.pre("save", function (next) {
     if (!Array.isArray(this.likes)) {
         this.likes = [];

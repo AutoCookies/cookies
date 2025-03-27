@@ -1,49 +1,94 @@
+/* Đặt overlay với màu nền mờ nhẹ */
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 230, 234, 0.7); /* Hồng nhạt trong suốt */
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(5px); /* Làm mờ nền */
 }
 
+/* Tạo modal chính với màu sắc nhẹ nhàng */
 .modal {
-  background: white;
+  background: #fff0f6; /* Hồng phấn dịu nhẹ */
   padding: 20px;
-  border-radius: 10px;
-  width: 400px;
+  border-radius: 12px;
+  width: 420px;
   text-align: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  border: 2px solid #ffb6c1; /* Viền hồng pastel */
 }
 
+/* Tiêu đề */
+.modal h3 {
+  font-size: 20px;
+  color: #d63384; /* Hồng đậm hơn một chút */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Input textarea */
 .textarea {
   width: 100%;
-  height: 80px;
-  margin: 10px 0;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
+  height: 90px;
+  margin: 12px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ff99cc; /* Viền hồng pastel */
+  background: #fff5f7; /* Hồng rất nhạt */
+  font-size: 14px;
+  outline: none;
 }
 
+/* Select dropdown */
+.select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ff99cc;
+  background: #fff5f7;
+  font-size: 14px;
+  outline: none;
+}
+
+/* Container nút */
 .actions {
   display: flex;
   justify-content: space-between;
+  margin-top: 12px;
 }
 
+/* Style chung cho nút */
 .button {
-  padding: 8px 12px;
+  padding: 10px 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: 0.3s;
 }
 
+/* Nút hủy */
 .cancelButton {
-  background: #ccc;
+  background: #ffe5ec; /* Hồng nhạt hơn */
+  color: #d63384; /* Hồng đậm */
 }
 
+.cancelButton:hover {
+  background: #ffccd5;
+}
+
+/* Nút chia sẻ */
 .shareButton {
-  background: #007bff;
+  background: #ff4d6d; /* Hồng cherry */
   color: white;
+}
+
+.shareButton:hover {
+  background: #ff1e56; /* Hồng đậm hơn */
 }

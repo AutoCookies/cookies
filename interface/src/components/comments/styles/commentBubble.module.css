@@ -1,0 +1,61 @@
+.commentBubble {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  background: #ffe6f2; /* Màu hồng nhạt */
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.commentBubble:hover {
+  transform: scale(1.02);
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #ff99cc; /* Viền hồng đậm */
+  margin-right: 12px;
+}
+
+.commentContent {
+  flex: 1;
+}
+
+.userInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: bold;
+  color: #d63384; /* Màu hồng đậm */
+}
+
+.text {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #5c5c5c;
+  line-height: 1.5;
+}
+
+.commentActions {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #8a8a8a;
+}
+
+.commentActions span {
+  background: #ff99cc;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #a64d79; /* Hồng trầm */
+}

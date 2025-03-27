@@ -7,7 +7,7 @@ export const handleShare = async (
   onSuccess: () => void
 ) => {
   try {
-    console.log(`Chia sẻ bài viết: ${postId} với quyền: ${visibility}`);
+    // console.log(`Chia sẻ bài viết: ${postId} với quyền: ${visibility}`);
 
     const response = await fetch(`${ENV_VARS.API_ROUTE}/posts/${postId}/share`, {
       method: "POST",
@@ -20,7 +20,7 @@ export const handleShare = async (
       throw new Error("Không thể chia sẻ bài viết!");
     }
 
-    console.log("Chia sẻ thành công!");
+    // console.log("Chia sẻ thành công!");
 
     onSuccess();
   } catch (error) {

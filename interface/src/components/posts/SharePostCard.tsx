@@ -52,9 +52,9 @@ const SharePostCard: React.FC<SharePostProps> = ({
     });
   };
 
-  const handleSharePost = () => {
-    handleShare(sharePostId, "Bài viết hay quá!", () => {
-      console.log("Cập nhật UI sau khi chia sẻ!");
+  const handleSharePost = (caption: string, visibility: "public" | "private" | "friends") => {
+    handleShare(sharePostId, caption, visibility, () => {
+      console.log("Cập nhật UI sau khi chia sẻ!", visibility);
       onShare(); // Cập nhật danh sách bài viết
     });
   };
@@ -137,6 +137,7 @@ const SharePostCard: React.FC<SharePostProps> = ({
           onShare={handleSharePost}
         />
       )}
+
     </div>
   );
 };

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import styles from "./styles/postCard.module.css";
 import { handleLike } from "@/utils/posts/handleLike";
 import { handleShare } from "@/utils/posts/handleSharePosts";
 import SharePostModal from "@/components/posts/sharePostModal";
+import CommentSection from "@/components/comments/CommentSection";
 
 interface PostProps {
   postId: string;
@@ -34,6 +36,7 @@ const PostCard: React.FC<PostProps> = ({
 }) => {
   const [liked, setLiked] = useState(isLiked);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showCommentModal, setShowCommentModal] = useState(false);
 
   const handleLikePost = () => {
     handleLike(postId, liked, () => {
@@ -44,8 +47,8 @@ const PostCard: React.FC<PostProps> = ({
 
   const handleSharePost = (caption: string, visibility: "public" | "private" | "friends") => {
     handleShare(postId, caption, visibility, () => {
-      console.log("Đã cập nhật UI sau khi chia sẻ!");
-      onShare(); 
+      console.log("Đã cập nhật UI sau khi chia sẻ!", visibility);
+      onShare();
     });
   };
 
@@ -88,7 +91,7 @@ const PostCard: React.FC<PostProps> = ({
               className={liked ? styles.liked : ""}
             />
           </button>
-          <button className={styles["icon-button"]}>
+          <button className={styles["icon-button"]} onClick={() => setShowCommentModal(true)}>
             <img src="/svg/information-svgrepo-com.svg" alt="Comment" />
           </button>
           <button className={styles["icon-button"]} onClick={() => setShowShareModal(true)}>
@@ -105,6 +108,17 @@ const PostCard: React.FC<PostProps> = ({
           onShare={handleSharePost}
         />
       )}
+
+      {showCommentModal &&
+        ReactDOM.createPortal(
+          <div className={styles.overlay} onClick={() => setShowCommentModal(false)}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.closeButton} onClick={() => setShowCommentModal(false)}>✖</button>
+              <CommentSection postId={postId} onClose={() => setShowCommentModal(false)} />
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

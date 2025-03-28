@@ -1,9 +1,11 @@
+/* Share Post Card Container */
 .post-card {
-  background-color: #fff;
+  background-color: #ffffff; /* Hồng nhạt */
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(255, 77, 109, 0.2);
   margin-bottom: 20px;
   overflow: hidden;
+  border: 1px solid #ffb7c5;
 }
 
 .post-header {
@@ -11,7 +13,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #ffb7c5;
 }
 
 .user-info {
@@ -25,11 +27,13 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #ff4d6d;
 }
 
 .username {
   font-weight: 600;
   font-size: 14px;
+  color: #d6336c;
 }
 
 .dropdown-wrapper {
@@ -44,11 +48,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #65676b;
+  color: #7d284f;
 }
 
 .dropdown-toggle:hover {
-  background-color: #f0f0f0;
+  background-color: #ffe4e9;
   border-radius: 50%;
 }
 
@@ -58,7 +62,7 @@
   top: 100%;
   background-color: #fff;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.3);
   min-width: 160px;
   z-index: 100;
   overflow: hidden;
@@ -73,15 +77,15 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
-  color: #050505;
+  color: #7d284f;
 }
 
 .dropdown-item:hover {
-  background-color: #f5f5f5;
+  background-color: #ffe4e9;
 }
 
 .delete-item {
-  color: #ff4d4f;
+  color: #ff4d6d;
 }
 
 .post-body {
@@ -92,12 +96,14 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 8px;
+  color: #a32b4f;
 }
 
 .post-content {
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 12px;
+  color: #7d284f;
 }
 
 .post-image-container {
@@ -113,7 +119,7 @@
 
 .post-footer {
   padding: 8px 16px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #ffb7c5;
 }
 
 .post-stats {
@@ -121,7 +127,7 @@
   justify-content: space-between;
   padding: 8px 0;
   font-size: 14px;
-  color: #65676b;
+  color: #7d284f;
 }
 
 .like-count,
@@ -130,12 +136,12 @@
 }
 
 .liked-count {
-  color: #ff4081;
+  color: #ff4d6d;
 }
 
 .action-buttons {
   display: flex;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #ffb7c5;
   padding-top: 4px;
 }
 
@@ -150,16 +156,16 @@
   padding: 8px 0;
   cursor: pointer;
   font-size: 14px;
-  color: #65676b;
+  color: #7d284f;
   border-radius: 4px;
 }
 
 .action-button:hover {
-  background-color: #f5f5f5;
+  background-color: #ffe4e9;
 }
 
 .action-button.liked {
-  color: #ff4081;
+  color: #ff4d6d;
 }
 
 .action-button svg {

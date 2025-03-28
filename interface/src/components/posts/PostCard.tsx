@@ -219,9 +219,9 @@ const PostCard: React.FC<PostProps> = ({
       <div className={styles["post-footer"]}>
         <div className={styles["post-stats"]}>
           <span className={liked ? styles["liked-count"] : styles["like-count"]}>
-            {likesCount} lượt thích
+            {likesCount} Likes
           </span>
-          <span className={styles["comment-count"]}>{commentCount} bình luận</span>
+          <span className={styles["comment-count"]}>{commentCount} Comments</span>
         </div>
         <div className={styles["action-buttons"]}>
           <button
@@ -241,7 +241,7 @@ const PostCard: React.FC<PostProps> = ({
                 strokeWidth="2"
               />
             </svg>
-            Thích
+            Likes
           </button>
           <button
             className={styles["action-button"]}

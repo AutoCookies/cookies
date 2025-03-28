@@ -1,0 +1,269 @@
+/* EditSharePostModal.module.css */
+
+/* Base styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+    background-color: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transform: translateY(0);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    margin: 20px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header styles */
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #f9f9f9;
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    cursor: pointer;
+    color: #666;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.closeButton:hover {
+    color: #333;
+    background-color: #f0f0f0;
+}
+
+/* Form container */
+.formContainer {
+    padding: 24px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #444;
+    font-size: 0.9375rem;
+}
+
+/* Textarea styles */
+.captionInput {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    min-height: 150px;
+    resize: vertical;
+    transition: all 0.25s ease;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.captionInput:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+}
+
+.captionInput::placeholder {
+    color: #aaa;
+}
+
+/* Error states */
+.errorInput {
+    border-color: #ff4d4f;
+}
+
+.errorInput:focus {
+    border-color: #ff4d4f;
+    box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+}
+
+.charCounter {
+    text-align: right;
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 6px;
+}
+
+.charCounter.warning {
+    color: #faad14;
+}
+
+.charCounter.error {
+    color: #ff4d4f;
+}
+
+.errorMessage {
+    color: #ff4d4f;
+    font-size: 0.8125rem;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.errorMessage::before {
+    content: "⚠";
+    font-size: 1rem;
+}
+
+/* Button styles */
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.secondaryButton {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #d9d9d9;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
+}
+
+.secondaryButton:hover:not(:disabled) {
+    background-color: #f5f5f5;
+    border-color: #bfbfbf;
+}
+
+.secondaryButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.primaryButton {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.primaryButton:hover:not(:disabled) {
+    background-color: #3a7bc8;
+    transform: translateY(-1px);
+}
+
+.primaryButton:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.primaryButton:disabled {
+    background-color: #b8d4f8;
+    cursor: not-allowed;
+}
+
+/* Loading spinner */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .modalContent {
+        margin: 10px;
+        max-height: 85vh;
+    }
+
+    .modalHeader {
+        padding: 16px;
+    }
+
+    .formContainer {
+        padding: 16px;
+    }
+
+    .modalActions {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .secondaryButton,
+    .primaryButton {
+        width: 100%;
+        padding: 12px;
+    }
+}

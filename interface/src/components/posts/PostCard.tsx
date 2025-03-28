@@ -6,6 +6,7 @@ import CommentSection from "../comments/commentSection";
 import SharePostModal from "@/components/posts/sharePostModal";
 import { ENV_VARS } from "@/config/envVars";
 import { handleDeletePost } from "@/utils/posts/handleDeletePost";
+import EditPostModal from "@/components/posts/EditPostModal";
 
 interface PostProps {
   postId: string;
@@ -47,6 +48,7 @@ const PostCard: React.FC<PostProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -182,7 +184,7 @@ const PostCard: React.FC<PostProps> = ({
                 <button
                   className={styles["dropdown-item"]}
                   onClick={() => {
-                    onEdit?.();
+                    setShowEditModal(true);
                     setShowDropdown(false);
                   }}
                 >
@@ -299,6 +301,24 @@ const PostCard: React.FC<PostProps> = ({
           postId={postId}
           onClose={() => setShowShareModal(false)}
           onShare={handleSharePost}
+        />
+      )}
+
+      {showEditModal && (
+        <EditPostModal
+          isOpen={showEditModal}
+          initialData={{
+            title: title,
+            content: content,
+            imageUrl: image,
+            postId: postId
+          }}
+          onClose={() => setShowEditModal(false)}
+          onUpdateSuccess={(updatedPost) => {
+            // Cập nhật UI với dữ liệu mới
+            // Bạn có thể cần truyền callback từ component cha
+            onEdit?.();
+          }}
         />
       )}
     </div>

@@ -58,78 +58,142 @@ export const getOwnPostsService = async (userId) => {
     return posts;
 };
 
-export const updatePostService = async (userId, postId, title, content, imageBuffer, caption) => {
+// export const updatePostService = async (userId, postId, title, content, imageBuffer, caption) => {
+//     const user = await User.findById(userId);
+//     if (!user) throw new Error("Người dùng không tồn tại!");
+
+//     // Tìm cả Post và SharePost
+//     let post = await Post.findById(postId);
+//     let sharePost = await SharePost.findById(postId);
+
+//     if (!post && !sharePost) {
+//         throw new Error("Bài viết không tồn tại!");
+//     }
+
+//     // Kiểm tra quyền chỉnh sửa
+//     const isOwner = (post && post.user.toString() === userId.toString()) || 
+//                    (sharePost && sharePost.user.toString() === userId.toString());
+//     if (!isOwner) {
+//         throw new Error("Bạn không có quyền chỉnh sửa bài viết này!");
+//     }
+
+//     // Xử lý cập nhật Post
+//     if (post) {
+//         let imageUrl = post.image;
+
+//         if (imageBuffer) {
+//             if (post.image) {
+//                 try {
+//                     const publicId = post.image.split("/").pop().split(".")[0];
+//                     await cloudinary.uploader.destroy(`post_images/${publicId}`);
+//                 } catch (error) {
+//                     console.error("Lỗi khi xóa ảnh cũ:", error);
+//                 }
+//             }
+
+//             imageUrl = await uploadImageService(imageBuffer);
+//             if (!imageUrl) throw new Error("Lỗi khi tải ảnh lên");
+//         }
+
+//         post = await Post.findByIdAndUpdate(
+//             postId,
+//             { 
+//                 title: title !== undefined ? title : post.title,
+//                 content: content !== undefined ? content : post.content,
+//                 image: imageUrl || post.image
+//             },
+//             { new: true, runValidators: true } // Thêm runValidators
+//         );
+//         return post;
+//     }
+
+//     // Xử lý cập nhật SharePost
+//     if (sharePost) {
+//         sharePost = await SharePost.findByIdAndUpdate(
+//             postId,
+//             { 
+//                 caption: caption !== undefined ? caption : sharePost.caption 
+//             },
+//             { new: true, runValidators: true } // Thêm runValidators
+//         );
+//         return sharePost;
+//     }
+
+//     // Xóa cache Redis
+//     await redisClient.del(`post:${postId}`);
+// };
+
+// API để cập nhật Post
+export const updatePostService = async (userId, postId, title, content, imageBuffer) => {
+    // 1. Kiểm tra người dùng
     const user = await User.findById(userId);
     if (!user) throw new Error("Người dùng không tồn tại!");
 
-    let post = await Post.findById(postId);
-    let postType = "Post";
-
-    // Nếu không tìm thấy trong Post, kiểm tra trong SharePost
-    if (!post) {
-        post = await SharePost.findById(postId);
-        postType = "SharePost";
-    }
-
+    // 2. Tìm post
+    let post = await Post.findById(postId);  // Thay đổi `const` thành `let`
     if (!post) throw new Error("Bài viết không tồn tại!");
 
-    // Kiểm tra quyền chỉnh sửa bài viết
+    // 3. Kiểm tra quyền
     if (post.user.toString() !== userId.toString()) {
         throw new Error("Bạn không có quyền chỉnh sửa bài viết này!");
     }
 
-    if (postType === "Post") {
-        let imageUrl = post.image; // Giữ ảnh cũ nếu không có ảnh mới
-
-        if (imageBuffer) {
-            // 🔹 Xóa ảnh cũ trên Cloudinary trước khi upload ảnh mới
-            if (post.image) {
-                try {
-                    // Lấy public_id từ URL ảnh cũ
-                    const publicId = post.image.split("/").pop().split(".")[0]; 
-                    console.log("Xóa ảnh cũ:", publicId);
-
-                    await cloudinary.uploader.destroy(`post_images/${publicId}`);
-                    console.log("Ảnh cũ đã xóa thành công!");
-                } catch (error) {
-                    console.error("Lỗi khi xóa ảnh cũ:", error);
-                }
-            }
-
-            // Upload ảnh mới
-            console.log("Uploading new image...");
-            imageUrl = await uploadImageService(imageBuffer);
-            console.log("New image URL:", imageUrl);
-
-            if (!imageUrl) {
-                throw new Error("Lỗi khi tải ảnh lên, vui lòng thử lại!");
+    // 4. Xử lý ảnh nếu có
+    let imageUrl = post.image;
+    if (imageBuffer) {
+        if (post.image) {
+            try {
+                const publicId = post.image.split("/").pop().split(".")[0];
+                await cloudinary.uploader.destroy(`post_images/${publicId}`);
+            } catch (error) {
+                console.error("Lỗi khi xóa ảnh cũ:", error);
             }
         }
 
-        // Cập nhật Post
-        post = await Post.findByIdAndUpdate(
-            postId,
-            { 
-                title, 
-                content, 
-                image: imageUrl ?? post.image  
-            },
-            { new: true }
-        );
-
-    } else if (postType === "SharePost") {
-        // Cập nhật SharePost (chỉ cập nhật caption)
-        post = await SharePost.findByIdAndUpdate(
-            postId,
-            { caption },
-            { new: true }
-        );
+        imageUrl = await uploadImageService(imageBuffer);
+        if (!imageUrl) throw new Error("Lỗi khi tải ảnh lên");
     }
 
-    // Xóa cache Redis
+    // Cập nhật bài viết
+    post = await Post.findByIdAndUpdate(  // Gán lại `post`
+        postId,
+        {
+            title: title !== undefined ? title : post.title,
+            content: content !== undefined ? content : post.content,
+            image: imageUrl || post.image
+        },
+        { new: true, runValidators: true }
+    );
+
     await redisClient.del(`post:${postId}`);
 
     return post;
+};
+
+
+export const updateSharePostService = async (userId, sharePostId, newCaption) => {
+
+    console.log(`SharePostId ${sharePostId}`)
+    // 1. Kiểm tra bài viết chia sẻ có tồn tại hay không
+    let sharePost = await SharePost.findById(sharePostId);
+    if (!sharePost) throw new Error("Bài viết không tồn tại!");
+
+    // 2. Kiểm tra quyền chỉnh sửa
+    if (sharePost.user.toString() !== userId.toString()) {
+        throw new Error("Bạn không có quyền chỉnh sửa bài viết này!");
+    }
+
+    // 3. Cập nhật caption
+    sharePost = await SharePost.findByIdAndUpdate(
+        sharePostId,
+        { caption: newCaption }, // Đổi từ caption thành newCaption
+        { new: true, runValidators: true } 
+    );
+
+    // 4. Xóa cache Redis
+    await redisClient.del(`post:${sharePostId}`);
+
+    return sharePost;
 };
 
 
@@ -170,7 +234,7 @@ export const deletePostService = async (userId, postId) => {
 
     // Xóa bài viết
     await post.deleteOne();
-    
+
     // Xóa cache Redis liên quan
     await redisClient.del(`post:${postId}`);
 
@@ -200,7 +264,7 @@ export const sharePostService = async (userId, postId, caption, visibility) => {
         originalPost: originalPostId,
         originalPostModel: originalPostModel,
         caption: caption,
-        visibility: visibility 
+        visibility: visibility
     });
 
     await newSharedPost.save();
@@ -249,7 +313,7 @@ export const getAllPostsService = async (userId, page = 1, limit = 10) => {
         const postsWithLikeStatus = allPosts.map(post => ({
             ...post,
             isLiked: userLikedPosts.map(id => id.toString()).includes(post._id.toString()),
-        }));  
+        }));
 
         return postsWithLikeStatus;
     } catch (error) {

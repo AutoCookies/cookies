@@ -6,6 +6,8 @@ import { handleShare } from "@/utils/posts/handleSharePosts";
 import { handleDeletePost } from "@/utils/posts/handleDeletePost";
 import CommentSection from "../comments/commentSection";
 import { ENV_VARS } from "@/config/envVars";
+import { handleUpdateSharePost } from "@/utils/posts/handleUpdateSharePost";
+import EditSharePostModal from './EditSharePostModal';
 
 interface SharePostProps {
   sharePostId: string;
@@ -35,7 +37,7 @@ interface SharePostProps {
   onShare: () => void;
   onChangeComment: () => void;
   onDelete: () => void;
-  onEdit?: () => void;
+  onEdit: () => void;
 }
 
 const SharePostCard: React.FC<SharePostProps> = ({
@@ -56,6 +58,7 @@ const SharePostCard: React.FC<SharePostProps> = ({
   const [showShareModal, setShowShareModal] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -87,6 +90,22 @@ const SharePostCard: React.FC<SharePostProps> = ({
     });
     setIsDeleting(false);
     setShowDropdown(false);
+  };
+
+  const handleSaveEdit = async (newCaption: string) => {
+    try {
+      const { success } = await handleUpdateSharePost(sharePostId, {
+        caption: newCaption
+      });
+
+      if (success) {
+        setIsEditing(false);
+        onEdit?.(); // Notify parent component
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+      throw error; // Let the modal handle the error display
+    }
   };
 
   useEffect(() => {
@@ -189,8 +208,8 @@ const SharePostCard: React.FC<SharePostProps> = ({
                 <button
                   className={styles["dropdown-item"]}
                   onClick={() => {
-                    onEdit?.();
                     setShowDropdown(false);
+                    setIsEditing(true);
                   }}
                 >
                   Chỉnh sửa
@@ -286,6 +305,15 @@ const SharePostCard: React.FC<SharePostProps> = ({
           postId={sharePostId}
           onClose={() => setShowShareModal(false)}
           onShare={handleSharePost}
+        />
+      )}
+
+      {isEditing && (
+        <EditSharePostModal
+          isOpen={isEditing}
+          initialCaption={caption}
+          onSave={handleSaveEdit}
+          onClose={() => setIsEditing(false)}
         />
       )}
     </div>

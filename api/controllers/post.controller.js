@@ -5,6 +5,7 @@ import {
     deletePostService,
     sharePostService,
     getAllPostsService,
+    updateSharePostService
 } from '../services/post.service.js';
 
 /**
@@ -46,6 +47,28 @@ export const getOwnPosts = async (req, res) => {
     }
 };
 
+// export const updatePost = async (req, res) => {
+//     try {
+//         const userId = req.user._id;
+//         const { postId } = req.params;
+//         const { title, content } = req.body;
+//         const imageBuffer = req.file ? req.file.buffer : null;
+
+//         console.log("Received image file:", req.file); // 🛠 Debug
+
+//         const updatedPost = await updatePostService(userId, postId, title, content, imageBuffer);
+
+//         res.status(200).json({
+//             message: "Bài đăng đã được cập nhật thành công!",
+//             post: updatedPost,
+//         });
+//     } catch (error) {
+//         console.error("Error in updatePost:", error.message);
+//         res.status(400).json({ message: error.message });
+//     }
+// };
+
+
 export const updatePost = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -53,14 +76,43 @@ export const updatePost = async (req, res) => {
         const { title, content } = req.body;
         const imageBuffer = req.file ? req.file.buffer : null;
 
-        console.log("Received image file:", req.file); // 🛠 Debug
-
         const updatedPost = await updatePostService(userId, postId, title, content, imageBuffer);
 
         res.status(200).json({
             message: "Bài đăng đã được cập nhật thành công!",
             post: updatedPost,
         });
+
+    } catch (error) {
+        console.error("Error in updatePost:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateSharePost = async (req, res) => {
+    try {
+
+        const userId = req.user._id;
+        // 2. Lấy dữ liệu từ request
+        const { sharePostId } = req.params;
+        const { caption } = req.body;
+
+        if (!caption && caption !== "") {
+            throw new Error("Vui lý nhập caption!");
+        }
+
+        // 3. Gọi service
+        const updatedSharePost = await updateSharePostService(
+            userId,
+            sharePostId,
+            caption
+        );
+
+        res.status(200).json({
+            message: "Bài đăng đã được cập nhật thành công!",
+            post: updatedSharePost,
+        });
+
     } catch (error) {
         console.error("Error in updatePost:", error.message);
         res.status(400).json({ message: error.message });

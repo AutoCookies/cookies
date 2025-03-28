@@ -49,7 +49,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             {/* Header */}
             <header className={styles.header}>
                 <div className={styles.logo}>
-                    <h1>AutoCookies</h1>
+                    <a href="/home/postPage" style={{ textDecoration: "none", color: "inherit" }}><h1>AutoCookies</h1></a>
                 </div>
                 <div className={styles.searchBar}>
                     <input type="text" placeholder="Searching..." />

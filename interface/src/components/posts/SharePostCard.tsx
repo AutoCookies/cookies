@@ -3,6 +3,7 @@ import styles from "./styles/sharePostCard.module.css";
 import SharePostModal from "./sharePostModal";
 import { handleLike } from "@/utils/posts/handleLike";
 import { handleShare } from "@/utils/posts/handleSharePosts";
+import { handleDeletePost } from "@/utils/posts/handleDeletePost";
 import CommentSection from "../comments/commentSection";
 import { ENV_VARS } from "@/config/envVars";
 
@@ -33,7 +34,7 @@ interface SharePostProps {
   onLike: () => void;
   onShare: () => void;
   onChangeComment: () => void;
-  onDelete?: () => void;
+  onDelete: () => void;
   onEdit?: () => void;
 }
 
@@ -56,6 +57,7 @@ const SharePostCard: React.FC<SharePostProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLikeSharePost = async () => {
@@ -76,23 +78,14 @@ const SharePostCard: React.FC<SharePostProps> = ({
     setShowComments(prev => !prev);
   };
 
-  const handleDeletePost = async () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bài chia sẻ này?")) {
-      try {
-        const response = await fetch(`${ENV_VARS.API_ROUTE}/share/${sharePostId}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          onDelete?.();
-        } else {
-          throw new Error("Không thể xóa bài chia sẻ");
-        }
-      } catch (error) {
-        console.error("Lỗi khi xóa bài chia sẻ:", error);
-      }
-    }
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const { success } = await handleDeletePost(sharePostId, () => {
+      onDelete?.(); // Gọi callback khi xóa thành công
+    }, (error) => {
+      console.error("Lỗi khi xóa bài viết:", error);
+    });
+    setIsDeleting(false);
     setShowDropdown(false);
   };
 
@@ -143,48 +136,71 @@ const SharePostCard: React.FC<SharePostProps> = ({
           </div>
         </div>
 
-        {/* Dropdown menu */}
-        {currentUserId && currentUserId === user._id && (
-          <div className={styles["dropdown-container"]} ref={dropdownRef}>
+        {currentUserId === user?._id && (
+          <div className={styles["dropdown-wrapper"]} ref={dropdownRef}>
             <button
               className={styles["dropdown-toggle"]}
               onClick={(e) => {
                 e.stopPropagation();
                 setShowDropdown(!showDropdown);
               }}
-              aria-label="More options"
+              disabled={isDeleting}
             >
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <circle cx="12" cy="12" r="1.5"></circle>
-                <circle cx="6" cy="12" r="1.5"></circle>
-                <circle cx="18" cy="12" r="1.5"></circle>
-              </svg>
+              {isDeleting ? (
+                <span>Đang xóa...</span>
+              ) : (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
             </button>
 
             {showDropdown && (
               <div className={styles["dropdown-menu"]}>
-                <button 
+                <button
                   className={styles["dropdown-item"]}
                   onClick={() => {
                     onEdit?.();
                     setShowDropdown(false);
                   }}
                 >
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
                   Chỉnh sửa
                 </button>
-                <button 
+                <button
                   className={`${styles["dropdown-item"]} ${styles["delete-item"]}`}
-                  onClick={handleDeletePost}
+                  onClick={handleDelete}
+                  disabled={isDeleting}
                 >
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor">
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                  Xóa bài viết
+                  {isDeleting ? "Đang xóa..." : "Xóa bài viết"}
                 </button>
               </div>
             )}

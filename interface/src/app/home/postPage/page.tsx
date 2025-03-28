@@ -116,6 +116,7 @@ export default function PostPage() {
                 }}
                 onLike={() => fetchPosts(1, true)}
                 onShare={() => fetchPosts(1, true)}
+                onDelete={() => fetchPosts(1, true)}
                 onChangeComment={() => handleCommentChange(post._id)}
               />
             ) : (
@@ -130,6 +131,7 @@ export default function PostPage() {
                 user={post.user}
                 onLike={() => fetchPosts(1, true)}
                 onShare={() => fetchPosts(1, true)}
+                onDelete={() => fetchPosts(1, true)}
                 onChangeComment={() => handleCommentChange(post._id)}
               />
             )}

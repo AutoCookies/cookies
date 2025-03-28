@@ -5,6 +5,7 @@ import { handleShare } from "@/utils/posts/handleSharePosts";
 import CommentSection from "../comments/commentSection";
 import SharePostModal from "@/components/posts/sharePostModal";
 import { ENV_VARS } from "@/config/envVars";
+import { handleDeletePost } from "@/utils/posts/handleDeletePost";
 
 interface PostProps {
   postId: string;
@@ -22,7 +23,7 @@ interface PostProps {
   onLike: () => void;
   onShare: () => void;
   onChangeComment: () => void;
-  onDelete?: () => void;
+  onDelete: () => void;
   onEdit?: () => void;
 }
 
@@ -46,6 +47,7 @@ const PostCard: React.FC<PostProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLikePost = () => {
@@ -66,23 +68,14 @@ const PostCard: React.FC<PostProps> = ({
     setShowComments((prev) => !prev);
   };
 
-  const handleDeletePost = async () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-      try {
-        const response = await fetch(`${ENV_VARS.API_ROUTE}/posts/${postId}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          onDelete?.();
-        } else {
-          throw new Error("Không thể xóa bài viết");
-        }
-      } catch (error) {
-        console.error("Lỗi khi xóa bài viết:", error);
-      }
-    }
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const { success } = await handleDeletePost(postId, () => {
+      onDelete?.(); // Gọi callback khi xóa thành công
+    }, (error) => {
+      console.error("Lỗi khi xóa bài viết:", error);
+    });
+    setIsDeleting(false);
     setShowDropdown(false);
   };
 
@@ -144,39 +137,44 @@ const PostCard: React.FC<PostProps> = ({
                 e.stopPropagation();
                 setShowDropdown(!showDropdown);
               }}
+              disabled={isDeleting}
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
-                  fill="currentColor"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
-                  fill="currentColor"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
-                  fill="currentColor"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {isDeleting ? (
+                <span>Đang xóa...</span>
+              ) : (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
             </button>
 
             {showDropdown && (
@@ -192,9 +190,10 @@ const PostCard: React.FC<PostProps> = ({
                 </button>
                 <button
                   className={`${styles["dropdown-item"]} ${styles["delete-item"]}`}
-                  onClick={handleDeletePost}
+                  onClick={handleDelete}
+                  disabled={isDeleting}
                 >
-                  Xóa bài viết
+                  {isDeleting ? "Đang xóa..." : "Xóa bài viết"}
                 </button>
               </div>
             )}

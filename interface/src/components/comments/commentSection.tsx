@@ -17,9 +17,10 @@ interface Comment {
   isLiked: boolean;
 }
 
-const CommentSection = ({ postId, currentUserId }: { 
+const CommentSection = ({ postId, currentUserId, onCommentAdd }: { 
   postId: string;
-  currentUserId: string;
+  currentUserId: string | null;
+  onCommentAdd: () => void;
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,8 +48,10 @@ const CommentSection = ({ postId, currentUserId }: {
         postId,
         content: newComment
       });
-      setNewComment(""); // Xóa nội dung input sau khi gửi
-      await fetchComments(); // Làm mới danh sách comment
+
+      setNewComment(""); 
+      await fetchComments(); 
+      onCommentAdd(); 
     } catch (error) {
       console.error("Failed to add comment:", error);
     } finally {
@@ -61,19 +64,19 @@ const CommentSection = ({ postId, currentUserId }: {
   }, [postId]);
 
   return (
-    <div className={styles.commentSection}> {/* Áp dụng className từ CSS Module */}
+    <div className={styles.commentSection}>
       <div className={styles.commentInputContainer}>
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Write a comment..."
-          className={styles.commentInput} // Dùng styles.commentInput
+          className={styles.commentInput}
           disabled={isSubmitting}
         />
         <button
           onClick={handleAddNewComment}
           disabled={!newComment.trim() || isSubmitting}
-          className={styles.commentSubmitButton} // Dùng styles.commentSubmitButton
+          className={styles.commentSubmitButton}
         >
           {isSubmitting ? "Posting..." : "Post Comment"}
         </button>
@@ -91,6 +94,7 @@ const CommentSection = ({ postId, currentUserId }: {
             createdAt={comment.createdAt}
             likeCount={comment.likeCount}
             isLiked={comment.isLiked}
+            currentUserId={currentUserId}
             onLikeChange={fetchComments}
             onDeleteComment={fetchComments}
             onEditComment={fetchComments}

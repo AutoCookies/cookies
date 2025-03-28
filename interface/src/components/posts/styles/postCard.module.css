@@ -1,110 +1,168 @@
-/* postCard.module.css */
 .post-card {
   background-color: #fff;
   border-radius: 8px;
-  padding: 20px; /* Tăng padding để không gian rộng rãi hơn */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
-  width: 100%;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  transition: box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
-.post-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
-.post-card-header {
+.post-header {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.post-card-header img {
-  width: 50px; /* Tăng kích thước avatar */
-  height: 50px; /* Tăng kích thước avatar */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin-right: 10px;
+  object-fit: cover;
 }
 
 .username {
-  font-weight: bold;
-  font-size: 18px; /* Tăng kích thước chữ của username */
-  color: #222; /* Màu đậm cho tên người dùng */
+  font-weight: 600;
+  font-size: 14px;
 }
 
-.post-card-body h3 {
-  font-size: 24px; /* Tăng kích thước tiêu đề */
-  margin: 15px 0; /* Thêm khoảng cách giữa tiêu đề và nội dung */
-  color: #333; /* Màu chữ đậm cho tiêu đề */
+.dropdown-wrapper {
+  position: relative;
 }
 
-.post-card-body p {
-  font-size: 16px; /* Tăng kích thước chữ của nội dung */
-  color: #555; /* Màu chữ nhẹ nhưng dễ đọc */
-  line-height: 1.6;
+.dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #65676b;
+}
+
+.dropdown-toggle:hover {
+  background-color: #f0f0f0;
+  border-radius: 50%;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 160px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #050505;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.delete-item {
+  color: #ff4d4f;
+}
+
+.post-body {
+  padding: 12px 16px;
+}
+
+.post-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.post-content {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.post-image-container {
+  margin-top: 12px;
 }
 
 .post-image {
   width: 100%;
   border-radius: 8px;
-  margin-top: 10px;
-  object-fit: cover;
+  max-height: 500px;
+  object-fit: contain;
 }
 
-/* postCard.module.css */
-.post-card-footer {
+.post-footer {
+  padding: 8px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.post-stats {
   display: flex;
-  justify-content: flex-start; /* Căn trái các mục */
-  gap: 20px; /* Khoảng cách giữa các mục like và comment */
-  font-size: 16px;
-  color: #777;
-  margin-top: 15px; /* Thêm khoảng cách trên cho footer */
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #65676b;
 }
 
-.actions p {
-  font-weight: bold;
-  display: inline-block; /* Đảm bảo chúng nằm trên cùng một hàng */
-  margin: 5px;
-}
-
-.buttons {
-  display: flex;
-  gap: 6px; /* Giảm khoảng cách giữa các nút */
-}
-
-.icon-button {
-  background: none;
-  border: none;
+.like-count,
+.liked-count {
   cursor: pointer;
-  padding: 4px; /* Giảm padding để nút nhỏ hơn */
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  width: 28px; /* Giảm kích thước tổng thể của button */
-  height: 28px;
+}
+
+.liked-count {
+  color: #ff4081;
+}
+
+.action-buttons {
+  display: flex;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 4px;
+}
+
+.action-button {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #65676b;
+  border-radius: 4px;
 }
 
-.icon-button img {
-  width: 30px;
-  height: 30px;
+.action-button:hover {
+  background-color: #f5f5f5;
 }
 
-.icon-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+.action-button.liked {
+  color: #ff4081;
 }
 
-.liked {
-  filter: invert(39%) sepia(85%) saturate(1000%) hue-rotate(290deg);
-}
-
-.comment-avatar {
+.action-button svg {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
 }

@@ -9,22 +9,20 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     const [profileImage, setProfileImage] = useState<string | null>(null);
 
     const fetchUserProfile = async () => {
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
 
-        if (!token) {
-            console.error("Token không tồn tại trong localStorage!");
-            return;
-        }
-
-        console.log("Token đã lấy được:", token); // In ra token để kiểm tra
+        // if (!token) {
+        //     console.error("Token không tồn tại trong localStorage!");
+        //     return;
+        // }
 
         try {
             const response = await fetch(`${ENV_VARS.API_ROUTE}/user/me/profile-picture`, {
                 method: "GET",
                 headers: {
-                    "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
+                credentials: "include"
             });
 
             if (response.ok) {

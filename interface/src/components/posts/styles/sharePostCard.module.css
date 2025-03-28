@@ -1,172 +1,196 @@
-/* sharePostCard.module.css */
+/* Share Post Card Container */
 .share-post-card {
-  width: 100%;
-  max-width: 600px;
-  margin: 15px auto;
-  padding: 20px;
   background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f4e1e1; /* Màu hồng nhạt, phù hợp với chủ đề hoa anh đào */
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  overflow: hidden;
 }
 
-.share-post-card:hover {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transform: translateY(-5px); /* Tạo hiệu ứng nhẹ khi hover */
-}
-
+/* Header Section */
 .share-header {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 16px;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.share-user {
-  font-weight: bold;
-  color: #000000; /* Màu hồng nhẹ tạo sự tương phản tốt với background */
-  font-size: 20px;
+  align-items: flex-start;
+  padding: 12px 16px 0;
+  position: relative;
 }
 
 .share-avatar {
-  border-radius: 90px;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.share-info {
+  flex-grow: 1;
+  margin-left: 12px;
+  min-width: 0;
+}
+
+.share-user {
+  font-weight: 600;
+  font-size: 15px;
+  display: block;
+  margin-bottom: 4px;
 }
 
 .share-caption {
-  font-size: 0.9rem;
-  color: #000000;
-  margin-top: 8px;
-  line-height: 1.5;
-  font-size: 16px;
+  font-size: 15px;
+  line-height: 1.4;
+  margin: 8px 0;
+  word-break: break-word;
 }
 
-.share-footer {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: #777;
-  border-top: 1px solid #f1f1f1;
-  padding-top: 12px;
-  margin-top: 16px;
-}
-
-.share-footer p {
-  margin: 0;
-}
-
-.share-footer strong {
-  font-weight: bold;
-  color: #333;
-}
-
+/* Original Post Styling */
 .post-card {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #fafafa;
+  border: 1px solid #e4e6eb;
   border-radius: 8px;
-  border: 1px solid #f1f1f1;
+  margin: 8px 0 0 52px; /* Align with caption */
+  overflow: hidden;
 }
 
 .post-card-header {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  padding: 10px 12px;
 }
 
 .post-avatar {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  margin-right: 10px;
+  object-fit: cover;
+  margin-right: 8px;
 }
 
 .post-username {
-  font-weight: bold;
-  color: #333;
+  font-weight: 600;
+  font-size: 13px;
 }
 
 .post-card-body {
-  margin-top: 12px;
+  padding: 0 12px 12px;
 }
 
 .post-card-body h3 {
-  font-size: 1.3rem;
-  font-weight: 700; /* Đậm hơn để nổi bật */
-  margin-bottom: 10px;
-  color: #333;
-  text-transform: capitalize;
-  letter-spacing: 0.5px; /* Thêm khoảng cách giữa các chữ */
+  font-size: 15px;
+  margin: 8px 0 4px;
 }
 
 .post-card-body p {
-  font-size: 1.1rem;
-  line-height: 1.8; /* Cải thiện khoảng cách giữa các dòng */
-  color: #444;
-  margin-bottom: 12px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Thêm hiệu ứng đổ bóng nhẹ cho chữ */
-}
-
-.post-card-body p:hover {
-  color: #F8BBD0; /* Màu hồng nhẹ khi hover */
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 8px 0;
 }
 
 .post-image {
-  max-width: 100%;
-  margin-top: 10px;
-  border-radius: 8px;
-  object-fit: cover;
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 0 0 8px 8px;
+  margin-top: 8px;
 }
 
-.post-card-footer {
+/* Footer Section */
+.share-footer {
+  padding: 6px 16px 10px;
+}
+
+.actions {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
-  color: #777;
+  padding: 8px 0;
+  font-size: 13px;
+  color: #65676b;
+  border-bottom: 1px solid #e4e6eb;
 }
 
-.actions p {
-  margin: 0;
-  cursor: pointer;
-}
-
-.actions p:hover {
-  color: #F8BBD0; /* Màu hồng nhẹ phù hợp với chủ đề hoa anh đào */
-  font-weight: bold;
-}
-
-.buttons {
+.action-buttons {
   display: flex;
-  gap: 6px;
+  margin-top: 4px;
 }
 
-.icon-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  width: 28px;
-  height: 28px;
+.action-button {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #65676b;
+  border-radius: 4px;
+  font-weight: 500;
 }
 
-.icon-button img {
-  width: 30px;
-  height: 30px;
+.action-button:hover {
+  background-color: #f0f2f5;
 }
 
-.icon-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+.action-button.liked {
+  color: #1877f2;
 }
 
-.liked {
-  filter: invert(39%) sepia(85%) saturate(1000%) hue-rotate(290deg);
+/* Dropdown Styles */
+.dropdown-container {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #65676b;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+
+.dropdown-toggle:hover {
+  background-color: #f0f2f5;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #050505;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.delete-item {
+  color: #ff4d4f;
 }

@@ -209,28 +209,34 @@ export const sharePostService = async (userId, postId, caption, visibility) => {
 };
 
 
-export const getAllPostsService = async (userId) => {
+export const getAllPostsService = async (userId, page = 1, limit = 10) => {
     try {
-        console.log("Truy vấn danh sách bài viết...");
+        // console.log(`Truy vấn danh sách bài viết... Trang: ${page}, Giới hạn: ${limit}`);
+
+        const skip = (page - 1) * limit;
 
         // Lấy danh sách tất cả bài Post
         const posts = await Post.find()
-            .populate("user", "username profilePicture")
+            .populate("user", "id username profilePicture")
             .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
             .lean();
 
         // Lấy danh sách tất cả SharePost
         const sharedPosts = await SharePost.find()
-            .populate("user", "username profilePicture")
+            .populate("user", "id username profilePicture")
             .populate("originalPost", "title content image user createdAt")
             .populate({
                 path: "originalPost",
                 populate: { path: "user", select: "username profilePicture" }
             })
             .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
             .lean();
 
-        // Gộp tất cả bài viết
+        // Gộp tất cả bài viết & sắp xếp theo thời gian
         const allPosts = [...posts, ...sharedPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         // Nếu có userId, kiểm tra bài viết nào user đã like
@@ -239,13 +245,11 @@ export const getAllPostsService = async (userId) => {
             userLikedPosts = await LikePost.find({ user: userId }).distinct("post"); // Lấy danh sách ID của các bài đã like
         }
 
-        // console.log(`User Liked Posts ${userLikedPosts}`)
-
         // Gán thêm isLiked vào từng post
         const postsWithLikeStatus = allPosts.map(post => ({
             ...post,
             isLiked: userLikedPosts.map(id => id.toString()).includes(post._id.toString()),
-        }));        
+        }));  
 
         return postsWithLikeStatus;
     } catch (error) {
@@ -253,5 +257,6 @@ export const getAllPostsService = async (userId) => {
         throw new Error("Không thể lấy danh sách bài viết!");
     }
 };
+
 
 

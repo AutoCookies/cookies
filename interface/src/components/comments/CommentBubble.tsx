@@ -16,6 +16,7 @@ interface CommentProps {
     profilePicture: string;
   };
   isLiked: boolean;
+  currentUserId: string | null;
   onLikeChange: () => void;
   onDeleteComment: () => void;
   onEditComment: () => void;
@@ -28,6 +29,7 @@ export const CommentBubble: React.FC<CommentProps> = ({
   likeCount,
   user,
   isLiked,
+  currentUserId,
   onLikeChange,
   onDeleteComment,
   onEditComment,
@@ -36,27 +38,27 @@ export const CommentBubble: React.FC<CommentProps> = ({
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  // const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditingLoading, setIsEditingLoading] = useState(false); // Thêm state cho trạng thái loading khi edit
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
-          credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setCurrentUserId(data._id);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCurrentUser = async () => {
+  //     try {
+  //       const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
+  //         credentials: "include",
+  //       });
+  //       if (res.ok) {
+  //         const data = await res.json();
+  //         setCurrentUserId(data._id);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching user:", error);
+  //     }
+  //   };
 
-    fetchCurrentUser();
-  }, []);
+  //   fetchCurrentUser();
+  // }, []);
 
   const handleLikeClick = async () => {
     try {

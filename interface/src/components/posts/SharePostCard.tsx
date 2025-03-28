@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles/sharePostCard.module.css";
 import SharePostModal from "./sharePostModal";
 import { handleLike } from "@/utils/posts/handleLike";
 import { handleShare } from "@/utils/posts/handleSharePosts";
-import CommentSection from "../comments/commentSection"; // Thêm import CommentSection
+import { handleDeletePost } from "@/utils/posts/handleDeletePost";
+import CommentSection from "../comments/commentSection";
+import { ENV_VARS } from "@/config/envVars";
 
 interface SharePostProps {
   sharePostId: string;
   caption: string;
   user: {
+    _id: string;
     username: string;
     profilePicture: string;
   };
@@ -30,7 +33,9 @@ interface SharePostProps {
   };
   onLike: () => void;
   onShare: () => void;
-  currentUserId: string; // Thêm currentUserId
+  onChangeComment: () => void;
+  onDelete: () => void;
+  onEdit?: () => void;
 }
 
 const SharePostCard: React.FC<SharePostProps> = ({
@@ -43,48 +48,167 @@ const SharePostCard: React.FC<SharePostProps> = ({
   originalPost,
   onLike,
   onShare,
-  currentUserId,
+  onChangeComment,
+  onDelete,
+  onEdit,
 }) => {
   const [liked, setLiked] = useState(isLiked);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [showComments, setShowComments] = useState(false); // Thêm state cho comment section
+  const [showComments, setShowComments] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleLikeSharePost = () => {
-    handleLike(sharePostId, liked, () => {
-      setLiked((prev) => !prev);
-      onLike();
-    });
+  const handleLikeSharePost = async () => {
+    try {
+      setLiked(prev => !prev);
+      await handleLike(sharePostId, liked, onLike);
+    } catch (error) {
+      setLiked(prev => !prev);
+      console.error("Failed to like post:", error);
+    }
   };
 
   const handleSharePost = (caption: string, visibility: "public" | "private" | "friends") => {
-    handleShare(sharePostId, caption, visibility, () => {
-      console.log("Cập nhật UI sau khi chia sẻ!", visibility);
-      onShare();
-    });
+    handleShare(sharePostId, caption, visibility, onShare);
   };
 
   const toggleComments = () => {
-    setShowComments((prev) => !prev); // Toggle hiển thị comment section
+    setShowComments(prev => !prev);
   };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const { success } = await handleDeletePost(sharePostId, () => {
+      onDelete?.(); // Gọi callback khi xóa thành công
+    }, (error) => {
+      console.error("Lỗi khi xóa bài viết:", error);
+    });
+    setIsDeleting(false);
+    setShowDropdown(false);
+  };
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentUserId(data._id.toString());
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className={styles["share-post-card"]}>
-      {/* Người dùng đã chia sẻ bài viết */}
+      {/* Header - User who shared the post */}
       <div className={styles["share-header"]}>
-        <img
-          src={user?.profilePicture || "/default-avatar.jpg"}
-          alt="User Avatar"
-          className={styles["share-avatar"]}
-        />
-        <div className={styles["share-info"]}>
-          <span className={styles["share-user"]}>
-            <strong>{user?.username || "Người dùng không xác định"}</strong>
-          </span>
-          <p className={styles["share-caption"]}>{caption}</p>
+        <div className={styles["user-info-container"]}>
+          <img
+            src={user?.profilePicture || "/default-avatar.jpg"}
+            alt="User Avatar"
+            className={styles["share-avatar"]}
+          />
+          <div className={styles["share-info"]}>
+            <span className={styles["share-user"]}>
+              <strong>{user?.username || "Người dùng không xác định"}</strong>
+            </span>
+            <p className={styles["share-caption"]}>{caption}</p>
+          </div>
         </div>
+
+        {currentUserId === user?._id && (
+          <div className={styles["dropdown-wrapper"]} ref={dropdownRef}>
+            <button
+              className={styles["dropdown-toggle"]}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowDropdown(!showDropdown);
+              }}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <span>Đang xóa...</span>
+              ) : (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </button>
+
+            {showDropdown && (
+              <div className={styles["dropdown-menu"]}>
+                <button
+                  className={styles["dropdown-item"]}
+                  onClick={() => {
+                    onEdit?.();
+                    setShowDropdown(false);
+                  }}
+                >
+                  Chỉnh sửa
+                </button>
+                <button
+                  className={`${styles["dropdown-item"]} ${styles["delete-item"]}`}
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Đang xóa..." : "Xóa bài viết"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Bài đăng gốc */}
+      {/* Original post */}
       <div className={styles["post-card"]}>
         <div className={styles["post-card-header"]}>
           <img
@@ -105,7 +229,7 @@ const SharePostCard: React.FC<SharePostProps> = ({
 
         <div className={styles["post-card-footer"]}>
           <div className={styles["actions"]}>
-            <p>
+            <p style={{ color: originalPost.isLiked ? "#ff4081" : "#333" }}>
               <strong>{originalPost.likesCount}</strong> Likes
             </p>
             <p>
@@ -117,41 +241,46 @@ const SharePostCard: React.FC<SharePostProps> = ({
 
       {/* Footer của bài chia sẻ */}
       <div className={styles["share-footer"]}>
-        <p>
-          <strong>{likesCount}</strong> Likes <strong>{commentCount}</strong> Comments
-        </p>
-        <div className={styles.buttons}>
-          <button className={styles["icon-button"]} onClick={handleLikeSharePost}>
-            <img
-              src="/svg/like-svgrepo-com.svg"
-              alt="Like"
-              className={liked ? styles.liked : ""}
-            />
-          </button>
-          <button 
-            className={styles["icon-button"]} 
-            onClick={toggleComments}
-            aria-label={showComments ? "Hide comments" : "Show comments"}
+        <div className={styles["actions"]}>
+          <p style={{ color: liked ? "#ff4081" : "#333" }}>
+            <strong>{likesCount}</strong> Likes
+          </p>
+          <p>
+            <strong>{commentCount}</strong> Comments
+          </p>
+        </div>
+        <div className={styles["action-buttons"]}>
+          <button
+            className={`${styles["action-button"]} ${liked ? styles["liked"] : ""}`}
+            onClick={handleLikeSharePost}
           >
-            <img src="/svg/information-svgrepo-com.svg" alt="Comment" />
+            {liked ? "Đã thích" : "Thích"}
           </button>
-          <button 
-            className={styles["icon-button"]}
+          <button
+            className={styles["action-button"]}
+            onClick={toggleComments}
+          >
+            Bình luận
+          </button>
+          <button
+            className={styles["action-button"]}
             onClick={() => setShowShareModal(true)}
           >
-            <img src="/svg/forward-svgrepo-com.svg" alt="Share" />
+            Chia sẻ
           </button>
         </div>
       </div>
 
-      {/* Hiển thị comment section khi nhấn nút comment */}
+      {/* Comment section */}
       {showComments && (
-        <CommentSection 
-          postId={sharePostId} 
+        <CommentSection
+          postId={sharePostId}
+          currentUserId={currentUserId}
+          onCommentAdd={onChangeComment}
         />
       )}
 
-      {/* Hiển thị modal khi nhấn Share */}
+      {/* Share modal */}
       {showShareModal && (
         <SharePostModal
           postId={sharePostId}

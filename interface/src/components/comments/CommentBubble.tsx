@@ -3,6 +3,7 @@ import styles from "./styles/commentBubble.module.css";
 import { handleLikeComment } from "@/utils/comments/handleLikeComments";
 import { ENV_VARS } from "@/config/envVars";
 import { handleDeleteComment } from "@/utils/comments/hadnleDeleteComments";
+import { handleEditComment } from "@/utils/comments/handleEditComment";
 
 interface CommentProps {
   id: string;
@@ -15,9 +16,10 @@ interface CommentProps {
     profilePicture: string;
   };
   isLiked: boolean;
+  currentUserId: string | null;
   onLikeChange: () => void;
-  onDeleteComment: () => void; // Callback khi xóa comment
-  onEditComment: () => void; // Callback khi chỉnh sửa comment
+  onDeleteComment: () => void;
+  onEditComment: () => void;
 }
 
 export const CommentBubble: React.FC<CommentProps> = ({
@@ -27,6 +29,7 @@ export const CommentBubble: React.FC<CommentProps> = ({
   likeCount,
   user,
   isLiked,
+  currentUserId,
   onLikeChange,
   onDeleteComment,
   onEditComment,
@@ -35,27 +38,27 @@ export const CommentBubble: React.FC<CommentProps> = ({
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  // const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditingLoading, setIsEditingLoading] = useState(false); // Thêm state cho trạng thái loading khi edit
 
-  // Lấy thông tin user hiện tại
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
-          credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setCurrentUserId(data._id);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCurrentUser = async () => {
+  //     try {
+  //       const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
+  //         credentials: "include",
+  //       });
+  //       if (res.ok) {
+  //         const data = await res.json();
+  //         setCurrentUserId(data._id);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching user:", error);
+  //     }
+  //   };
 
-    fetchCurrentUser();
-  }, []);
+  //   fetchCurrentUser();
+  // }, []);
 
   const handleLikeClick = async () => {
     try {
@@ -67,16 +70,6 @@ export const CommentBubble: React.FC<CommentProps> = ({
     }
   };
 
-/*************  ✨ Codeium Command 🌟  *************/
-  /**
-   * Handles the delete click on the comment menu
-   * @remarks
-   * 1. Set `isDeleting` to true to show the loading state
-   * 2. Calls the `handleDeleteComment` function to delete the comment
-   * 3. Calls the `onDeleteComment` callback function to notify the parent
-   * 4. Set `isDeleting` to false to hide the loading state
-   * 5. Set `showMenu` to false to hide the menu
-   */
   const handleDeleteClick = async () => {
     try {
       setIsDeleting(true);
@@ -89,11 +82,27 @@ export const CommentBubble: React.FC<CommentProps> = ({
       setShowMenu(false);
     }
   };
-/******  20a235b2-4be3-420a-b716-987e0b52afe1  *******/
 
-  const handleEditSave = () => {
-    onEditComment(); // Gọi callback chỉnh sửa
-    setIsEditing(false);
+  // Hàm xử lý khi lưu chỉnh sửa comment
+  const handleEditSave = async () => {
+    try {
+      setIsEditingLoading(true); // Bật trạng thái loading
+      
+      // Gọi API chỉnh sửa comment với nội dung mới
+      await handleEditComment({ 
+        commentId: id, 
+        newContent: editedContent 
+      });
+      
+      // Gọi callback để component cha fetch lại dữ liệu
+      onEditComment();
+    } catch (error) {
+      console.error("Error while editing:", error);
+      // Có thể thêm hiển thị thông báo lỗi ở đây
+    } finally {
+      setIsEditingLoading(false); // Tắt trạng thái loading
+      setIsEditing(false); // Đóng chế độ chỉnh sửa
+    }
   };
 
   const isCurrentUserComment = currentUserId && user.id === currentUserId;
@@ -115,17 +124,20 @@ export const CommentBubble: React.FC<CommentProps> = ({
               <button 
                 className={styles["more-button"]}
                 onClick={() => setShowMenu(!showMenu)}
-                disabled={isDeleting}
+                disabled={isDeleting || isEditingLoading}
               >
                 {isDeleting ? "Đang xóa..." : "⋮"}
               </button>
               
-              {showMenu && (
+              {showMenu && !isEditing && (
                 <div className={styles["menu-dropdown"]}>
-                  <button onClick={() => {
-                    setIsEditing(true);
-                    setShowMenu(false);
-                  }}>
+                  <button 
+                    onClick={() => {
+                      setIsEditing(true);
+                      setShowMenu(false);
+                    }}
+                    disabled={isEditingLoading}
+                  >
                     Chỉnh sửa
                   </button>
                   <button 
@@ -147,13 +159,22 @@ export const CommentBubble: React.FC<CommentProps> = ({
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
               className={styles["edit-textarea"]}
+              disabled={isEditingLoading}
             />
             <div className={styles["edit-buttons"]}>
-              <button onClick={handleEditSave}>Lưu</button>
-              <button onClick={() => {
-                setIsEditing(false);
-                setEditedContent(content);
-              }}>
+              <button 
+                onClick={handleEditSave}
+                disabled={isEditingLoading || !editedContent.trim()}
+              >
+                {isEditingLoading ? "Đang lưu..." : "Lưu"}
+              </button>
+              <button 
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditedContent(content);
+                }}
+                disabled={isEditingLoading}
+              >
                 Hủy
               </button>
             </div>
@@ -168,6 +189,7 @@ export const CommentBubble: React.FC<CommentProps> = ({
           <button
             className={`${styles["like-button"]} ${liked ? styles.liked : ""}`}
             onClick={handleLikeClick}
+            disabled={isEditing || isDeleting || isEditingLoading}
           >
             <img
               src="/svg/like-svgrepo-com.svg"

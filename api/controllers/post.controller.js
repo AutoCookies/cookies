@@ -104,10 +104,14 @@ export const sharePost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
     try {
         const userId = req.user ? req.user._id : null;
-        const posts = await getAllPostsService(userId);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        const posts = await getAllPostsService(userId, page, limit);
         res.json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 

@@ -152,7 +152,7 @@ export const sharePost = async (req, res) => {
         const { postId } = req.params;
         const { caption, visibility = "public" } = req.body;
 
-        console.log("📤 Dữ liệu nhận từ frontend:", { caption, visibility });
+        console.log("Dữ liệu nhận từ frontend:", { caption, visibility });
 
         const sharedPost = await sharePostService(userId, postId, caption, visibility);
 

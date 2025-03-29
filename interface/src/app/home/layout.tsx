@@ -21,7 +21,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 const data = await response.json();
                 setProfileImage(data.profilePicture || "/default-profile.jpg");
             } else {
-                console.error("Failed to fetch profile, Status:", response.status);
+                console.log("Failed to fetch profile, Status:", response.status);
             }
         } catch (error) {
             console.error("Error fetching profile data:", error);
@@ -73,13 +73,15 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                     <button className={styles.iconButton}>
                         <img src="/svg/information-svgrepo-com.svg" alt="Messages" className={styles.iconSVG} />
                     </button>
-                    <button className={styles.iconButton} onClick={fetchUserProfile}>
-                        {profileImage ? (
-                            <img src={profileImage} alt="User Profile" className={styles.profileImage} />
-                        ) : (
-                            <img src="/svg/personal-svgrepo-com.svg" alt="Default Profile" className={styles.iconSVG} />
-                        )}
-                    </button>
+                    <Link href={"/home/me"}>
+                        <button className={styles.iconButton}>
+                            {profileImage ? (
+                                <img src={profileImage} alt="User Profile" className={styles.profileImage} />
+                            ) : (
+                                <img src="/svg/personal-svgrepo-com.svg" alt="Default Profile" className={styles.iconSVG} />
+                            )}
+                        </button>
+                    </Link>
                 </div>
             </header>
 

@@ -92,6 +92,7 @@ export default function PostPage() {
   const handlePostCreated = useCallback((newPost: any) => {
     setPosts(prev => [newPost, ...prev]);
     setShowCreateModal(false);
+    refreshPosts();
   }, []);
 
   const refreshPosts = useCallback(() => {
@@ -140,6 +141,7 @@ export default function PostPage() {
                   commentCount: post.originalPost.commentCount,
                   isLiked: post.originalPost.isLiked,
                 }}
+                visibility={post.visibility}
                 onLike={refreshPosts}
                 onShare={refreshPosts}
                 onDelete={refreshPosts}
@@ -156,6 +158,7 @@ export default function PostPage() {
                 commentCount={post.commentCount}
                 isLiked={post.isLiked}
                 user={post.user}
+                visibility={post.visibility}
                 onLike={refreshPosts}
                 onShare={refreshPosts}
                 onDelete={refreshPosts}

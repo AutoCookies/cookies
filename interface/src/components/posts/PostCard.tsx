@@ -21,6 +21,7 @@ interface PostProps {
     username: string;
     profilePicture: string;
   };
+  visibility: "public" | "private" | "friends";
   onLike: () => void;
   onShare: () => void;
   onChangeComment: () => void;
@@ -37,6 +38,7 @@ const PostCard: React.FC<PostProps> = ({
   commentCount,
   isLiked,
   user,
+  visibility,
   onLike,
   onShare,
   onChangeComment,
@@ -129,6 +131,20 @@ const PostCard: React.FC<PostProps> = ({
             className={styles["user-avatar"]}
           />
           <span className={styles.username}>{user.username}</span>
+
+          <div>
+            <div className={styles["visibility-badge"]}>
+              {visibility === "public" && (
+                <span className={styles.public}>Công khai</span>
+              )}
+              {visibility === "private" && (
+                <span className={styles.private}>Riêng tư</span>
+              )}
+              {visibility === "friends" && (
+                <span className={styles.friends}>Bạn bè</span>
+              )}
+            </div>
+          </div>
         </div>
 
         {isCurrentUser && (

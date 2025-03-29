@@ -17,10 +17,21 @@ export const createPost = async (req, res) => {
     try {
         console.log(`User id: ${req.user._id}`);
         const userId = req.user._id;
-        const { title, content } = req.body;
+        const { title, content, visibility = 'public' } = req.body; // Default to 'public'
         const imageBuffer = req.file ? req.file.buffer : null;
 
-        const newPost = await createPostService(userId, title, content, imageBuffer);
+        // Validate visibility value
+        if (!['public', 'friends', 'private'].includes(visibility)) {
+            throw new Error("Chế độ hiển thị không hợp lệ!");
+        }
+
+        const newPost = await createPostService(
+            userId, 
+            title, 
+            content, 
+            imageBuffer, 
+            visibility
+        );
 
         res.status(201).json({
             message: "Bài đăng đã được tạo thành công!",
@@ -28,13 +39,15 @@ export const createPost = async (req, res) => {
         });
     } catch (error) {
         console.error("Error in createPost:", error.message);
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ 
+            message: error.message || "Có lỗi xảy ra khi tạo bài viết" 
+        });
     }
 };
 
 export const getOwnPosts = async (req, res) => {
     try {
-        const userId = req.user._id; // Lấy userId từ token
+        const userId = req.user ? req.user._id : null;
         const posts = await getOwnPostsService(userId);
 
         res.status(200).json({

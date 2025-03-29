@@ -1,77 +1,220 @@
-/* Header Style */
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #fff5f7;
+    /* Lighter pink background */
+}
+
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(45deg, #ff80ab, #f8bbd0); /* Màu gradient nhẹ nhàng như hoa anh đào */
-    padding: 10px 20px;
-    position: fixed;
-    width: 100%;
+    padding: 15px 20px;
+    background-color: #ffecf1;
+    /* Soft cherry blossom pink background */
+    border-bottom: 1px solid #ffb7c5;
+    /* Medium pink border */
+    position: sticky;
     top: 0;
-    left: 0;
-    z-index: 10; /* Đảm bảo header nằm trên các phần tử khác */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(255, 183, 197, 0.2);
+    /* Soft pink shadow */
 }
 
-/* Logo */
-.logo h1 {
-    font-size: 1.5rem;
-    color: white;
-    font-family: 'Arial', sans-serif;
-}
-
-/* Thanh tìm kiếm */
-.searchBar input {
-    padding: 8px 12px;
-    border-radius: 20px;
-    border: none;
-    outline: none;
-    width: 250px;
-    font-size: 1rem;
-}
-
-/* Các biểu tượng điều hướng */
-.nav {
+.leftSection {
     display: flex;
-    gap: 15px; /* Giảm khoảng cách giữa các biểu tượng */
+    align-items: center;
+    gap: 20px;
+    flex: 1;
 }
 
-/* Điều chỉnh kích thước icon */
+.logo h1 {
+    color: #d35d6e;
+    /* Deep cherry blossom pink */
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(211, 93, 110, 0.1);
+}
+
+.searchBar input {
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid #ffb7c5;
+    /* Medium pink border */
+    background-color: #fff9fa;
+    /* Very light pink */
+    width: 200px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.searchBar input:focus {
+    border-color: #d35d6e;
+    /* Deep cherry blossom pink */
+    box-shadow: 0 0 0 2px rgba(255, 183, 197, 0.3);
+}
+
+.navIcons {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex: 1;
+}
+
+.navIcon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #d35d6e;
+    /* Deep cherry blossom pink */
+    transition: all 0.2s ease;
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+
+.navIcon:hover {
+    color: #b74758;
+    /* Darker cherry blossom pink */
+    background-color: #ffd1dc;
+    /* Light pink */
+    transform: translateY(-2px);
+}
+
+.navIcon img {
+    filter: drop-shadow(1px 1px 1px rgba(211, 93, 110, 0.2));
+}
+
+.navIcon span {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.rightSection {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    flex: 1;
+}
+
 .iconButton {
     background: none;
     border: none;
-    font-size: 1.2rem; /* Giảm kích thước font cho icon */
     cursor: pointer;
-    color: white;
-    transition: transform 0.2s ease;
     padding: 8px;
-}
-
-.iconButton img {
-    width: 30px;
-    height: 30px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .iconButton:hover {
+    background-color: #ffb7c5;
+    /* Medium pink */
     transform: scale(1.1);
 }
 
-/* Kích thước icon SVG */
 .iconSVG {
-    width: 20px; /* Điều chỉnh kích thước của icon */
-    height: 20px;
+    width: 24px;
+    height: 24px;
+    fill: #d35d6e;
+    /* Deep cherry blossom pink */
 }
 
-/* Các ảnh profile */
 .profileImage {
-    width: 40px; /* Giảm kích thước ảnh profile */
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffb7c5;
+    /* Medium pink border */
+    transition: all 0.3s ease;
 }
 
-/* Nội dung chính */
+.profileImage:hover {
+    border-color: #d35d6e;
+    /* Deep cherry blossom pink */
+    transform: scale(1.05);
+}
+
 .mainContent {
-    margin-top: 70px; /* Khoảng cách dưới header */
+    flex: 1;
     padding: 20px;
+    background-color: white;
+}
+
+/* Active nav icon */
+.activeNav {
+    color: #b74758;
+    /* Darker cherry blossom pink */
+    background-color: #ffd1dc;
+    /* Light pink */
+    font-weight: 600;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .leftSection,
+    .navIcons,
+    .rightSection {
+        width: 100%;
+        justify-content: center;
+        padding: 5px 0;
+    }
+
+    .navIcons {
+        gap: 15px;
+    }
+
+    .searchBar input {
+        width: 150px;
+    }
+
+    .iconButton {
+        padding: 6px;
+    }
+}
+
+/* Animation for cherry blossom petals */
+@keyframes petalFall {
+    0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Optional: Add cherry blossom petal decoration */
+.cherryBlossomPetal {
+    position: fixed;
+    top: -10px;
+    background-image: url('/svg/cherry-blossom-petal.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    z-index: -1;
+    animation: petalFall linear infinite;
 }

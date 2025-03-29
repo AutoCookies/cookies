@@ -61,7 +61,7 @@ const PostCard: React.FC<PostProps> = ({
 
   const handleSharePost = (caption: string, visibility: "public" | "private" | "friends") => {
     handleShare(postId, caption, visibility, () => {
-      console.log("Đã cập nhật UI sau khi chia sẻ!");
+      // console.log("Đã cập nhật UI sau khi chia sẻ!");
       onShare();
     });
   };

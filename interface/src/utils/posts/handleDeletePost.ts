@@ -31,13 +31,13 @@ export const handleDeletePost = async (
     }
 
     const data = await response.json();
-    console.log("Xóa bài viết thành công:", data.message);
+    // console.log("Xóa bài viết thành công:", data.message);
     
     onSuccess?.();
     return { ...data, success: true };
 
   } catch (error) {
-    console.error("Lỗi khi xóa bài viết:", error);
+    // console.error("Lỗi khi xóa bài viết:", error);
     const errorMessage = error instanceof Error ? error.message : "Lỗi không xác định khi xóa bài viết";
     
     onError?.(errorMessage);

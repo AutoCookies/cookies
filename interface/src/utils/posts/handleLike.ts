@@ -6,7 +6,7 @@ export const handleLike = async (
   onSuccess: () => void
 ) => {
   try {
-    console.log(`Like bài viết: ${postId}`);
+    // console.log(`Like bài viết: ${postId}`);
 
     const response = await fetch(`${ENV_VARS.API_ROUTE}/likes/post/${postId}/like`, {
       method: liked ? "DELETE" : "POST",
@@ -18,7 +18,7 @@ export const handleLike = async (
       throw new Error("Không thể like bài viết!");
     }
 
-    console.log("Like thành công!");
+    // console.log("Like thành công!");
     
     onSuccess(); // Gọi callback sau khi like thành công
   } catch (error) {

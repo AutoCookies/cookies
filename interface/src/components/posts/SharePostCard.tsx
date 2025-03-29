@@ -6,6 +6,8 @@ import { handleShare } from "@/utils/posts/handleSharePosts";
 import { handleDeletePost } from "@/utils/posts/handleDeletePost";
 import CommentSection from "../comments/commentSection";
 import { ENV_VARS } from "@/config/envVars";
+import { handleUpdateSharePost } from "@/utils/posts/handleUpdateSharePost";
+import EditSharePostModal from './EditSharePostModal';
 
 interface SharePostProps {
   sharePostId: string;
@@ -35,7 +37,7 @@ interface SharePostProps {
   onShare: () => void;
   onChangeComment: () => void;
   onDelete: () => void;
-  onEdit?: () => void;
+  onEdit: () => void;
 }
 
 const SharePostCard: React.FC<SharePostProps> = ({
@@ -56,6 +58,7 @@ const SharePostCard: React.FC<SharePostProps> = ({
   const [showShareModal, setShowShareModal] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -87,6 +90,22 @@ const SharePostCard: React.FC<SharePostProps> = ({
     });
     setIsDeleting(false);
     setShowDropdown(false);
+  };
+
+  const handleSaveEdit = async (newCaption: string) => {
+    try {
+      const { success } = await handleUpdateSharePost(sharePostId, {
+        caption: newCaption
+      });
+
+      if (success) {
+        setIsEditing(false);
+        onEdit?.(); // Notify parent component
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+      throw error; // Let the modal handle the error display
+    }
   };
 
   useEffect(() => {
@@ -189,8 +208,8 @@ const SharePostCard: React.FC<SharePostProps> = ({
                 <button
                   className={styles["dropdown-item"]}
                   onClick={() => {
-                    onEdit?.();
                     setShowDropdown(false);
+                    setIsEditing(true);
                   }}
                 >
                   Chỉnh sửa
@@ -254,18 +273,59 @@ const SharePostCard: React.FC<SharePostProps> = ({
             className={`${styles["action-button"]} ${liked ? styles["liked"] : ""}`}
             onClick={handleLikeSharePost}
           >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill={liked ? "#ff4081" : "none"}
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                stroke={liked ? "#ff4081" : "#333"}
+                strokeWidth="2"
+              />
+            </svg>
             {liked ? "Đã thích" : "Thích"}
           </button>
           <button
             className={styles["action-button"]}
             onClick={toggleComments}
           >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"
+                stroke="#333"
+                strokeWidth="2"
+              />
+            </svg>
             Bình luận
           </button>
           <button
             className={styles["action-button"]}
             onClick={() => setShowShareModal(true)}
           >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6zM8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"
+                stroke="#333"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
             Chia sẻ
           </button>
         </div>
@@ -286,6 +346,15 @@ const SharePostCard: React.FC<SharePostProps> = ({
           postId={sharePostId}
           onClose={() => setShowShareModal(false)}
           onShare={handleSharePost}
+        />
+      )}
+
+      {isEditing && (
+        <EditSharePostModal
+          isOpen={isEditing}
+          initialCaption={caption}
+          onSave={handleSaveEdit}
+          onClose={() => setIsEditing(false)}
         />
       )}
     </div>

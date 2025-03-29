@@ -6,6 +6,7 @@ import CommentSection from "../comments/commentSection";
 import SharePostModal from "@/components/posts/sharePostModal";
 import { ENV_VARS } from "@/config/envVars";
 import { handleDeletePost } from "@/utils/posts/handleDeletePost";
+import EditPostModal from "@/components/posts/EditPostModal";
 
 interface PostProps {
   postId: string;
@@ -47,6 +48,7 @@ const PostCard: React.FC<PostProps> = ({
   const [showComments, setShowComments] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +61,7 @@ const PostCard: React.FC<PostProps> = ({
 
   const handleSharePost = (caption: string, visibility: "public" | "private" | "friends") => {
     handleShare(postId, caption, visibility, () => {
-      console.log("Đã cập nhật UI sau khi chia sẻ!");
+      // console.log("Đã cập nhật UI sau khi chia sẻ!");
       onShare();
     });
   };
@@ -182,7 +184,7 @@ const PostCard: React.FC<PostProps> = ({
                 <button
                   className={styles["dropdown-item"]}
                   onClick={() => {
-                    onEdit?.();
+                    setShowEditModal(true);
                     setShowDropdown(false);
                   }}
                 >
@@ -217,9 +219,9 @@ const PostCard: React.FC<PostProps> = ({
       <div className={styles["post-footer"]}>
         <div className={styles["post-stats"]}>
           <span className={liked ? styles["liked-count"] : styles["like-count"]}>
-            {likesCount} lượt thích
+            {likesCount} Likes
           </span>
-          <span className={styles["comment-count"]}>{commentCount} bình luận</span>
+          <span className={styles["comment-count"]}>{commentCount} Comments</span>
         </div>
         <div className={styles["action-buttons"]}>
           <button
@@ -239,7 +241,7 @@ const PostCard: React.FC<PostProps> = ({
                 strokeWidth="2"
               />
             </svg>
-            Thích
+            Likes
           </button>
           <button
             className={styles["action-button"]}
@@ -299,6 +301,24 @@ const PostCard: React.FC<PostProps> = ({
           postId={postId}
           onClose={() => setShowShareModal(false)}
           onShare={handleSharePost}
+        />
+      )}
+
+      {showEditModal && (
+        <EditPostModal
+          isOpen={showEditModal}
+          initialData={{
+            title: title,
+            content: content,
+            imageUrl: image,
+            postId: postId
+          }}
+          onClose={() => setShowEditModal(false)}
+          onUpdateSuccess={(updatedPost) => {
+            // Cập nhật UI với dữ liệu mới
+            // Bạn có thể cần truyền callback từ component cha
+            onEdit?.();
+          }}
         />
       )}
     </div>

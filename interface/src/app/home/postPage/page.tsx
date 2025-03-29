@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { getAllPosts } from "@/utils/posts/fetchAllPosts";
 import PostCard from "../../../components/posts/PostCard";
 import SharePostCard from "../../../components/posts/SharePostCard";
+import CreatePostModal from "@/components/posts/CreatePostModal";
 import styles from "../../../styles/home/postPage.module.css";
 
 export default function PostPage() {
@@ -12,7 +13,8 @@ export default function PostPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [hasMore, setHasMore] = useState(true);
-  const lastFetchedPage = useRef(0); // Lưu trạng thái page đã fetch
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const lastFetchedPage = useRef(0);
 
   const fetchPosts = useCallback(async (pageNumber: number, forceRefresh = false) => {
     if ((!hasMore || loading || lastFetchedPage.current === pageNumber) && !forceRefresh) return;
@@ -25,13 +27,12 @@ export default function PostPage() {
       if (error) throw new Error(error);
 
       setPosts(prev => {
-        // Chỉ merge dữ liệu khi không force refresh
         if (!forceRefresh && pageNumber !== 1) {
           const uniquePosts = new Map(prev.map(post => [post._id, post]));
           data.forEach((post: any) => uniquePosts.set(post._id, post));
           return Array.from(uniquePosts.values());
         }
-        return data; // Trả về dữ liệu mới hoàn toàn khi force refresh
+        return data;
       });
 
       setHasMore(data.length > 0);
@@ -45,7 +46,7 @@ export default function PostPage() {
 
   useEffect(() => {
     fetchPosts(page);
-  }, [page]);
+  }, [page, fetchPosts]);
 
   useEffect(() => {
     let timeout: any = null;
@@ -58,7 +59,7 @@ export default function PostPage() {
           !loading &&
           hasMore
         ) {
-          setPage((prev) => (hasMore ? prev + 1 : prev)); // Chặn tăng page khi hết dữ liệu
+          setPage((prev) => (hasMore ? prev + 1 : prev));
         }
       }, 200);
     };
@@ -69,7 +70,6 @@ export default function PostPage() {
       if (timeout) clearTimeout(timeout);
     };
   }, [loading, hasMore]);
-
 
   const handleCommentChange = useCallback((postId: string) => {
     setPosts(prev => prev.map(post => {
@@ -89,9 +89,35 @@ export default function PostPage() {
     }));
   }, []);
 
+  const handlePostCreated = useCallback((newPost: any) => {
+    setPosts(prev => [newPost, ...prev]);
+    setShowCreateModal(false);
+  }, []);
+
+  const refreshPosts = useCallback(() => {
+    fetchPosts(1, true);
+  }, [fetchPosts]);
+
   return (
     <div className={styles.container}>
+      <div className={styles.header}>
+        <h1>Posts</h1>
+        <button 
+          className={styles.createButton}
+          onClick={() => setShowCreateModal(true)}
+          disabled={loading}
+        >
+          + Tell Your Feeling
+        </button>
+      </div>
+
       {error && <p className={styles.error}>Lỗi: {error}</p>}
+
+      <CreatePostModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onPostCreated={handlePostCreated}
+      />
 
       <div className={styles.posts}>
         {posts.map((post) => (
@@ -114,9 +140,10 @@ export default function PostPage() {
                   commentCount: post.originalPost.commentCount,
                   isLiked: post.originalPost.isLiked,
                 }}
-                onLike={() => fetchPosts(1, true)}
-                onShare={() => fetchPosts(1, true)}
-                onDelete={() => fetchPosts(1, true)}
+                onLike={refreshPosts}
+                onShare={refreshPosts}
+                onDelete={refreshPosts}
+                onEdit={refreshPosts}
                 onChangeComment={() => handleCommentChange(post._id)}
               />
             ) : (
@@ -129,9 +156,10 @@ export default function PostPage() {
                 commentCount={post.commentCount}
                 isLiked={post.isLiked}
                 user={post.user}
-                onLike={() => fetchPosts(1, true)}
-                onShare={() => fetchPosts(1, true)}
-                onDelete={() => fetchPosts(1, true)}
+                onLike={refreshPosts}
+                onShare={refreshPosts}
+                onDelete={refreshPosts}
+                onEdit={refreshPosts}
                 onChangeComment={() => handleCommentChange(post._id)}
               />
             )}

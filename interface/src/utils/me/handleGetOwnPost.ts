@@ -1,49 +1,13 @@
 import { ENV_VARS } from '@/config/envVars';
 
-interface Post {
-    _id: string;
-    user: {
-        _id: string;
-        username: string;
-        profilePicture?: string;
-    };
-    title?: string;
-    content?: string;
-    image?: string;
-    likesCount: number;
-    commentCount: number;
-    visibility: string;
-    createdAt: string;
-    updatedAt: string;
-    __v?: number;
-    originalPost?: any; // Hoặc định nghĩa interface cụ thể cho originalPost
-    caption?: string;
-}
-
-interface ApiResponse {
-    message: string;
-    posts: {
-        posts: Post[];
-        total: number;
-        page: number;
-        limit: number;
-    };
-}
-
-interface ReturnType {
-    data: Post[];
-    error: string | null;
-}
-
-export const handleGetOwnPosts = async (page = 1, limit = 10): Promise<ReturnType> => {
+export const handleGetOwnPosts = async (page = 1, limit = 10) => {
     try {
         const response = await fetch(
             `${ENV_VARS.API_ROUTE}/posts/getown?page=${page}&limit=${limit}`,
             {
                 method: "GET",
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('token')}`
                 },
                 credentials: "include",
             }
@@ -51,26 +15,19 @@ export const handleGetOwnPosts = async (page = 1, limit = 10): Promise<ReturnTyp
 
         if (!response.ok) {
             const errorData = await response.json();
-            return { 
-                data: [], 
-                error: errorData.message || 'Failed to fetch posts' 
-            };
+            return { data: [], error: errorData?.message || "Có lỗi xảy ra khi lấy dữ liệu." };
         }
 
-        const data: ApiResponse = await response.json();
+        const data = await response.json();
+        console.log('API Response:', data); // Debug log
         
-        // Kiểm tra và trả về mảng posts đúng cách
-        const postsArray = data?.posts?.posts ?? [];
-        
-        return {
-            data: Array.isArray(postsArray) ? postsArray : [],
-            error: null
+        // Trả về data.posts thay vì data
+        return { 
+            data: Array.isArray(data.posts) ? data.posts : [], 
+            error: "" 
         };
-    } catch (error) {
-        console.error('Error fetching user posts:', error);
-        return {
-            data: [],
-            error: error instanceof Error ? error.message : 'Unknown error'
-        };
+    } catch (err: any) {
+        console.error('Fetch error:', err);
+        return { data: [], error: err.message || "Có lỗi xảy ra." };
     }
 };

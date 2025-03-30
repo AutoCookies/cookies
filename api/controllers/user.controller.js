@@ -7,7 +7,9 @@ import {
     changeUserPhoneNumberService,
     updateProfilePictureService,
     getProfilePictureService,
-    searchUserByNameService
+    searchUserByNameService,
+    updateCoverPhotoService,
+    getCoverPhotoService
 } from '../services/user.service.js';
 
 /**
@@ -105,6 +107,23 @@ export const updateProfilePicture = async (req, res) => {
     }
 };
 
+export const updateCoverPhoto = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const imageBuffer = req.file ? req.file.buffer : null;
+
+        if (!imageBuffer) {
+            return res.status(400).json({ error: "Không có file nào được tải lên!" });
+        }
+
+        const result = await updateCoverPhotoService(userId, imageBuffer);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        return status(500).json({ error: error.message });
+    }
+}
+
 export const getProfilePicture = async (req, res) => {
     try {
         const result = getProfilePictureService(req.user);  // Lấy từ user đã đăng nhập
@@ -116,6 +135,19 @@ export const getProfilePicture = async (req, res) => {
         res.json(result);
     } catch (error) {
         console.error("Error in getProfilePicture:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const getCoverPhoto = async (req, res) => {
+    try {
+        const result = await getCoverPhotoService(req.user);
+        if (!result.coverPhoto) {
+            return res.status(404).json({ message: "Người dùng chưa có ảnh biến" });
+        }
+        res.json(result);
+    } catch (error) {
+        console.error("Error in getCoverPhoto:", error.message);
         res.status(400).json({ message: error.message });
     }
 };

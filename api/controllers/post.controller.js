@@ -48,7 +48,10 @@ export const createPost = async (req, res) => {
 export const getOwnPosts = async (req, res) => {
     try {
         const userId = req.user ? req.user._id : null;
-        const posts = await getOwnPostsService(userId);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        const posts = await getOwnPostsService(userId, page, limit);
 
         res.status(200).json({
             message: "Lấy danh sách bài đăng thành công!",

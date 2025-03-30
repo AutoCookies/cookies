@@ -1,19 +1,21 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, useCallback, useRef, use } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { handleGetOwnPosts } from "@/utils/me/handleGetOwnPost";
-import styles from '@/styles/me/personalPage.module.css';
 import PostCard from "@/components/posts/PostCard";
 import SharePostCard from "@/components/posts/SharePostCard";
-
+import styles from '@/styles/me/personalPage.module.css';
+import { ENV_VARS } from "@/config/envVars";
 
 export default function PersonalPage() {
     const [posts, setPosts] = useState<any[]>([]);
-    const [hasMore, setHasMore] = useState(true);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const lastFetchedPage = useRef(0);
     const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string>("");
+    const [hasMore, setHasMore] = useState(true);
+    const lastFetchedPage = useRef(0);
+    const [coverPhoto, setCoverPhoto] = useState<string>("/default/default-cover.jpg");
+    const [profileImage, setProfileImage] = useState<string>("/default/default-cover.jpg");
 
     const fetchPosts = useCallback(async (pageNumber: number, forceRefresh = false) => {
         if ((!hasMore || loading || lastFetchedPage.current === pageNumber) && !forceRefresh) return;
@@ -23,36 +25,58 @@ export default function PersonalPage() {
 
         try {
             const { data, error } = await handleGetOwnPosts(pageNumber, 10);
-            if (error) {
-                throw new Error(error);
-            }
+            if (error) throw new Error(error);
 
-            // Thêm kiểm tra data tồn tại và là mảng
-            const receivedPosts = Array.isArray(data) ? data : [];
+            // Đảm bảo data là mảng
+            const postsData = Array.isArray(data) ? data : [];
 
             setPosts(prev => {
                 if (!forceRefresh && pageNumber !== 1) {
                     const uniquePosts = new Map(prev.map(post => [post._id, post]));
-                    receivedPosts.forEach((post: any) => uniquePosts.set(post._id, post));
+                    postsData.forEach((post: any) => uniquePosts.set(post._id, post));
                     return Array.from(uniquePosts.values());
                 }
-                return receivedPosts;
+                return postsData; // Sử dụng postsData đã được kiểm tra
             });
 
-            // Kiểm tra xem còn dữ liệu không
-            setHasMore(receivedPosts.length >= 10);
-
-        } catch (error) {
-            console.error("Failed to fetch posts", error);
-            setError("Failed to load posts");
+            setHasMore(postsData.length > 0);
+            lastFetchedPage.current = pageNumber;
+        } catch (err) {
+            setError(err.message);
+            setPosts([]); // Reset về mảng rỗng nếu có lỗi
         } finally {
             setLoading(false);
         }
     }, [hasMore, loading]);
 
+    const fetchProfileData = useCallback(async () => {
+        try {
+            // Fetch cover photo
+            const coverRes = await fetch(`${ENV_VARS.API_ROUTE}/user/cover-photo`, { credentials: 'include' });
+            if (coverRes.ok) {
+                const coverData = await coverRes.json();
+                setCoverPhoto(coverData.coverPhoto || "/default/default-cover.jpg");
+            }
+
+            // Fetch profile picture
+            const profileRes = await fetch(`${ENV_VARS.API_ROUTE}/user/me/profile-picture`, { credentials: 'include' });
+            if (profileRes.ok) {
+                const profileData = await profileRes.json();
+                setProfileImage(profileData.profilePicture || "default/default-profile.jpg");
+            }
+        } catch (error) {
+            console.error("Error fetching profile data:", error);
+        }
+    }, []);
+
     useEffect(() => {
         fetchPosts(page);
+
     }, [page, fetchPosts]);
+
+    useEffect(() => {
+        fetchProfileData();
+    }, [fetchProfileData])
 
     const refreshPosts = useCallback(() => {
         fetchPosts(1, true);
@@ -101,6 +125,34 @@ export default function PersonalPage() {
 
     return (
         <div className={styles.container}>
+            {/* Phần Profile Header */}
+            <div className={styles.profileHeader}>
+                <div className={styles.coverPhotoContainer}>
+                    <img
+                        src={coverPhoto}
+                        alt="Cover"
+                        className={styles.coverPhoto}
+                        onError={() => setCoverPhoto("/default/default-cover.jpg")}
+                    />
+                </div>
+
+                <div className={styles.profileInfo}>
+                    <div className={styles.avatarContainer}>
+                        <img
+                            src={profileImage}
+                            alt="Profile"
+                            className={styles.avatar}
+                            onError={() => setProfileImage("/default/default-profile.jpg")}
+                        />
+                    </div>
+                    <div className={styles.profileNav}>
+                        <button className={styles.navItemActive}>Bài viết</button>
+                        <button className={styles.navItem}>Giới thiệu</button>
+                        <button className={styles.navItem}>Bạn bè</button>
+                    </div>
+                </div>
+            </div>
+
             <div className={styles.posts}>
                 {posts.map((post) => (
                     <div key={post._id}>
@@ -159,5 +211,5 @@ export default function PersonalPage() {
 
             {!hasMore && <p className={styles.endMessage}>Không còn bài viết nào.</p>}
         </div>
-    )
+    );
 }

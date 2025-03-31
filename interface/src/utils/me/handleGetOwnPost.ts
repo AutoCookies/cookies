@@ -1,4 +1,4 @@
-import { ENV_VARS } from '@/config/envVars';
+import { ENV_VARS } from '@/lib/envVars';
 
 export const handleGetOwnPosts = async (page = 1, limit = 10) => {
     try {

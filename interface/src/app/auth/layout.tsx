@@ -1,19 +1,10 @@
-import styles from "../../styles/auth/auth.module.css"; // Import CSS Modules
+import styles from "../../styles/auth/auth.module.css";
+import SakuraFlower from "@/components/ui/SakuraFlower"; // Import SakuraEffect
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.authLayout}>
-      {/* 🌸 Thêm hiệu ứng hoa rơi */}
-      {Array.from({ length: 10 }).map((_, i) => (
-        <div 
-          key={i} 
-          className={styles.sakuraPetal} 
-          style={{ 
-            left: `${Math.random() * 100}%`, 
-            animationDuration: `${Math.random() * 5 + 5}s` 
-          }} 
-        />
-      ))}
+      <SakuraFlower /> {/* 🌸 Hiệu ứng hoa rơi (Client Component) */}
 
       <main className={styles.authContent}>{children}</main>
 

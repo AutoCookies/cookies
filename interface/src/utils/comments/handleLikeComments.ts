@@ -1,4 +1,4 @@
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 
 export const handleLikeComment = async (commentId: string, isLiked: boolean) => {
     try {

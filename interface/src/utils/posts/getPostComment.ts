@@ -1,4 +1,4 @@
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 
 export const getPostComments = async (postId: string) => {
     // console.log(`Lấy bình luận bài viết: ${postId}`);

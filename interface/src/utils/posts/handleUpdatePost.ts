@@ -1,5 +1,5 @@
 // utils/posts/handleUpdatePost.ts
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 
 interface UpdatePostParams {
   title?: string;

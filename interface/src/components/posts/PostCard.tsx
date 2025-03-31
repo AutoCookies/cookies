@@ -4,7 +4,7 @@ import { handleLike } from "@/utils/posts/handleLike";
 import { handleShare } from "@/utils/posts/handleSharePosts";
 import CommentSection from "../comments/commentSection";
 import SharePostModal from "@/components/posts/sharePostModal";
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 import { handleDeletePost } from "@/utils/posts/handleDeletePost";
 import EditPostModal from "@/components/posts/EditPostModal";
 
@@ -27,6 +27,7 @@ interface PostProps {
   onChangeComment: () => void;
   onDelete: () => void;
   onEdit?: () => void;
+  onUsernameClick?: (userId: string, username: string) => void;
 }
 
 const PostCard: React.FC<PostProps> = ({
@@ -44,6 +45,7 @@ const PostCard: React.FC<PostProps> = ({
   onChangeComment,
   onDelete,
   onEdit,
+  onUsernameClick
 }) => {
   const [liked, setLiked] = useState(isLiked);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -131,7 +133,13 @@ const PostCard: React.FC<PostProps> = ({
             className={styles["user-avatar"]}
           />
           <div className={styles["user-details"]}>
-            <span className={styles.username}>{user.username}</span>
+            <span
+              className={styles.username}
+              onClick={() => onUsernameClick?.(user._id, user.username)}
+              style={{ cursor: "pointer" }}
+            >
+              {user.username}
+            </span>
             <span className={styles["visibility-text"]} data-visibility={visibility}>
               {visibility === "public" && "Public"}
               {visibility === "private" && "Private"}

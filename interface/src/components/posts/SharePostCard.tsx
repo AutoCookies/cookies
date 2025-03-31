@@ -5,7 +5,7 @@ import { handleLike } from "@/utils/posts/handleLike";
 import { handleShare } from "@/utils/posts/handleSharePosts";
 import { handleDeletePost } from "@/utils/posts/handleDeletePost";
 import CommentSection from "../comments/commentSection";
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 import { handleUpdateSharePost } from "@/utils/posts/handleUpdateSharePost";
 import EditSharePostModal from './EditSharePostModal';
 
@@ -39,6 +39,7 @@ interface SharePostProps {
   onChangeComment: () => void;
   onDelete: () => void;
   onEdit: () => void;
+  onUsernameClick?: (userId: string, username: string) => void;
 }
 
 const SharePostCard: React.FC<SharePostProps> = ({
@@ -55,6 +56,7 @@ const SharePostCard: React.FC<SharePostProps> = ({
   onChangeComment,
   onDelete,
   onEdit,
+  onUsernameClick
 }) => {
   const [liked, setLiked] = useState(isLiked);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -191,8 +193,12 @@ const SharePostCard: React.FC<SharePostProps> = ({
             className={styles["share-avatar"]}
           />
           <div className={styles["share-info"]}>
-            <span className={styles["share-user"]}>
-              <strong>{user?.username || "Người dùng không xác định"}</strong>
+            <span
+              className={styles["share-user"]}
+              onClick={() => onUsernameClick?.(user._id, user.username)}
+              style={{ cursor: "pointer" }}
+            >
+              {user.username}
             </span>
             <span className={styles["visibility-text"]} data-visibility={visibility}>
               {visibility === "public" && "Public"}

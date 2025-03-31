@@ -1,4 +1,4 @@
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 
 interface ApiComment {
   _id: string;

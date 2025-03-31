@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { getAllPosts } from "@/utils/posts/fetchAllPosts";
-import PostCard from "../../../components/posts/PostCard";
-import SharePostCard from "../../../components/posts/SharePostCard";
+import PostCard from "@/components/posts/PostCard";
+import SharePostCard from "@/components/posts/SharePostCard";
 import CreatePostModal from "@/components/posts/CreatePostModal";
-import styles from "../../../styles/home/postPage.module.css";
-import { ENV_VARS } from "@/config/envVars";
+import styles from "@/styles/home/postPage.module.css";
+import { ENV_VARS } from "@/lib/envVars";
 import { useRouter } from 'next/navigation';
 
 export default function PostPage() {
@@ -113,13 +113,9 @@ export default function PostPage() {
   }, []);
 
   const handleUsernameClick = (userId: string) => {
-    if (userId === currentUserId) {
-      router.push('/home/me');
-    } else {
-      router.push(`/home/${userId}`);
-    }
-  };  
-  
+    router.push(`/home/${userId}`);
+  };
+
   const handlePostCreated = useCallback((newPost: any) => {
     setPosts(prev => [newPost, ...prev]);
     setShowCreateModal(false);
@@ -178,6 +174,7 @@ export default function PostPage() {
                 onDelete={refreshPosts}
                 onEdit={refreshPosts}
                 onChangeComment={() => handleCommentChange(post._id)}
+                onUsernameClick={handleUsernameClick}
               />
             ) : (
               <PostCard
@@ -195,6 +192,7 @@ export default function PostPage() {
                 onDelete={refreshPosts}
                 onEdit={refreshPosts}
                 onChangeComment={() => handleCommentChange(post._id)}
+                onUsernameClick={handleUsernameClick}
               />
             )}
           </div>

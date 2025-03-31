@@ -1,6 +1,6 @@
 "use client";
 import styles from "../../styles/home/home.module.css";
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
@@ -41,7 +41,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             <header className={styles.header}>
                 <div className={styles.leftSection}>
                     <div className={styles.logo}>
-                        <Link href="/home/postPage" style={{ textDecoration: "none", color: "inherit" }}>
+                        <Link href="/home" style={{ textDecoration: "none", color: "inherit" }}>
                             <h1>AutoCookies</h1>
                         </Link>
                     </div>

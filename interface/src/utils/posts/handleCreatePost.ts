@@ -1,5 +1,5 @@
 // utils/posts/handleCreatePost.ts
-import { ENV_VARS } from '@/config/envVars';
+import { ENV_VARS } from '@/lib/envVars';
 
 // Define visibility types
 export type PostVisibility = 'public' | 'friends' | 'private';

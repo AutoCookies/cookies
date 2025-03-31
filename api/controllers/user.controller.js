@@ -158,13 +158,6 @@ export const getUserImagePage = async (req, res) => {
         const { userId } = req.params;
         const userProfile = await getUserImagePageService(userId);
 
-        // Nếu không có cả ảnh đại diện và ảnh bìa
-        if (!userProfile.profilePicture && !userProfile.coverPhoto) {
-            return res.status(404).json({ 
-                message: "User has no profile picture or cover photo" 
-            });
-        }
-
         res.status(200).json(userProfile);
     } catch (error) {
         console.error("Error fetching user profile:", error.message);

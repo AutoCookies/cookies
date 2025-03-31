@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../../../styles/auth/signup.module.css";
 import Link from "next/link";
-import { ENV_VARS } from "../../../config/envVars";
+import { ENV_VARS } from "../../../lib/envVars";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");

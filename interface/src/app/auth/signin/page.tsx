@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../../../styles/auth/signin.module.css";
 import Link from "next/link";
-import { ENV_VARS } from "../../../config/envVars";
+import { ENV_VARS } from "../../../lib/envVars";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -40,7 +40,7 @@ export default function SignIn() {
       if (data.role === "admin") {
         router.push("/dashboard");
       } else {
-        router.push("/home/postPage");
+        router.push("/home");
       }
     } catch (err: any) {
       setError(err.message);

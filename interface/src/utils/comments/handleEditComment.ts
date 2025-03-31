@@ -1,5 +1,5 @@
 // src/utils/comments/handleEditComment.ts
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 
 interface EditCommentParams {
   commentId: string;

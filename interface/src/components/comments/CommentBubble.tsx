@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles/commentBubble.module.css";
 import { handleLikeComment } from "@/utils/comments/handleLikeComments";
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 import { handleDeleteComment } from "@/utils/comments/hadnleDeleteComments";
 import { handleEditComment } from "@/utils/comments/handleEditComment";
 

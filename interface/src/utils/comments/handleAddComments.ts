@@ -1,5 +1,5 @@
 // src/utils/comments/handleAddComment.ts
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 
 interface AddCommentParams {
   postId: string;

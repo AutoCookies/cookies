@@ -1,5 +1,5 @@
 // src/utils/fetchPosts.ts
-import { ENV_VARS } from "@/config/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 
 export const getAllPosts = async (page: number = 1, limit: number = 10) => {
   try {

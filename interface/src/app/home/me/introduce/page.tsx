@@ -5,6 +5,8 @@ import { handleGetOwnPosts } from "@/utils/me/handleGetOwnPost";
 import PostCard from "@/components/posts/PostCard";
 import SharePostCard from "@/components/posts/SharePostCard";
 import styles from '@/styles/me/personalPage.module.css';
+import { ENV_VARS } from "@/config/envVars";
+import { handleGetUserDetails } from "@/utils/me/handleGetUserDetails";
 
 export default function PersonalPage() {
     const [posts, setPosts] = useState<any[]>([]);
@@ -13,6 +15,9 @@ export default function PersonalPage() {
     const [error, setError] = useState<string>("");
     const [hasMore, setHasMore] = useState(true);
     const lastFetchedPage = useRef(0);
+    const [coverPhoto, setCoverPhoto] = useState<string>("/default/default-cover.jpg");
+    const [profileImage, setProfileImage] = useState<string>("/default/default-cover.jpg");
+    const [username, setUsername] = useState<string>("");
 
 
     const fetchPosts = useCallback(async (pageNumber: number, forceRefresh = false) => {
@@ -39,16 +44,56 @@ export default function PersonalPage() {
 
             setHasMore(postsData.length > 0);
             lastFetchedPage.current = pageNumber;
-        } catch (error) {
-            console.log("Error: ", error)
+        } catch (err) {
+            setError(err.message);
             setPosts([]); // Reset về mảng rỗng nếu có lỗi
         } finally {
             setLoading(false);
         }
     }, [hasMore, loading]);
 
+    const fetchProfileData = useCallback(async () => {
+        try {
+            // Fetch cover photo
+            const coverRes = await fetch(`${ENV_VARS.API_ROUTE}/user/cover-photo`, { credentials: 'include' });
+            if (coverRes.ok) {
+                const coverData = await coverRes.json();
+                setCoverPhoto(coverData.coverPhoto || "/default/default-cover.jpg");
+            }
+
+            // Fetch profile picture
+            const profileRes = await fetch(`${ENV_VARS.API_ROUTE}/user/me/profile-picture`, { credentials: 'include' });
+            if (profileRes.ok) {
+                const profileData = await profileRes.json();
+                setProfileImage(profileData.profilePicture || "default/default-profile.jpg");
+            }
+        } catch (error) {
+            console.error("Error fetching profile data:", error);
+        }
+    }, []);
+
+    const fetchUserDetails = useCallback(async () => {
+        try {
+            const { data, error } = await handleGetUserDetails();
+
+            if (error) {
+                console.error("Error fetching user details:", error);
+                return;
+            }
+
+            if (data) {
+                setUsername(data.username || "");
+                console.log("Username set to:", data.username); // Debug log
+            }
+        } catch (err) {
+            console.error("Failed to fetch user details:", err);
+        }
+    }, []);
+
     useEffect(() => {
         const fetchInitialData = async () => {
+            await fetchUserDetails();
+            await fetchProfileData();
             await fetchPosts(page);
         };
 
@@ -102,6 +147,37 @@ export default function PersonalPage() {
 
     return (
         <div className={styles.container}>
+            {/* Phần Profile Header */}
+            <div className={styles.profileHeader}>
+                <div className={styles.coverPhotoContainer}>
+                    <img
+                        src={coverPhoto}
+                        alt="Cover"
+                        className={styles.coverPhoto}
+                        onError={() => setCoverPhoto("/default/default-cover.jpg")}
+                    />
+                </div>
+
+                <div className={styles.profileInfo}>
+                    <div className={styles.avatarContainer}>
+                        <img
+                            src={profileImage}
+                            alt="Profile"
+                            className={styles.avatar}
+                            onError={() => setProfileImage("/default/default-profile.jpg")}
+                        />
+                        <h2 className={styles.username}>
+                            {username || "Đang tải..."}
+                        </h2>
+                    </div>
+                    <div className={styles.profileNav}>
+                        <button className={styles.navItemActive}>Bài viết</button>
+                        <button className={styles.navItem}>Giới thiệu</button>
+                        <button className={styles.navItem}>Bạn bè</button>
+                    </div>
+                </div>
+            </div>
+
             <div className={styles.posts}>
                 {posts.map((post) => (
                     <div key={post._id}>

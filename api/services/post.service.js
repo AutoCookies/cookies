@@ -65,7 +65,7 @@ export const createPostService = async (
 
 
 export const getOwnPostsService = async (userId, page = 1, limit = 10) => {
-    console.log(`UserId ${userId}`)
+    // console.log(`UserId ${userId}`)
     const skip = (page - 1) * limit;
 
     const user = await User.findById(userId);
@@ -79,7 +79,7 @@ export const getOwnPostsService = async (userId, page = 1, limit = 10) => {
         .limit(limit)
         .lean();//
 
-    console.log(`Posts length ${posts.length}`)
+    // console.log(`Posts length ${posts.length}`)
 
     // Lấy danh sách bài SharePost với pagination
     const sharedPosts = await SharePost.find({ user: userId })
@@ -97,14 +97,14 @@ export const getOwnPostsService = async (userId, page = 1, limit = 10) => {
         .limit(limit)
         .lean();
 
-    console.log(`SharedPosts length ${sharedPosts.length}`)
+    // console.log(`SharedPosts length ${sharedPosts.length}`)
 
     // Gộp và sắp xếp
     const allPosts = [...posts, ...sharedPosts].sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
 
-    console.log(`AllPosts length ${allPosts.length}`)
+    // console.log(`AllPosts length ${allPosts.length}`)
 
     let userLikedPosts = [];
     if (userId) {
@@ -112,7 +112,7 @@ export const getOwnPostsService = async (userId, page = 1, limit = 10) => {
             .distinct("post");
     }
 
-    console.log(`UserLikedPosts length ${userLikedPosts.length}`)
+    // console.log(`UserLikedPosts length ${userLikedPosts.length}`)
 
     // Gán trạng thái like
     const postsWithLikeStatus = allPosts.map(post => ({
@@ -122,7 +122,7 @@ export const getOwnPostsService = async (userId, page = 1, limit = 10) => {
         ),
     }));
 
-    console.log(`PostsWithLikeStatus length ${postsWithLikeStatus.length}`)
+    // console.log(`PostsWithLikeStatus length ${postsWithLikeStatus.length}`)
 
     return postsWithLikeStatus;
 };
@@ -340,4 +340,63 @@ export const getAllPostsService = async (userId, page = 1, limit = 10) => {
 };
 
 
+export const getPostsByUserIdService = async (userId, page = 1, limit = 10) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error("Người dùng không tồn tại!");
+        }
+        // Lấy danh sách bài Post của user với pagination
+        const posts = await Post.find({ user: userId })
+            .populate("user", "username profilePicture")
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
 
+        const sharePosts = await SharePost.find({ user: userId })
+            .populate("user", "username profilePicture")
+            .populate("originalPost", "title content image user createdAt")
+            .populate({
+                path: "originalPost",
+                populate: {
+                    path: "user",
+                    select: "username profilePicture"
+                }
+            })
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
+
+        // Lọc bỏ các SharePost mà originalPost không phải public
+        const filteredSharedPosts = sharePosts.filter(
+            post => post.originalPost?.visibility === 'public'
+        );
+
+        // Gộp và sắp xếp bài viết
+        const allPosts = [...posts, ...filteredSharedPosts].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        // Kiểm tra bài viết nào user đã like (nếu có userId)
+        let userLikedPosts = [];
+        if (userId) {
+            userLikedPosts = await LikePost.find({ user: userId })
+                .distinct("post");
+        }
+
+        // Gán trạng thái like
+        const postsWithLikeStatus = allPosts.map(post => ({
+            ...post,
+            isLiked: userLikedPosts.some(
+                id => id.toString() === post._id.toString()
+            ),
+        }));
+
+        return postsWithLikeStatus;
+
+    } catch (error) {
+        console.log(error)
+    }
+};

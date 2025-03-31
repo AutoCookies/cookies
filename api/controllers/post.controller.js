@@ -5,7 +5,8 @@ import {
     deletePostService,
     sharePostService,
     getAllPostsService,
-    updateSharePostService
+    updateSharePostService,
+    getPostsByUserIdService
 } from '../services/post.service.js';
 
 /**
@@ -26,10 +27,10 @@ export const createPost = async (req, res) => {
         }
 
         const newPost = await createPostService(
-            userId, 
-            title, 
-            content, 
-            imageBuffer, 
+            userId,
+            title,
+            content,
+            imageBuffer,
             visibility
         );
 
@@ -39,8 +40,8 @@ export const createPost = async (req, res) => {
         });
     } catch (error) {
         console.error("Error in createPost:", error.message);
-        res.status(400).json({ 
-            message: error.message || "Có lỗi xảy ra khi tạo bài viết" 
+        res.status(400).json({
+            message: error.message || "Có lỗi xảy ra khi tạo bài viết"
         });
     }
 };
@@ -182,4 +183,15 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
+export const getPostsByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
 
+        const posts = await getPostsByUserIdService(userId, page, limit);
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

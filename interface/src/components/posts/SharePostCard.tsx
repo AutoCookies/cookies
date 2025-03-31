@@ -33,7 +33,6 @@ interface SharePostProps {
     commentCount: number;
     isLiked: boolean;
   };
-  visibility: "public" | "private" | "friends";
   onLike: () => void;
   onShare: () => void;
   onChangeComment: () => void;
@@ -49,7 +48,6 @@ const SharePostCard: React.FC<SharePostProps> = ({
   commentCount,
   isLiked,
   originalPost,
-  visibility,
   onLike,
   onShare,
   onChangeComment,
@@ -154,20 +152,6 @@ const SharePostCard: React.FC<SharePostProps> = ({
               <strong>{user?.username || "Người dùng không xác định"}</strong>
             </span>
             <p className={styles["share-caption"]}>{caption}</p>
-          </div>
-
-          <div>
-            <div className={styles["visibility-badge"]}>
-              {visibility === "public" && (
-                <span className={styles.public}>Công khai</span>
-              )}
-              {visibility === "private" && (
-                <span className={styles.private}>Riêng tư</span>
-              )}
-              {visibility === "friends" && (
-                <span className={styles.friends}>Bạn bè</span>
-              )}
-            </div>
           </div>
         </div>
 

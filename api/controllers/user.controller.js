@@ -9,7 +9,8 @@ import {
     getProfilePictureService,
     searchUserByNameService,
     updateCoverPhotoService,
-    getCoverPhotoService
+    getCoverPhotoService,
+    getUserImagePageService,
 } from '../services/user.service.js';
 
 /**
@@ -149,6 +150,30 @@ export const getCoverPhoto = async (req, res) => {
     } catch (error) {
         console.error("Error in getCoverPhoto:", error.message);
         res.status(400).json({ message: error.message });
+    }
+};
+
+export const getUserImagePage = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const userProfile = await getUserImagePageService(userId);
+
+        // Nếu không có cả ảnh đại diện và ảnh bìa
+        if (!userProfile.profilePicture && !userProfile.coverPhoto) {
+            return res.status(404).json({ 
+                message: "User has no profile picture or cover photo" 
+            });
+        }
+
+        res.status(200).json(userProfile);
+    } catch (error) {
+        console.error("Error fetching user profile:", error.message);
+        
+        if (error.message === "User not found") {
+            return res.status(404).json({ message: error.message });
+        }
+        
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 

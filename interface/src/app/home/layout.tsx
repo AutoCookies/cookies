@@ -29,8 +29,11 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     };
 
     useEffect(() => {
-        fetchUserProfile();
+        (async () => {
+            await fetchUserProfile();
+        })();
     }, []);
+
 
     return (
         <div className={styles.container}>

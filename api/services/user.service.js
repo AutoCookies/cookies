@@ -1,7 +1,6 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../config/cloudinary.js";
-import fs from "fs";
 
 export const getUser = async (id, currentUser) => {
     const user = await User.findById(id).select("-password").lean();
@@ -12,7 +11,8 @@ export const getUser = async (id, currentUser) => {
             username: user.username,
             profilePicture: user.profilePicture,
             bio: user.bio,
-            visibility: user.visibility
+            visibility: user.visibility,
+            coverPhoto: user.coverPhoto
         };
     }
     return user;
@@ -192,6 +192,20 @@ export const getCoverPhotoService = (user) => {
     return { coverPhoto: user.coverPhoto };
 };
 
+export const getUserImagePageService = async (userId) => {
+    const user = await User.findById(userId).select("username profilePicture coverPhoto");
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return {
+        username: user.username || null,
+        profilePicture: user.profilePicture || null,
+        coverPhoto: user.coverPhoto || null
+    };
+};
+
 export const searchUserByNameService = async (query, limit = 10) => {
     try {
         query = query.trim(); // Loại bỏ khoảng trắng thừa
@@ -216,5 +230,3 @@ export const searchUserByNameService = async (query, limit = 10) => {
         throw new Error("Lỗi khi tìm kiếm người dùng: " + error.message);
     }
 };
-
-

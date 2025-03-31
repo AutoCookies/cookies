@@ -294,3 +294,16 @@
   transform: translateY(-1px);
   transition: transform 0.2s ease;
 }
+
+.usernameButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.usernameButton:hover {
+  text-decoration: underline;
+}

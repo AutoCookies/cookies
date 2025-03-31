@@ -1,87 +1,157 @@
+/* personalPage.module.css */
+
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .profileHeader {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  
-  .coverPhotoContainer {
-    height: 350px;
-    background: #f0f2f5;
-  }
-  
-  .coverPhoto {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .profileInfo {
-    display: flex;
-    flex-direction: column;
-    padding: 0 16px;
-    position: relative;
-  }
-  
-  .avatarContainer {
-    width: 168px;
-    height: 168px;
-    border-radius: 50%;
-    border: 4px solid white;
-    background: white;
-    margin-top: -84px;
-    overflow: hidden;
-  }
-  
-  .avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .profileNav {
-    display: flex;
-    margin-top: 16px;
-    border-top: 1px solid #dddfe2;
-  }
-  
-  .navItem {
-    padding: 16px 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    color: #65676b;
-  }
-  
-  .navItemActive {
-    composes: navItem;
-    color: #1877f2;
-    border-bottom: 3px solid #1877f2;
-  }
-  
-  /* Giữ nguyên các style cũ từ postPage.module.css */
-  .posts {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .loading {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-  }
-  
-  .endMessage {
-    text-align: center;
-    padding: 20px;
-    color: #65676b;
-  }
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff9f9;
+  min-height: 100vh;
+}
+
+/* Phần header với hoa anh đào */
+.profileHeader {
+  position: relative;
+  margin-bottom: 40px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(255, 183, 197, 0.3);
+}
+
+.coverPhotoContainer {
+  height: 300px;
+  position: relative;
+  background: linear-gradient(135deg, #ffb7c5, #ffdfea);
+}
+
+.coverPhotoContainer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23ffffff50"><path d="M50 0c-8 15-20 25-35 30 5 15 15 25 30 30-15 5-25 15-30 30 15-5 25-15 30-30 5 15 15 25 30 30-5-15-15-25-30-30 15-5 25-15 30-30-15 5-25 15-30 30z"/></svg>');
+  background-size: 100px;
+  opacity: 0.3;
+}
+
+.coverPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileInfo {
+  position: relative;
+  padding: 20px;
+  text-align: center;
+  background-color: white;
+  border-radius: 0 0 12px 12px;
+}
+
+.avatarContainer {
+  position: relative;
+  margin-top: -80px;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 4px 15px rgba(255, 183, 197, 0.4);
+  object-fit: cover;
+  background-color: #ffdfea;
+}
+
+.username {
+  margin-top: 15px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #e75480;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+.profileNav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.navItem, .navItemActive {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navItem {
+  background-color: #ffdfea;
+  color: #e75480;
+}
+
+.navItemActive {
+  background-color: #e75480;
+  color: white;
+}
+
+.navItem:hover {
+  background-color: #ffb7c5;
+}
+
+/* Phần bài viết */
+.posts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 25px;
+  margin-top: 30px;
+}
+
+/* Loading animation */
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.loading img {
+  width: 60px;
+  height: 60px;
+}
+
+.endMessage {
+  text-align: center;
+  padding: 20px;
+  color: #e75480;
+  font-size: 1.2rem;
+  margin-top: 30px;
+}
+
+/* Sakura decoration elements */
+.profileHeader::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23e75480"><path d="M50 0c-8 15-20 25-35 30 5 15 15 25 30 30-15 5-25 15-30 30 15-5 25-15 30-30 5 15 15 25 30 30-5-15-15-25-30-30 15-5 25-15 30-30-15 5-25 15-30 30z"/></svg>');
+  background-size: contain;
+  opacity: 0.7;
+}
+
+.container::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(90deg, #ffb7c5, #e75480, #ffb7c5);
+  z-index: 1000;
+}

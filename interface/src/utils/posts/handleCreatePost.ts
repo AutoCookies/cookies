@@ -1,21 +1,40 @@
 // utils/posts/handleCreatePost.ts
 import { ENV_VARS } from '@/config/envVars';
 
+// Define visibility types
+export type PostVisibility = 'public' | 'friends' | 'private';
+
 interface CreatePostParams {
     title: string;
     content: string;
     image?: File | null;
+    visibility?: PostVisibility;
 }
 
 interface CreatePostResponse {
     success: boolean;
-    post?: any; // Replace 'any' with your Post interface/type
+    post?: Post;
     message?: string;
+}
+
+interface Post {
+    _id: string;
+    title: string;
+    content: string;
+    image?: string;
+    visibility: PostVisibility;
+    user: {
+        _id: string;
+        username: string;
+        profilePicture?: string;
+    };
+    createdAt: string;
+    updatedAt: string;
 }
 
 export const handleCreatePost = async (
     postData: CreatePostParams,
-    onSuccess?: (post: any) => void,
+    onSuccess?: (post: Post) => void,
     onError?: (error: string) => void
 ): Promise<CreatePostResponse> => {
     try {
@@ -28,10 +47,14 @@ export const handleCreatePost = async (
             throw new Error('Bài viết phải có nội dung hoặc ảnh');
         }
 
-        // Prepare FormData for potential file upload
+        // Set default visibility if not provided
+        const visibility = postData.visibility || 'public';
+
+        // Prepare FormData
         const formData = new FormData();
         formData.append('title', postData.title);
         formData.append('content', postData.content);
+        formData.append('visibility', visibility);
 
         if (postData.image) {
             formData.append('image', postData.image);
@@ -41,10 +64,10 @@ export const handleCreatePost = async (
         const response = await fetch(`${ENV_VARS.API_ROUTE}/posts/create`, {
             method: 'POST',
             body: formData,
-            credentials: 'include', // For cookies/session if using authentication
+            credentials: 'include',
         });
 
-        // Handle non-JSON responses (like HTML errors)
+        // Handle response
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const errorText = await response.text();
@@ -59,6 +82,11 @@ export const handleCreatePost = async (
 
         if (!response.ok) {
             throw new Error(data.message || 'Tạo bài viết thất bại');
+        }
+
+        // Validate response data
+        if (!data.post || !data.post._id) {
+            throw new Error('Dữ liệu bài viết không hợp lệ từ máy chủ');
         }
 
         // Success case
@@ -87,24 +115,3 @@ export const handleCreatePost = async (
         };
     }
 };
-
-// Optional: Type interfaces for better type safety
-interface Post {
-    _id: string;
-    title: string;
-    content: string;
-    image?: string;
-    user: {
-        _id: string;
-        username: string;
-        profilePicture?: string;
-    };
-    createdAt: string;
-    updatedAt: string;
-}
-
-interface ApiResponse {
-    success: boolean;
-    message?: string;
-    post?: Post;
-}

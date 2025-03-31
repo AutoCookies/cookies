@@ -11,10 +11,6 @@ import likeRoute from './routes/like.route.js';
 import CookieParser from "cookie-parser";
 import { isAdmin, protectRoute } from "./middlewares/auth.middleware.js";
 import { checkBanStatus } from "./middlewares/checkBan.middleware.js";
-import {  
-     postRateLimiter,
-     commentLimiter,
-} from "./middlewares/rateLimit.middleware.js";
 import cors from 'cors';
 // import User from "./models/user.model.js";
 
@@ -50,6 +46,9 @@ app.use(CookieParser())
 app.use(cors({
     origin: "http://localhost:3000",
     credentials: true,
+    optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 
 app.use("/api/v1/auth", authRoutes);

@@ -5,7 +5,8 @@ import {
     deletePostService,
     sharePostService,
     getAllPostsService,
-    updateSharePostService
+    updateSharePostService,
+    getPostsByUserIdService
 } from '../services/post.service.js';
 
 /**
@@ -17,10 +18,21 @@ export const createPost = async (req, res) => {
     try {
         console.log(`User id: ${req.user._id}`);
         const userId = req.user._id;
-        const { title, content } = req.body;
+        const { title, content, visibility = 'public' } = req.body; // Default to 'public'
         const imageBuffer = req.file ? req.file.buffer : null;
 
-        const newPost = await createPostService(userId, title, content, imageBuffer);
+        // Validate visibility value
+        if (!['public', 'friends', 'private'].includes(visibility)) {
+            throw new Error("Chế độ hiển thị không hợp lệ!");
+        }
+
+        const newPost = await createPostService(
+            userId,
+            title,
+            content,
+            imageBuffer,
+            visibility
+        );
 
         res.status(201).json({
             message: "Bài đăng đã được tạo thành công!",
@@ -28,14 +40,19 @@ export const createPost = async (req, res) => {
         });
     } catch (error) {
         console.error("Error in createPost:", error.message);
-        res.status(400).json({ message: error.message });
+        res.status(400).json({
+            message: error.message || "Có lỗi xảy ra khi tạo bài viết"
+        });
     }
 };
 
 export const getOwnPosts = async (req, res) => {
     try {
-        const userId = req.user._id; // Lấy userId từ token
-        const posts = await getOwnPostsService(userId);
+        const userId = req.user ? req.user._id : null;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        const posts = await getOwnPostsService(userId, page, limit);
 
         res.status(200).json({
             message: "Lấy danh sách bài đăng thành công!",
@@ -139,7 +156,7 @@ export const sharePost = async (req, res) => {
         const { postId } = req.params;
         const { caption, visibility = "public" } = req.body;
 
-        console.log("📤 Dữ liệu nhận từ frontend:", { caption, visibility });
+        console.log("Dữ liệu nhận từ frontend:", { caption, visibility });
 
         const sharedPost = await sharePostService(userId, postId, caption, visibility);
 
@@ -166,4 +183,15 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
+export const getPostsByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
 
+        const posts = await getPostsByUserIdService(userId, page, limit);
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

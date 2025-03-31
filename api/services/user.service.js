@@ -1,7 +1,6 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../config/cloudinary.js";
-import fs from "fs";
 
 export const getUser = async (id, currentUser) => {
     const user = await User.findById(id).select("-password").lean();
@@ -12,7 +11,8 @@ export const getUser = async (id, currentUser) => {
             username: user.username,
             profilePicture: user.profilePicture,
             bio: user.bio,
-            visibility: user.visibility
+            visibility: user.visibility,
+            coverPhoto: user.coverPhoto
         };
     }
     return user;
@@ -101,7 +101,7 @@ export const updateProfilePictureService = async (userId, imageBuffer) => {
             console.log("Ảnh cũ đã xóa thành công!");
         }
 
-        console.log("📤 Bắt đầu upload ảnh từ buffer...");
+        // console.log("Bắt đầu upload ảnh từ buffer...");
 
         // Upload ảnh mới lên Cloudinary
         const result = await new Promise((resolve, reject) => {
@@ -118,13 +118,13 @@ export const updateProfilePictureService = async (userId, imageBuffer) => {
             throw new Error("Không thể upload ảnh!");
         }
 
-        console.log("Upload thành công:", result.secure_url);
+        // console.log("Upload thành công:", result.secure_url);
 
         // Cập nhật ảnh mới vào database
         user.profilePicture = result.secure_url;
         await user.save();
 
-        console.log("Cập nhật profilePicture thành công!");
+        // console.log("Cập nhật profilePicture thành công!");
 
         return {
             message: "Ảnh đại diện đã được cập nhật thành công!",
@@ -136,11 +136,74 @@ export const updateProfilePictureService = async (userId, imageBuffer) => {
     }
 };
 
+export const updateCoverPhotoService = async (userId, imageBuffer) => {
+    try {
+        if (!imageBuffer) {
+            throw new Error("Không có ảnh để upload!");
+        }
+
+        const user = await User.findById(userId);
+        if (!user) throw new Error("Người dùng không tồn tại!");
+
+        if (user.coverPhoto) {
+            const publicId = user.coverPhoto.split("/").pop().split(".")[0];
+            await cloudinary.uploader.destroy(`user_covers/${publicId}`);
+        }
+
+        // Upload ảnh mới lên Cloudinary
+        const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                { folder: "user_covers", transformation: [{ width: 500, height: 500, crop: "limit" }] },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(imageBuffer);
+        });
+
+        if (!result.secure_url) {
+            throw new Error("Không thể upload ảnh!");
+        }
+
+        user.coverPhoto = result.secure_url;
+        await user.save();
+
+        return {
+            message: "Ảnh bìa đã được cập nhật thành công!",
+            coverPhoto: user.coverPhoto
+        };
+    } catch (error) {
+        console.error("Lỗi trong updateCoverPhoto:", error);
+        throw error;
+    }
+}
+
 export const getProfilePictureService = (user) => {
     if (!user || !user.profilePicture) {
         return { profilePicture: null };
     }
     return { profilePicture: user.profilePicture };
+};
+
+export const getCoverPhotoService = (user) => {
+    if (!user || !user.coverPhoto) {
+        return { coverPhoto: null };
+    }
+    return { coverPhoto: user.coverPhoto };
+};
+
+export const getUserImagePageService = async (userId) => {
+    const user = await User.findById(userId).select("username profilePicture coverPhoto");
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return {
+        username: user.username || null,
+        profilePicture: user.profilePicture || null,
+        coverPhoto: user.coverPhoto || null
+    };
 };
 
 export const searchUserByNameService = async (query, limit = 10) => {
@@ -167,5 +230,3 @@ export const searchUserByNameService = async (query, limit = 10) => {
         throw new Error("Lỗi khi tìm kiếm người dùng: " + error.message);
     }
 };
-
-

@@ -15,47 +15,116 @@ import LikePost from "../models/likePost.model.js";
  * @param {string} data.imageMimetype - Loại ảnh (image/png, image/jpeg, ...)
  * @returns {Promise<Object>} - Bài viết đã tạo
  */
-export const createPostService = async (userId, title, content, imageBuffer) => {
+export const createPostService = async (
+    userId,
+    title,
+    content,
+    imageBuffer,
+    visibility = 'public' // Default to public
+) => {
+    // Validate user exists
     const user = await User.findById(userId);
     if (!user) throw new Error("Người dùng không tồn tại!");
 
+    // Validate required fields
     if (!title || (!content && !imageBuffer)) {
         throw new Error("Bài đăng phải có tiêu đề và ít nhất nội dung hoặc ảnh!");
     }
 
+    // Validate visibility value
+    if (!['public', 'friends', 'private'].includes(visibility)) {
+        throw new Error("Chế độ hiển thị không hợp lệ!");
+    }
+
+    // Upload image if provided
     let imageUrl = "";
     if (imageBuffer) {
         imageUrl = await uploadImageService(imageBuffer);
     }
 
+    // Create new post with visibility
     const newPost = await Post.create({
         user: userId,
         title,
         content,
         image: imageUrl,
+        visibility // Add visibility field
     });
 
+    // Update user's posts
     user.posts.push(newPost._id);
     await user.save();
 
-    // Cache bài viết mới ngay lập tức
-    await redisClient.set(`post:${newPost._id}`, JSON.stringify(newPost), { EX: 600 });
+    // Cache the new post
+    await redisClient.set(`post:${newPost._id}`, JSON.stringify(newPost), {
+        EX: 600 // Expire after 10 minutes
+    });
 
     return newPost;
 };
 
 
-export const getOwnPostsService = async (userId) => {
+export const getOwnPostsService = async (userId, page = 1, limit = 10) => {
+    // console.log(`UserId ${userId}`)
+    const skip = (page - 1) * limit;
+
     const user = await User.findById(userId);
     if (!user) throw new Error("Người dùng không tồn tại!");
 
-    // Lấy danh sách bài viết và populate thêm thông tin user
+    // Lấy danh sách bài Post của user với pagination
     const posts = await Post.find({ user: userId })
-        .populate("user", "username profilePicture") // Lấy thông tin user
-        .sort({ createdAt: -1 }) // Sắp xếp bài đăng mới nhất lên đầu
+        .populate("user", "username profilePicture")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();//
+
+    // console.log(`Posts length ${posts.length}`)
+
+    // Lấy danh sách bài SharePost với pagination
+    const sharedPosts = await SharePost.find({ user: userId })
+        .populate("user", "id username profilePicture")
+        .populate("originalPost", "title content image user createdAt")
+        .populate({
+            path: "originalPost",
+            populate: {
+                path: "user",
+                select: "username profilePicture"
+            }
+        })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean();
 
-    return posts;
+    // console.log(`SharedPosts length ${sharedPosts.length}`)
+
+    // Gộp và sắp xếp
+    const allPosts = [...posts, ...sharedPosts].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    // console.log(`AllPosts length ${allPosts.length}`)
+
+    let userLikedPosts = [];
+    if (userId) {
+        userLikedPosts = await LikePost.find({ user: userId })
+            .distinct("post");
+    }
+
+    // console.log(`UserLikedPosts length ${userLikedPosts.length}`)
+
+    // Gán trạng thái like
+    const postsWithLikeStatus = allPosts.map(post => ({
+        ...post,
+        isLiked: userLikedPosts.some(
+            id => id.toString() === post._id.toString()
+        ),
+    }));
+
+    // console.log(`PostsWithLikeStatus length ${postsWithLikeStatus.length}`)
+
+    return postsWithLikeStatus;
 };
 
 // API để cập nhật Post
@@ -122,7 +191,7 @@ export const updateSharePostService = async (userId, sharePostId, newCaption) =>
     sharePost = await SharePost.findByIdAndUpdate(
         sharePostId,
         { caption: newCaption }, // Đổi từ caption thành newCaption
-        { new: true, runValidators: true } 
+        { new: true, runValidators: true }
     );
 
     // 4. Xóa cache Redis
@@ -208,54 +277,126 @@ export const sharePostService = async (userId, postId, caption, visibility) => {
 };
 
 
+// Ở đây chỉ hiện các bài Post có visibility là "public"
+// Muốn hiện tất cả thì xóa "if (post.visibility !== 'public')"
 export const getAllPostsService = async (userId, page = 1, limit = 10) => {
     try {
-        // console.log(`Truy vấn danh sách bài viết... Trang: ${page}, Giới hạn: ${limit}`);
-
         const skip = (page - 1) * limit;
 
-        // Lấy danh sách tất cả bài Post
-        const posts = await Post.find()
+        // Lấy danh sách bài Post với visibility là "public"
+        const posts = await Post.find({ visibility: 'public' })
             .populate("user", "id username profilePicture")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
             .lean();
 
-        // Lấy danh sách tất cả SharePost
-        const sharedPosts = await SharePost.find()
+        // Lấy danh sách bài SharePost với visibility là "public"
+        const sharedPosts = await SharePost.find({ visibility: 'public' })
             .populate("user", "id username profilePicture")
-            .populate("originalPost", "title content image user createdAt")
+            .populate("originalPost", "title content image user createdAt visibility")
             .populate({
                 path: "originalPost",
-                populate: { path: "user", select: "username profilePicture" }
+                populate: {
+                    path: "user",
+                    select: "username profilePicture"
+                }
             })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
             .lean();
 
-        // Gộp tất cả bài viết & sắp xếp theo thời gian
-        const allPosts = [...posts, ...sharedPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Lọc bỏ các SharePost mà originalPost không phải public
+        const filteredSharedPosts = sharedPosts.filter(
+            post => post.originalPost?.visibility === 'public'
+        );
 
-        // Nếu có userId, kiểm tra bài viết nào user đã like
+        // Gộp và sắp xếp bài viết
+        const allPosts = [...posts, ...filteredSharedPosts].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        // Kiểm tra bài viết nào user đã like (nếu có userId)
         let userLikedPosts = [];
         if (userId) {
-            userLikedPosts = await LikePost.find({ user: userId }).distinct("post"); // Lấy danh sách ID của các bài đã like
+            userLikedPosts = await LikePost.find({ user: userId })
+                .distinct("post");
         }
 
-        // Gán thêm isLiked vào từng post
+        // Gán trạng thái like
         const postsWithLikeStatus = allPosts.map(post => ({
             ...post,
-            isLiked: userLikedPosts.map(id => id.toString()).includes(post._id.toString()),
+            isLiked: userLikedPosts.some(
+                id => id.toString() === post._id.toString()
+            ),
         }));
 
         return postsWithLikeStatus;
     } catch (error) {
-        console.error("Lỗi Redis hoặc MongoDB:", error);
+        console.error("Lỗi khi lấy danh sách bài viết:", error);
         throw new Error("Không thể lấy danh sách bài viết!");
     }
 };
 
 
+export const getPostsByUserIdService = async (userId, page = 1, limit = 10) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error("Người dùng không tồn tại!");
+        }
+        // Lấy danh sách bài Post của user với pagination
+        const posts = await Post.find({ user: userId })
+            .populate("user", "username profilePicture")
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
 
+        const sharePosts = await SharePost.find({ user: userId })
+            .populate("user", "username profilePicture")
+            .populate("originalPost", "title content image user createdAt")
+            .populate({
+                path: "originalPost",
+                populate: {
+                    path: "user",
+                    select: "username profilePicture"
+                }
+            })
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
+
+        // Lọc bỏ các SharePost mà originalPost không phải public
+        const filteredSharedPosts = sharePosts.filter(
+            post => post.originalPost?.visibility === 'public'
+        );
+
+        // Gộp và sắp xếp bài viết
+        const allPosts = [...posts, ...filteredSharedPosts].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        // Kiểm tra bài viết nào user đã like (nếu có userId)
+        let userLikedPosts = [];
+        if (userId) {
+            userLikedPosts = await LikePost.find({ user: userId })
+                .distinct("post");
+        }
+
+        // Gán trạng thái like
+        const postsWithLikeStatus = allPosts.map(post => ({
+            ...post,
+            isLiked: userLikedPosts.some(
+                id => id.toString() === post._id.toString()
+            ),
+        }));
+
+        return postsWithLikeStatus;
+
+    } catch (error) {
+        console.log(error)
+    }
+};

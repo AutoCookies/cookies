@@ -203,3 +203,107 @@
 .delete-item {
   color: #ff4d6d;
 }
+
+/* Share Post Card Container */
+.share-post-card {
+  background-color: #fff9fa; /* Màu hồng nhạt hơn */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(255, 77, 109, 0.2);
+  margin-bottom: 16px;
+  overflow: hidden;
+  border: 1px solid #ffb7c5;
+  position: relative; /* Thêm position relative cho container */
+}
+
+/* Visibility badge styles - Điều chỉnh để phù hợp với theme hồng */
+.visibility-badge {
+  position: absolute;
+  top: 12px;
+  right: 50px; /* Điều chỉnh vị trí tránh overlap với dropdown */
+  font-size: 0.7rem;
+  z-index: 1;
+}
+
+.visibility-badge span {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Màu sắc điều chỉnh cho phù hợp với theme hồng */
+.public {
+  background-color: #ffebf1;
+  color: #d6336c;
+  border: 1px solid #ffb7c5;
+}
+
+.private {
+  background-color: #ffebf1;
+  color: #c2185b;
+  border: 1px solid #f8bbd0;
+}
+
+.friends {
+  background-color: #ffebf1;
+  color: #ad1457;
+  border: 1px solid #f48fb1;
+}
+
+/* Điều chỉnh header để chứa visibility badge */
+.share-header {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 16px 0;
+  position: relative;
+}
+
+/* Điều chỉnh dropdown container để không bị overlap */
+.dropdown-container {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 2; /* Đảm bảo dropdown hiển thị trên visibility badge */
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .visibility-badge {
+    top: 8px;
+    right: 40px;
+    font-size: 0.6rem;
+  }
+  
+  .visibility-badge span {
+    padding: 2px 6px;
+  }
+}
+
+/* Icon styles (nếu sử dụng icon) */
+.visibility-icon {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+/* Hiệu ứng hover cho visibility badge */
+.visibility-badge span:hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
+
+.usernameButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.usernameButton:hover {
+  text-decoration: underline;
+}

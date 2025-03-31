@@ -14,3 +14,8 @@ User function:
 Một bài post sẽ có commentCount thống kê số comment trong Comment db, khi đó nó sẽ đếm số lượng Comment có PostId trùng với bài Post
 Khi thêm một post sẽ tạo cache cho postId đó, khi sửa, xóa thì sẽ xóa cache. Còn khi get-all thì khởi tạo tất cả cache từ MongoDB
 Tương tự với likeComment cũng vậy
+
+
+- Hường tiếp theo là làm sao khi nhấn vào tên của một user trong Post hay SharePost sẽ dẫn ta đến trang cá nhân của User đó.
+-> Lấy Post, SharePost theo id người dùng, chỉ bao gồm các bài viết public.
+-> lấy profilePicture và CoverPhoto theo Id người dùng.

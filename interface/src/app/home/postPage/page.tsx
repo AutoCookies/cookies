@@ -6,6 +6,8 @@ import PostCard from "../../../components/posts/PostCard";
 import SharePostCard from "../../../components/posts/SharePostCard";
 import CreatePostModal from "@/components/posts/CreatePostModal";
 import styles from "../../../styles/home/postPage.module.css";
+import { ENV_VARS } from "@/config/envVars";
+import { useRouter } from 'next/navigation';
 
 export default function PostPage() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -15,6 +17,9 @@ export default function PostPage() {
   const [hasMore, setHasMore] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const lastFetchedPage = useRef(0);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const fetchPosts = useCallback(async (pageNumber: number, forceRefresh = false) => {
     if ((!hasMore || loading || lastFetchedPage.current === pageNumber) && !forceRefresh) return;
@@ -43,6 +48,24 @@ export default function PostPage() {
       setLoading(false);
     }
   }, [hasMore, loading]);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentUserId(data._id.toString());
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     fetchPosts(page);
@@ -89,9 +112,18 @@ export default function PostPage() {
     }));
   }, []);
 
+  const handleUsernameClick = (userId: string) => {
+    if (userId === currentUserId) {
+      router.push('/home/me');
+    } else {
+      router.push(`/home/${userId}`);
+    }
+  };  
+  
   const handlePostCreated = useCallback((newPost: any) => {
     setPosts(prev => [newPost, ...prev]);
     setShowCreateModal(false);
+    refreshPosts();
   }, []);
 
   const refreshPosts = useCallback(() => {
@@ -102,7 +134,7 @@ export default function PostPage() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>Posts</h1>
-        <button 
+        <button
           className={styles.createButton}
           onClick={() => setShowCreateModal(true)}
           disabled={loading}
@@ -140,11 +172,13 @@ export default function PostPage() {
                   commentCount: post.originalPost.commentCount,
                   isLiked: post.originalPost.isLiked,
                 }}
+                visibility={post.visibility}
                 onLike={refreshPosts}
                 onShare={refreshPosts}
                 onDelete={refreshPosts}
                 onEdit={refreshPosts}
                 onChangeComment={() => handleCommentChange(post._id)}
+                onUsernameClick={handleUsernameClick}
               />
             ) : (
               <PostCard
@@ -156,11 +190,13 @@ export default function PostPage() {
                 commentCount={post.commentCount}
                 isLiked={post.isLiked}
                 user={post.user}
+                visibility={post.visibility}
                 onLike={refreshPosts}
                 onShare={refreshPosts}
                 onDelete={refreshPosts}
                 onEdit={refreshPosts}
                 onChangeComment={() => handleCommentChange(post._id)}
+                onUsernameClick={handleUsernameClick}
               />
             )}
           </div>

@@ -234,3 +234,64 @@
     margin-right: 8px;
     vertical-align: middle;
 }
+
+/* Visibility Dropdown Styles */
+.visibilityDropdown {
+    position: relative;
+    width: 100%;
+}
+
+.visibilityToggle {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.visibilityToggle:hover {
+    border-color: #d35d6e;
+}
+
+.dropdownArrow {
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
+.visibilityDropdownMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    margin-top: 5px;
+}
+
+.visibilityOption {
+    width: 100%;
+    padding: 10px 15px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.visibilityOption:hover {
+    background-color: #fff0f3;
+}
+
+.visibilityOption.active {
+    background-color: #ffd1dc;
+    color: #d35d6e;
+    font-weight: 500;
+}

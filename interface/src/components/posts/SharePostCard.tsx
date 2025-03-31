@@ -33,6 +33,7 @@ interface SharePostProps {
     commentCount: number;
     isLiked: boolean;
   };
+  visibility: "public" | "private" | "friends";
   onLike: () => void;
   onShare: () => void;
   onChangeComment: () => void;
@@ -48,6 +49,7 @@ const SharePostCard: React.FC<SharePostProps> = ({
   commentCount,
   isLiked,
   originalPost,
+  visibility,
   onLike,
   onShare,
   onChangeComment,
@@ -137,6 +139,47 @@ const SharePostCard: React.FC<SharePostProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+
+  const renderVisibilityIcon = (visibility: string) => {
+    const iconProps = {
+      width: "16",
+      height: "16",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "#666",
+      strokeWidth: "2",
+      className: styles["visibility-icon"],
+    };
+
+    switch (visibility) {
+      case "public":
+        return (
+          <svg {...iconProps}>
+            <title>Công khai</title>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        );
+      case "friends":
+        return (
+          <svg {...iconProps}>
+            <title>Bạn bè</title>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="8.5" cy="7" r="4" />
+            <path d="M17 11h3m-1.5 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 0v4" />
+          </svg>
+        );
+      case "private":
+      default:
+        return (
+          <svg {...iconProps}>
+            <title>Riêng tư</title>
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        );
+    }
+  };
+
   return (
     <div className={styles["share-post-card"]}>
       {/* Header - User who shared the post */}
@@ -150,6 +193,11 @@ const SharePostCard: React.FC<SharePostProps> = ({
           <div className={styles["share-info"]}>
             <span className={styles["share-user"]}>
               <strong>{user?.username || "Người dùng không xác định"}</strong>
+            </span>
+            <span className={styles["visibility-text"]} data-visibility={visibility}>
+              {visibility === "public" && "Public"}
+              {visibility === "private" && "Private"}
+              {visibility === "friends" && "Friends"}
             </span>
             <p className={styles["share-caption"]}>{caption}</p>
           </div>

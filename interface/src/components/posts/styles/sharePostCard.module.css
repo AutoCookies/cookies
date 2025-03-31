@@ -1,28 +1,32 @@
-/* Share Post Card Container */
+/* 🌸 Share Post Card Container */
 .share-post-card {
-  background-color: #ffffff; /* Hồng nhạt */
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(255, 77, 109, 0.2);
+  background-color: #FEE4E1; /* Màu hồng pastel nhẹ */
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(230, 126, 156, 0.2);
   margin-bottom: 16px;
   overflow: hidden;
-  border: 1px solid #ffb7c5;
+  border: 1px solid #F5B7B1;
+  transition: transform 0.2s ease-in-out;
 }
 
-/* Header Section */
+.share-post-card:hover {
+  transform: translateY(-2px);
+}
+
+/* 🌸 Header Section */
 .share-header {
   display: flex;
-  align-items: flex-start;
-  padding: 12px 16px 0;
+  align-items: center;
+  padding: 12px 16px;
   position: relative;
 }
 
 .share-avatar {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
-  border: 2px solid #ff4d6d; /* Viền hồng đậm */
+  border: 3px solid #E67E9C; /* Viền hồng pastel */
 }
 
 .share-info {
@@ -32,79 +36,105 @@
 }
 
 .share-user {
-  font-weight: 600;
-  font-size: 15px;
-  display: block;
-  margin-bottom: 4px;
-  color: #d6336c; /* Hồng đậm */
+  font-weight: 700;
+  font-size: 16px;
+  color: #8B5E3B; /* Màu nâu nhạt */
+  margin-right: 10px;
 }
 
+/* 🌸 Visibility badge */
+.visibility-text {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  color: white;
+  text-align: center;
+  width: fit-content;
+  transition: background 0.3s ease;
+}
+
+/* Màu sắc theo trạng thái */
+.visibility-text[data-visibility="public"] {
+  background-color: #E67E9C;
+}
+
+.visibility-text[data-visibility="private"] {
+  background-color: #D16B86;
+}
+
+.visibility-text[data-visibility="friends"] {
+  background-color: #C55A7A;
+}
+
+/* 🌸 Caption Section */
 .share-caption {
   font-size: 15px;
   line-height: 1.4;
   margin: 8px 0;
-  word-break: break-word;
-  color: #7d284f; /* Hồng trầm */
+  color: #8B5E3B; /* Màu nâu nhạt */
+  padding: 0 16px;
 }
 
-/* Original Post Styling */
+/* 🌸 Original Post Styling */
 .post-card {
-  border: 1px solid #ffb7c5;
-  border-radius: 8px;
-  margin: 8px 0 0 52px;
+  border: 1px solid #F5B7B1;
+  border-radius: 12px;
+  margin: 12px 16px;
   overflow: hidden;
-  background-color: #ffffff; /* Nền hồng rất nhạt */
+  background-color: #FFFFFF; /* Nền trắng */
 }
 
 .post-card-header {
   display: flex;
   align-items: center;
-  padding: 10px 12px;
+  padding: 12px;
 }
 
 .post-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 8px;
-  border: 2px solid #ff4d6d; /* Viền hồng */
+  border: 2px solid #E67E9C; /* Viền hồng pastel */
 }
 
 .post-username {
   font-weight: 600;
-  font-size: 13px;
-  color: #d6336c;
+  font-size: 14px;
+  color: #8B5E3B;
 }
 
 .post-card-body {
-  padding: 0 12px 12px;
+  padding: 12px;
 }
 
 .post-card-body h3 {
-  font-size: 15px;
-  margin: 8px 0 4px;
-  color: #a32b4f; /* Hồng trầm */
+  font-size: 16px;
+  margin: 8px 0;
+  color: #D16B86;
 }
 
 .post-card-body p {
   font-size: 14px;
   line-height: 1.4;
   margin: 8px 0;
-  color: #7d284f;
+  color: #8B5E3B;
 }
 
+/* 🌸 Image Styling */
 .post-image {
   width: 100%;
   max-height: 500px;
   object-fit: contain;
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 12px 12px;
   margin-top: 8px;
 }
 
-/* Footer Section */
+/* 🌸 Footer Section */
 .share-footer {
-  padding: 6px 16px 10px;
+  padding: 10px 16px;
 }
 
 .actions {
@@ -112,10 +142,11 @@
   justify-content: space-between;
   padding: 8px 0;
   font-size: 13px;
-  color: #7d284f;
-  border-bottom: 1px solid #ffb7c5;
+  color: #8B5E3B;
+  border-top: 1px solid #F5B7B1;
 }
 
+/* 🌸 Action Buttons */
 .action-buttons {
   display: flex;
   margin-top: 4px;
@@ -129,54 +160,56 @@
   gap: 6px;
   background: none;
   border: none;
-  padding: 8px 0;
+  padding: 10px 0;
   cursor: pointer;
   font-size: 14px;
-  color: #7d284f;
-  border-radius: 4px;
-  font-weight: 500;
+  color: #8B5E3B;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.3s ease-in-out;
 }
 
 .action-button:hover {
-  background-color: #ffe4e9;
+  background-color: #FCE4EC;
 }
 
 .action-button.liked {
-  color: #ff4d6d;
+  color: #E67E9C;
 }
 
-/* Dropdown Styles */
+/* 🌸 Dropdown Styles */
 .dropdown-container {
   position: absolute;
   right: 8px;
   top: 8px;
+  z-index: 2;
 }
 
 .dropdown-toggle {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #7d284f;
+  color: #8B5E3B;
   border-radius: 50%;
   width: 36px;
   height: 36px;
 }
 
 .dropdown-toggle:hover {
-  background-color: #ffe4e9;
+  background-color: #FCE4EC;
 }
 
 .dropdown-menu {
   position: absolute;
   right: 0;
   top: 100%;
-  background-color: #fff;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.3);
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(230, 126, 156, 0.3);
   min-width: 180px;
   z-index: 100;
   overflow: hidden;
@@ -187,123 +220,39 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 8px 16px;
+  padding: 10px 16px;
   text-align: left;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 14px;
-  color: #7d284f;
+  color: #8B5E3B;
+  transition: background 0.3s ease-in-out;
 }
 
 .dropdown-item:hover {
-  background-color: #ffe4e9;
+  background-color: #FCE4EC;
 }
 
 .delete-item {
-  color: #ff4d6d;
+  color: #E67E9C;
 }
 
-/* Share Post Card Container */
-.share-post-card {
-  background-color: #fff9fa; /* Màu hồng nhạt hơn */
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(255, 77, 109, 0.2);
-  margin-bottom: 16px;
-  overflow: hidden;
-  border: 1px solid #ffb7c5;
-  position: relative; /* Thêm position relative cho container */
-}
-
-/* Visibility badge styles - Điều chỉnh để phù hợp với theme hồng */
-.visibility-badge {
-  position: absolute;
-  top: 12px;
-  right: 50px; /* Điều chỉnh vị trí tránh overlap với dropdown */
-  font-size: 0.7rem;
-  z-index: 1;
-}
-
-.visibility-badge span {
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-/* Màu sắc điều chỉnh cho phù hợp với theme hồng */
-.public {
-  background-color: #ffebf1;
-  color: #d6336c;
-  border: 1px solid #ffb7c5;
-}
-
-.private {
-  background-color: #ffebf1;
-  color: #c2185b;
-  border: 1px solid #f8bbd0;
-}
-
-.friends {
-  background-color: #ffebf1;
-  color: #ad1457;
-  border: 1px solid #f48fb1;
-}
-
-/* Điều chỉnh header để chứa visibility badge */
-.share-header {
-  display: flex;
-  align-items: flex-start;
-  padding: 12px 16px 0;
-  position: relative;
-}
-
-/* Điều chỉnh dropdown container để không bị overlap */
-.dropdown-container {
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  z-index: 2; /* Đảm bảo dropdown hiển thị trên visibility badge */
-}
-
-/* Responsive adjustments */
+/* 🌸 Responsive Adjustments */
 @media (max-width: 480px) {
   .visibility-badge {
     top: 8px;
     right: 40px;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
   }
-  
+
   .visibility-badge span {
-    padding: 2px 6px;
+    padding: 3px 6px;
   }
 }
 
-/* Icon styles (nếu sử dụng icon) */
-.visibility-icon {
-  width: 12px;
-  height: 12px;
-  fill: currentColor;
-}
-
-/* Hiệu ứng hover cho visibility badge */
+/* 🌸 Hover Effect */
 .visibility-badge span:hover {
   transform: translateY(-1px);
-  transition: transform 0.2s ease;
-}
-
-.usernameButton {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-}
-
-.usernameButton:hover {
-  text-decoration: underline;
+  transition: transform 0.2s ease-in-out;
 }

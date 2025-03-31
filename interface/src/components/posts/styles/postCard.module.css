@@ -224,3 +224,32 @@
 .usernameButton:hover {
   text-decoration: underline;
 }
+
+.user-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.visibility-text {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  color: white;
+  text-align: center;
+}
+
+/* Màu sắc theo trạng thái */
+.visibility-text[data-visibility="public"] {
+  background-color: green;
+}
+
+.visibility-text[data-visibility="private"] {
+  background-color: red;
+}
+
+.visibility-text[data-visibility="friends"] {
+  background-color: blue;
+}

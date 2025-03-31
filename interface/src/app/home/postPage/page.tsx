@@ -178,7 +178,6 @@ export default function PostPage() {
                 onDelete={refreshPosts}
                 onEdit={refreshPosts}
                 onChangeComment={() => handleCommentChange(post._id)}
-                onUsernameClick={handleUsernameClick}
               />
             ) : (
               <PostCard
@@ -196,7 +195,6 @@ export default function PostPage() {
                 onDelete={refreshPosts}
                 onEdit={refreshPosts}
                 onChangeComment={() => handleCommentChange(post._id)}
-                onUsernameClick={handleUsernameClick}
               />
             )}
           </div>

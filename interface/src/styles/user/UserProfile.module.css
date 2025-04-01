@@ -194,3 +194,28 @@
     /* Hoa anh đào nhạt */
     color: black;
 }
+
+.followInfo {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.followCount {
+    background-color: #FFB7C5; /* Cherry Blossom Pink */
+    color: white;
+    padding: 8px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+.followCount:hover {
+    transform: scale(1.05);
+    background-color: #FF99AA; /* Slightly darker Cherry Blossom */
+}

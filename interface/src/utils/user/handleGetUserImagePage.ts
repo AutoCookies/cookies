@@ -26,6 +26,7 @@ export const handleGetUserImagePage = async (userId: string) => {
     }
 
     const data = await response.json();
+    console.log("User data:", data);
     return { data };
   } catch (error) {
     console.error("Error fetching user images:", error);

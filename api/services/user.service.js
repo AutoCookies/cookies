@@ -196,7 +196,9 @@ export const getCoverPhotoService = (user) => {
 };
 
 export const getUserImagePageService = async (userId) => {
-    const user = await User.findById(userId).select("username profilePicture coverPhoto");
+    // Lấy profilePicture, coverPhoto, username, followerCount, followingCount
+    const user = await User.findById(userId).select("username profilePicture coverPhoto followerCount followingCount")
+        .lean();;
     
     if (!user) {
         throw new Error("User not found");
@@ -205,7 +207,9 @@ export const getUserImagePageService = async (userId) => {
     return {
         username: user.username || null,
         profilePicture: user.profilePicture || null,
-        coverPhoto: user.coverPhoto || null
+        coverPhoto: user.coverPhoto || null,
+        followerCount: user.followerCount || 0,
+        followingCount: user.followingCount || 0
     };
 };
 

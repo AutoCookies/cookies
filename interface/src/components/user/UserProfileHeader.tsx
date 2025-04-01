@@ -10,6 +10,8 @@ interface UserProfileHeaderProps {
         coverPhoto?: string;
         profilePicture?: string;
         username?: string;
+        followerCount?: number;
+        followingCount?: number;
     };
     profileUserId: string;
     currentUserId: string;
@@ -68,6 +70,12 @@ export default function UserProfileHeader({ data, currentUserId, profileUserId }
 
                 {/* Username */}
                 <h2 className={styles.username}>{data.username ?? "Unknown User"}</h2>
+
+                {/* Followers and Following */}
+                <div className={styles.followInfo}>
+                    <span className={styles.followCount}>{data.followerCount ?? 0} người theo dõi</span>
+                    <span className={styles.followCount}>{data.followingCount ?? 0} đang theo dõi</span>
+                </div>
 
                 {/* Navigation Tabs */}
                 <div className={styles.profileTabs}>

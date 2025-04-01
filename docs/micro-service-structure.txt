@@ -1,0 +1,73 @@
+/microservices-project
+│── /frontend (Next.js - Giao diện chính)
+│   ├── 📂 src
+│   │   ├── 📂 app
+│   │   ├── 📂 components
+│   │   ├── 📂 styles
+│   │   ├── 📂 utils
+│   │   ├── 📂 lib
+│   │   ├── 📂 services (Chứa các API client-side tương tác với microservices)
+│   │   ├── next.config.js
+│   │   ├── package.json
+│   │   ├── tailwind.config.js
+│   │   ├── .env
+│── /api-gateway (API Gateway - Điều phối request)
+│   ├── index.js
+│   ├── package.json
+│   ├── 📂 routes
+│   ├── 📂 middlewares
+│   ├── 📂 config
+│   ├── 📂 utils
+│── /services
+│   ├── /auth-service (Xử lý xác thực)
+│   │   ├── 📂 controllers
+│   │   ├── 📂 models
+│   │   ├── 📂 routes
+│   │   ├── 📂 services
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env
+│   ├── /user-service (Xử lý thông tin người dùng)
+│   │   ├── 📂 controllers
+│   │   ├── 📂 models
+│   │   ├── 📂 routes
+│   │   ├── 📂 services
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env
+│   ├── /post-service (Xử lý bài viết)
+│   │   ├── 📂 controllers
+│   │   ├── 📂 models
+│   │   ├── 📂 routes
+│   │   ├── 📂 services
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env
+│   ├── /comment-service (Xử lý bình luận)
+│   │   ├── 📂 controllers
+│   │   ├── 📂 models
+│   │   ├── 📂 routes
+│   │   ├── 📂 services
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env
+│   ├── /notification-service (Xử lý thông báo)
+│   │   ├── 📂 controllers
+│   │   ├── 📂 models
+│   │   ├── 📂 routes
+│   │   ├── 📂 services
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env
+│   ├── /media-service (Xử lý lưu trữ hình ảnh, video)
+│   │   ├── 📂 controllers
+│   │   ├── 📂 routes
+│   │   ├── 📂 utils
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── .env
+│── /database
+│   ├── mongo-init.js (Khởi tạo MongoDB nếu dùng Docker)
+│   ├── docker-compose.yml (Chạy database trong Docker)
+│── /docker-compose.yml (Chạy toàn bộ hệ thống với Docker)
+│── /k8s (Kubernetes deployment files - nếu muốn dùng K8s)

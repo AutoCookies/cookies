@@ -19,6 +19,8 @@
 │   │   │   │── 📂 [userId]
 │   │   │   │   └── page.tsx (Client)
 │   │   │   │   └── layout.tsx (Server)
+│   │   │   │   └── loading.tsx
+│   │   │   │   └── error.tsx
 │   │   │   ├── page.tsx (Client)
 │   │   │   ├── layout.tsx (Client)
 │   │   │   ├── loading.tsx (Server)

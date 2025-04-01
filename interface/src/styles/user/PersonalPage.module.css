@@ -1,0 +1,13 @@
+/* Thêm các kiểu cho PersonalPage nếu muốn */
+.personalPageContainer {
+  padding: 20px;
+  background-color: #f7f7f7; /* Màu nền nhẹ */
+  border-radius: 10px;
+}
+
+.personalPageHeader {
+  text-align: center;
+  font-size: 24px;
+  color: #ff6b6b; /* Màu chủ đạo */
+  font-weight: bold;
+}

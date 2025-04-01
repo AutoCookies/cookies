@@ -17,9 +17,14 @@
 │   │   ├── error.tsx (Server)
 │   │   ├── 📂 home
 │   │   │   │── 📂 [userId]
-│   │   │   │   └── page.tsx (Client)
-│   │   │   │   └── layout.tsx (Server)
-│   │   │   │   └── loading.tsx
+│   │   │   │   │── page.tsx (Client)
+│   │   │   │   │── layout.tsx (Server)
+│   │   │   │   │── loading.tsx
+│   │   │   │   └── error.tsx
+│   │   │   │── 📂 [userId]
+│   │   │   │   │── page.tsx (Client)
+│   │   │   │   │── layout.tsx (Server)
+│   │   │   │   │── loading.tsx
 │   │   │   │   └── error.tsx
 │   │   │   ├── page.tsx (Client)
 │   │   │   ├── layout.tsx (Client)
@@ -36,7 +41,7 @@
 │   │   ├── 📂 learnmore
 │   │   │   ├── page.tsx (Server)
 │   │   │   ├── loading.tsx (Client)
-│   │   │   ├── error.tsx (Client)
+│   │   │   └── error.tsx (Client)
 │   │   │   
 │   ├── 📂 components (Client Components)
 │   │   ├── 📂 comments

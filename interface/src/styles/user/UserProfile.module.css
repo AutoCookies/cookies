@@ -1,20 +1,25 @@
 /* Tổng thể container */
 .container {
-    max-width: 60rem; /* Tăng kích thước container */
+    max-width: 60rem;
+    /* Tăng kích thước container */
     margin: 0 auto;
-    background-color: #fff0f5; /* Hồng nhạt */
+    background-color: #fff0f5;
+    /* Hồng nhạt */
     border-radius: 1rem;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
-    border: 1px solid #ff69b4; /* Viền hồng đậm */
+    border: 1px solid #ff69b4;
+    /* Viền hồng đậm */
 }
 
 /* Cover Photo */
 .coverPhoto {
     position: relative;
-    height: 20rem; /* Lớn hơn để nổi bật */
+    height: 20rem;
+    /* Lớn hơn để nổi bật */
     background-color: #ffe4e1;
-    border-bottom: 5px solid #ff69b4; /* Viền hoa anh đào */
+    border-bottom: 5px solid #ff69b4;
+    /* Viền hoa anh đào */
 }
 
 .coverImage {
@@ -26,13 +31,16 @@
 /* Profile Info */
 .profileSection {
     position: relative;
-    margin-top: -6rem; /* Đẩy profile lên trên */
+    margin-top: -6rem;
+    /* Đẩy profile lên trên */
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-bottom: 2rem;
-    background-color: #fffafa; /* Nền sáng nhẹ */
-    border-bottom: 3px solid #ffb6c1; /* Phân tách với phần dưới */
+    background-color: #fffafa;
+    /* Nền sáng nhẹ */
+    border-bottom: 3px solid #ffb6c1;
+    /* Phân tách với phần dưới */
 }
 
 /* Profile Picture */
@@ -57,7 +65,8 @@
     margin-top: 1.5rem;
     font-size: 2rem;
     font-weight: bold;
-    color: #d63384; /* Hồng đậm */
+    color: #d63384;
+    /* Hồng đậm */
 }
 
 /* Navigation Tabs */
@@ -94,7 +103,8 @@
     margin-top: 1.5rem;
 }
 
-.newPostButton, .messageButton {
+.newPostButton,
+.messageButton {
     padding: 0.75rem 2rem;
     font-size: 1.1rem;
     font-weight: bold;
@@ -157,8 +167,30 @@
         width: 100%;
     }
 
-    .newPostButton, .messageButton {
+    .newPostButton,
+    .messageButton {
         width: 100%;
         padding: 1rem;
     }
+}
+
+.followButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.followed {
+    background-color: #e75480;
+    /* Hoa anh đào đậm */
+    color: white;
+}
+
+.notFollowed {
+    background-color: #f8b7c0;
+    /* Hoa anh đào nhạt */
+    color: black;
 }

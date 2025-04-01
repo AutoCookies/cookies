@@ -19,3 +19,5 @@ Tương tự với likeComment cũng vậy
 - Hường tiếp theo là làm sao khi nhấn vào tên của một user trong Post hay SharePost sẽ dẫn ta đến trang cá nhân của User đó.
 -> Lấy Post, SharePost theo id người dùng, chỉ bao gồm các bài viết public.
 -> lấy profilePicture và CoverPhoto theo Id người dùng.
+
+- Hướng tiếp theo là khi vào trang cá nhân của user đó có thể follow hoặc unfollow user

@@ -182,7 +182,10 @@ export const getProfilePictureService = (user) => {
     if (!user || !user.profilePicture) {
         return { profilePicture: null };
     }
-    return { profilePicture: user.profilePicture };
+    return { 
+        userId: user._id,
+        profilePicture: user.profilePicture 
+    };
 };
 
 export const getCoverPhotoService = (user) => {

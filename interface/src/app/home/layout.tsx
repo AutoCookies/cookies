@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
 
     const fetchUserProfile = async () => {
         try {
@@ -20,6 +21,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             if (response.ok) {
                 const data = await response.json();
                 setProfileImage(data.profilePicture || "/default-profile.jpg");
+                setUserId(data.userId || null);
             } else {
                 console.log("Failed to fetch profile, Status:", response.status);
             }
@@ -76,7 +78,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                     <button className={styles.iconButton}>
                         <img src="/svg/information-svgrepo-com.svg" alt="Messages" className={styles.iconSVG} />
                     </button>
-                    <Link href={"/home/me"}>
+                    <Link href={`/home/${userId}`}>
                         <button className={styles.iconButton}>
                             {profileImage ? (
                                 <img src={profileImage} alt="User Profile" className={styles.profileImage} />

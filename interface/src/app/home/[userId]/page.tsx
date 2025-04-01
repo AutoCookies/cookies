@@ -1,7 +1,9 @@
-export default function PersonalPage({ params }: { params: { userId: string } }) {
+export default async function PersonalPage({ params }: { params: { userId: string } }) {
+  const { userId } = await params;
+
   return (
     <div>
-      <div>This is {params.userId} personal page</div>
+      <div>This is {userId} personal page</div>
     </div>
   );
 }

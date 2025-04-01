@@ -13,6 +13,8 @@
 │   ├── 📂 app (Chứa layout, page & server components)
 │   │   ├── layout.tsx (Server)
 │   │   ├── page.tsx (Server)
+│   │   ├── loading.tsx (Server)
+│   │   ├── error.tsx (Server)
 │   │   ├── 📂 home
 │   │   │   │── 📂 [userId]
 │   │   │   │   └── page.tsx (Client)
@@ -35,45 +37,41 @@
 │   │   │   ├── error.tsx (Client)
 │   │   │   
 │   ├── 📂 components (Client Components)
-│   │   ├── 📂 ui (Các UI component tái sử dụng)
-│   │   │   ├── Button.tsx (Client)
-│   │   │   ├── Input.tsx (Client)
-│   │   │   ├── Card.tsx (Client)
-│   │   │   └── Modal.tsx (Client)
-│   │   ├── Sidebar.tsx (Client)
-│   │   ├── Navbar.tsx (Client)
-│   │   ├── Footer.tsx (Client)
-│   │   └── ThemeSwitcher.tsx (Client)
+│   │   ├── 📂 comments
+│   │   │   ├── 📂 styles
+│   │   │   │   └── commentBubble.module.css
+│   │   │   │   └── commentSection.module.css
+│   │   │   ├── CommentBubble.tsx
+│   │   │   ├── commentSection.tsx
+│   │   ├── 📂 comments
+│   │   │   ├── 📂 styles
+│   │   │   │   └── CreatePostModal.module.css
+│   │   │   │   └── EditPostModal.module.css
+│   │   │   │   └── EditSharePostModal.module.css
+│   │   │   │   └── postCard.module.css
+│   │   │   │   └── sharePostCard.module.css
+│   │   │   ├── CreatePostModal.tsx (Server)
+│   │   │   ├── EditPostModal.tsx (Server)
+│   │   │   ├── PostCard.tsx (Server)
+│   │   │   ├── SharePostCard.tsx (Server)
+│   │   │   ├── SharePostModal.tsx (Server)
+│   │   ├── 📂 ui
+│   │   │   └── SakuraEffect.tsx
+│   │   ├── 📂 user
+│   │   │   └── UserProfileHeader.tsx
+│   ├── 📂 lib
+│   │   └── envVars.ts
 │   ├── 📂 utils (Chứa helper functions - Server/Client tùy vào chức năng)
 │   │   ├── fetchData.ts (Server) (Gọi API server-side)
 │   │   ├── formatDate.ts (Client) (Chỉ xử lý dữ liệu UI)
 │   │   ├── auth.ts (Server) (Hàm kiểm tra auth từ backend)
 │   │   └── constants.ts (Client) (Chứa các giá trị không đổi)
-│   ├── 📂 hooks (Custom hooks - Client)
-│   │   ├── useTheme.ts (Client)
-│   │   ├── useAuth.ts (Client)
-│   │   └── useFetch.ts (Client)
 │   ├── 📂 styles (Chứa CSS/SCSS/Tailwind)
-│   │   ├── globals.css
-│   │   ├── theme.css
-│   │   ├── layout.module.css
-│   │   └── button.module.css
-│   ├── 📂 config (Cấu hình ứng dụng)
-│   │   ├── siteConfig.ts (Client) (Cấu hình chung: title, description...)
-│   │   ├── apiConfig.ts (Client) (Chứa URL API)
-│   │   └── themeConfig.ts (Client) (Cấu hình theme)
-│   ├── 📂 lib (Thư viện dùng trong server-side)
-│   │   ├── db.ts (Server) (Kết nối database nếu cần)
-│   │   ├── auth.ts (Server) (Xác thực với backend)
-│   │   ├── cache.ts (Server) (Kết nối Redis nếu có)
-│   │   └── logger.ts (Server) (Ghi log)
-│   ├── 📂 middleware (Chứa các middleware)
-│   │   ├── authMiddleware.ts (Server)
-│   │   └── rateLimiter.ts (Server)
-│   ├── layout.tsx (Server) (Layout chung toàn bộ app)
-│   ├── page.tsx (Server) (Trang chính)
-│   ├── loading.tsx (Server) (Hiển thị loading)
-│   ├── error.tsx (Server) (Hiển thị lỗi)
+│   │   ├── 📂 auth
+│   │   ├── 📂 home
+│   │   ├── 📂 learn-more
+│   │   ├── 📂 me
+│   │   └── 📂 user
 │── .env (Biến môi trường)
 │── next.config.js (Cấu hình Next.js)
 │── tsconfig.json (Cấu hình TypeScript)

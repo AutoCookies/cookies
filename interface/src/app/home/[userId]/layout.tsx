@@ -24,7 +24,9 @@ export default async function UserLayout({ params, children }: { params: { userI
         />
       )}
       {/* User Content */}
-      <div className={styles.content}>{children}</div>
+      <div className={styles.content}>
+        {children}
+        </div>
     </div>
   );
 }

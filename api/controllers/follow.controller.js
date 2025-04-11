@@ -4,7 +4,8 @@ import {
     unfollowUserService,
     getFollowersService,
     getFollowingService,
-    checkFollowStatusService
+    checkFollowStatusService,
+    getFollowersOfUserService
 } from "../services/follow.service.js";
 
 /**
@@ -68,3 +69,21 @@ export const checkFollowStatus = asyncHandler(async (req, res) => {
     const isFollowing = await checkFollowStatusService(currentUserId, userId);
     res.status(200).json({ isFollowing });
 });
+
+export const getFollowersOfUser = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const followers = await getFollowersOfUserService(userId);
+        return res.status(200).json({
+            success: true,
+            followers,
+        });
+    } catch (error) {
+        console.error("Error in getFollowersOfUserController:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Đã xảy ra lỗi khi lấy danh sách follower.",
+        });
+    }
+};

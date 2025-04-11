@@ -53,7 +53,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                 </div>
 
                 <div className={styles.navIcons}>
-                    <Link href="/home/postPage" className={styles.navIcon}>
+                    <Link href="/home" className={styles.navIcon}>
                         <img src="/svg/front-page-svgrepo-com.svg" className={styles.iconSVG} />
                         <span>Home</span>
                     </Link>

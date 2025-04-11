@@ -4,7 +4,8 @@ import {
     unfollowUser,
     getFollowers,
     getFollowing,
-    checkFollowStatus
+    checkFollowStatus,
+    getFollowersOfUser
  } from "../controllers/follow.controller.js";
 
 const router = express.Router();
@@ -19,4 +20,6 @@ router.get("/:userId/followers", getFollowers);
 router.get("/:userId/following", getFollowing);
 // Kiểm tra trạng thái follow
 router.get("/:userId/check", checkFollowStatus);
+// Lấy followers của một người dùng
+router.get("/:userId/followersOfUser", getFollowersOfUser);
 export default router;

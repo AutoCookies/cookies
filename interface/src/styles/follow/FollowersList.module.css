@@ -1,0 +1,51 @@
+.container {
+    padding: 1.5rem;
+    background-color: #fff0f5; /* rất nhẹ nhàng và hợp hoa anh đào */
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(250, 218, 221, 0.4);
+  }
+  
+  .heading {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #d6336c;
+  }
+  
+  .empty {
+    color: #a05278;
+    font-style: italic;
+  }
+  
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #fadadd;
+    background-color: #fff8fa;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(250, 218, 221, 0.3);
+    transition: transform 0.2s ease;
+  }
+  
+  .item:hover {
+    transform: scale(1.02);
+  }
+  
+  .username {
+    font-size: 1.125rem;
+    color: #a8245e;
+  }
+  
+  .avatar {
+    border-radius: 9999px;
+    object-fit: cover;
+  }
+  

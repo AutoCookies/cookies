@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import styles from "@/styles/user/UserProfile.module.css";
 import { isFollowed } from "@/utils/follow/isFollowed";
 import { handleFollowUser } from "@/utils/follow/handleFollowUse";
+import Link from "next/link";
 
 interface UserProfileHeaderProps {
     data: {
@@ -79,9 +80,15 @@ export default function UserProfileHeader({ data, currentUserId, profileUserId }
 
                 {/* Navigation Tabs */}
                 <div className={styles.profileTabs}>
-                    <span className={styles.tabItem}>Bài viết</span>
-                    <span className={styles.tabItem}>Người theo dõi</span>
-                    <span className={styles.tabItem}>Hình ảnh</span>
+                    <Link href={`/home/${profileUserId}`}>
+                        <span className={styles.tabItem}>Bài viết</span>
+                    </Link>
+                    <Link href={`/home/${profileUserId}/followers`}>
+                        <span className={styles.tabItem}>Người theo dõi</span>
+                    </Link>
+                    <Link href={`/${profileUserId}/images`}>
+                        <span className={styles.tabItem}>Hình ảnh</span>
+                    </Link>
                 </div>
 
                 {/* Action Buttons */}

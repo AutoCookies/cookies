@@ -120,3 +120,18 @@ export const checkFollowStatusService = async (currentUserId, targetUserId) => {
         throw new Error("Không thể kiểm tra trạng thái follow.");
     }
 };
+
+
+export const getFollowersOfUserService = async (currentUserId) => {
+    try {
+      const followers = await FollowUser.find({ following: currentUserId }) // Người đang follow currentUserId
+        .populate("follower", "_id username profilePicture")
+        .lean();
+  
+      return followers.map(f => f.follower);
+    } catch (error) {
+      console.error("Error getting followers:", error);
+      throw new Error("Không thể lấy danh sách follower");
+    }
+  };
+  

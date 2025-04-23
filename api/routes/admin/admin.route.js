@@ -8,6 +8,7 @@ import {
     getAllPostsForAdmin,
     searchUserByName,
     banUser,
+    unbanUser,
     deleteCommnet
 } from '../../controllers/admin/admin.controller.js'
 
@@ -21,6 +22,8 @@ router.get("/search/user", searchUserByName);
 router.get("/posts", getAllPostsForAdmin);
 router.delete("/posts/:postId", adminDeletePost);
 router.post("/users/:userId/ban", banUser);
+router.post("/users/:userId/unban", unbanUser);
+
 router.delete("/comment/:commentId", deleteCommnet);
 
 export default router;

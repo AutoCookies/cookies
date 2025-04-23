@@ -187,6 +187,23 @@ export const banUserService = async (userId, adminId, { duration, reason }) => {
     };
 };
 
+export const unbanUserService = async (userId, adminId) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error("Người dùng không tồn tại!");
+    }
+    if (!user.isBanned) {
+        throw new Error("Người dùng không bị chặn!");
+    }
+
+    user.isBanned = false;
+    await user.save();
+
+    return {
+        message: "Người dùng đã được mở khóa!",
+    };
+}
+
 export const deleteCommentService = async (commentId, userId) => {
     // Tìm comment trong database
     const comment = await Comment.findById(commentId);

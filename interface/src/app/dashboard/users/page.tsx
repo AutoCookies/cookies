@@ -6,7 +6,7 @@ import { handleDeleteUser } from "@/utils/admin/handleDeleteUser";
 import { toast } from "react-hot-toast";
 import { handleBanUser } from "@/utils/admin/handleBanUser";  // Đoạn import này thêm để gọi API ban user
 import styles from '@/styles/dashboard/users.module.css';
-import { ENV_VARS } from "@/lib/envVars";
+import { handleUnBanUser } from "@/utils/admin/handleUnBanUser";  // Đoạn import này thêm để gọi API unban user
 
 interface User {
     _id: string;
@@ -48,20 +48,28 @@ export default function AdminUserPage() {
         setLoading(false);
     };
 
-    const handleBan = async () => {
+    const handleBan = async (userId: string) => {
         if (!reason) {
             toast.error("Lý do ban là bắt buộc!");
             return;
         }
 
         // Chắc chắn rằng currentUserId không phải là null trước khi gọi API
-        const success = await handleBanUser(banUser!._id, duration, reason); // Truyền reason và duration vào API
+        const success = await handleBanUser(userId, duration, reason); // Truyền reason và duration vào API
         if (success) {
             toast.success(`Đã ban người dùng ${banUser?.username}`);
             setIsBanModalOpen(false);
             fetchUsers();
         }
     };
+
+    const handleUnBan = async (userId: string) => {
+        const success = await handleUnBanUser(userId);
+        if (success) {
+            toast.success(`Đã bỏ ban người dùng ${userId}`);
+            fetchUsers();
+        }
+    }
 
     useEffect(() => {
         fetchUsers();
@@ -98,14 +106,29 @@ export default function AdminUserPage() {
                                 <td>{user.isBanned ? "Yes" : "No"}</td>
                                 <td>{user.visibility}</td>
                                 <td>
-                                    <button
-                                        onClick={() => {
-                                            setBanUser(user);
-                                            setIsBanModalOpen(true);
-                                        }}
-                                    >
-                                        Ban
-                                    </button>
+                                    {user.isBanned ? (
+                                        <button
+                                            onClick={async () => {
+                                                setBanUser(user);
+                                                const confirm = window.confirm(`Bạn có chắc muốn bỏ ban "${user.username}" không?`);
+                                                if (!confirm) return;
+
+                                                await handleUnBan(user._id);
+                                            }}
+                                        >
+                                            Unban
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => {
+                                                setBanUser(user);
+                                                setIsBanModalOpen(true);
+                                            }}
+                                        >
+                                            Ban
+                                        </button>
+                                    )}
+
                                     <button
                                         onClick={async () => {
                                             const confirm = window.confirm(`Bạn có chắc muốn xoá tài khoản "${user.username}" không?`);
@@ -178,7 +201,7 @@ export default function AdminUserPage() {
                             />
                         </div>
                         <div>
-                            <button onClick={handleBan}>Ban</button>
+                            <button onClick={() => banUser && handleBan(banUser._id)}>Ban</button>
                             <button onClick={() => setIsBanModalOpen(false)}>Cancel</button>
                         </div>
                     </div>

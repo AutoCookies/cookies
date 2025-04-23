@@ -61,6 +61,7 @@ export const loginUserService = async ({ email, password, res }) => {
         fullname: user.fullName,
         email: user.email,
         role: user.role,
+        isBaned: user.isBanned,
         token,
     };
 };

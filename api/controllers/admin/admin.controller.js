@@ -8,6 +8,7 @@ import {
     getAllPostsForAdminService,
     searchUserByNameService,
     banUserService,
+    unbanUserService,
     deleteCommentService
 } from '../../services/admin/admin.service.js';
 import { catchAsyncErrors } from '../../middlewares/catchAsyncError.middleware.js';
@@ -93,6 +94,19 @@ export const banUser = async (req, res) => {
         }
 
         const result = await banUserService(userId, adminId, { duration, reason });
+
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const unbanUser = async (req, res) => {
+    try {
+        const { userId } = req.params; // Lấy userId từ URL
+        const adminId = req.user._id; // Lấy adminId từ token xác thực
+
+        const result = await unbanUserService(userId, adminId);
 
         res.status(200).json(result);
     } catch (error) {

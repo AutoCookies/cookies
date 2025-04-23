@@ -37,10 +37,12 @@ export default function SignIn() {
       // Lưu token vào localStorage hoặc cookie
       // localStorage.setItem("token", data.token);
   
-      if (data.role === "admin") {
+      if (data.role === "admin" && data.isBaned === false) {
         router.push("/dashboard");
-      } else {
+      } else if (data.role === "user" && data.isBaned === false) {
         router.push("/home");
+      } else if (data.isBaned === true) {
+        router.push("/auth/ban");
       }
     } catch (err: any) {
       setError(err.message);

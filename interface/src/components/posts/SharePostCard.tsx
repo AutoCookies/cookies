@@ -26,6 +26,7 @@ interface SharePostProps {
     content: string;
     image: string | null;
     user: {
+      _id: string;
       username: string;
       profilePicture: string;
     };
@@ -188,7 +189,7 @@ const SharePostCard: React.FC<SharePostProps> = ({
       <div className={styles["share-header"]}>
         <div className={styles["user-info-container"]}>
           <img
-            src={user?.profilePicture || "/default-avatar.jpg"}
+            src={user?.profilePicture || "/default/default-profile.jpeg"}
             alt="User Avatar"
             className={styles["share-avatar"]}
           />
@@ -289,7 +290,14 @@ const SharePostCard: React.FC<SharePostProps> = ({
             alt="User Avatar"
             className={styles["post-avatar"]}
           />
-          <span className={styles["post-username"]}>{originalPost.user.username}</span>
+          <span 
+            className={
+              styles["post-username"]
+              }
+              onClick={() => onUsernameClick?.(originalPost.user._id, originalPost.user.username)}
+            style={{ cursor: "pointer" }}>
+              {originalPost.user.username}
+          </span>
         </div>
 
         <div className={styles["post-card-body"]}>

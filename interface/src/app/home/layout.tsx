@@ -21,7 +21,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             if (response.ok) {
                 const data = await response.json();
                 setProfileImage(data.profilePicture || "/default-profile.jpg");
-                setUserId(data.userId || null);
+                setUserId(data.userId);
+                // console.log("Profile data fetched successfully:", data);
             } else {
                 console.log("Failed to fetch profile, Status:", response.status);
             }

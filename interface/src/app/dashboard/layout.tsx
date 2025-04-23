@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
-import styles from '../../styles/dashboard/main.module.css'; // Import CSS module
+import styles from '../../styles/dashboard/main.module.css';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (

@@ -150,8 +150,13 @@ export const searchUserByNameService = async (query, limit = 10) => {
 };
 
 export const banUserService = async (userId, adminId, { duration, reason }) => {
+    console.log("userId:", userId);
     const user = await User.findById(userId);
-    if (!user) throw new Error("Người dùng không tồn tại!");
+
+    if (!user) {
+        console.error("Không tìm thấy user với ID:", userId);
+        throw new Error("Người dùng không tồn tại!");
+    }
 
     let banExpiresAt = null;
     if (duration > 0) {
@@ -159,16 +164,7 @@ export const banUserService = async (userId, adminId, { duration, reason }) => {
         banExpiresAt.setDate(banExpiresAt.getDate() + duration);
     }
 
-    user.banHistory.push({
-        admin: adminId,
-        reason,
-        duration,
-        banExpiresAt
-    });
-
-    user.isBanned = true;
-    await user.save();
-
+    // Tạo bản ghi BanHistory trước
     const banRecord = new BanHistory({
         user: userId,
         admin: adminId,
@@ -176,7 +172,14 @@ export const banUserService = async (userId, adminId, { duration, reason }) => {
         duration,
         banExpiresAt
     });
+
     await banRecord.save();
+
+    // Thêm ID của bản ghi vào user.banHistory
+    user.banHistory.push(banRecord._id);
+    user.isBanned = true;
+
+    await user.save();
 
     return {
         message: `Người dùng đã bị chặn ${duration > 0 ? `trong ${duration} ngày` : "vĩnh viễn"}!`,

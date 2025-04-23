@@ -116,11 +116,12 @@ const userSchema = new mongoose.Schema(
       default: false
     },
 
-    banHistory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "BanHistory",
-      default: null
-    },
+    banHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "BanHistory"
+      }
+    ],    
 
     passwordChangedAt: {
       type: Date,
@@ -150,4 +151,30 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
+
+userSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
+  const userId = this._id;
+
+  try {
+    await Promise.all([
+      mongoose.model("Post").deleteMany({ user: userId }),
+      mongoose.model("SharePost").deleteMany({ user: userId }),
+      mongoose.model("Comment").deleteMany({ user: userId }),
+      mongoose.model("LikePost").deleteMany({ user: userId }),
+      mongoose.model("LikeComment").deleteMany({ user: userId }),
+      mongoose.model("FollowUser").deleteMany({ $or: [{ follower: userId }, { following: userId }] }),
+      mongoose.model("BanHistory").deleteMany({ user: userId }),
+      mongoose.model("Notification").deleteMany({ user: userId }),
+      mongoose.model("Chat").deleteMany({ users: userId })
+    ]);
+
+    // Optional: cập nhật lại followerCount/followingCount cho những người đã follow user này nếu cần
+
+    next();
+  } catch (error) {
+    console.error("Error when deleting user related data:", error);
+    next(error);
+  }
+});
+
 export default User;

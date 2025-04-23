@@ -1,6 +1,7 @@
 import { ENV_VARS } from "@/lib/envVars";
 
 export const handleGetUserPosts = async (userId: string, page = 1, limit = 10) => {
+    console.log("Fetching user posts:", userId); // Debug log
     try {
         const response = await fetch(
             `${ENV_VARS.API_ROUTE}/posts/getPost/${userId}?page=${page}&limit=${limit}`,

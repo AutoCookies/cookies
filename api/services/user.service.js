@@ -179,9 +179,6 @@ export const updateCoverPhotoService = async (userId, imageBuffer) => {
 }
 
 export const getProfilePictureService = (user) => {
-    if (!user || !user.profilePicture) {
-        return { profilePicture: null };
-    }
     return { 
         userId: user._id,
         profilePicture: user.profilePicture 

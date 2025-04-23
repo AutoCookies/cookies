@@ -129,10 +129,6 @@ export const getProfilePicture = async (req, res) => {
     try {
         const result = getProfilePictureService(req.user);  // Lấy từ user đã đăng nhập
 
-        if (!result.profilePicture) {
-            return res.status(404).json({ message: "Người dùng chưa có ảnh đại diện" });
-        }
-
         res.json(result);
     } catch (error) {
         console.error("Error in getProfilePicture:", error.message);

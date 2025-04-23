@@ -35,6 +35,14 @@
   min-width: 0;
 }
 
+.share-info {
+  pointer-events: auto;
+}
+
+.share-user {
+  cursor: pointer;
+}
+
 .share-user {
   font-weight: 700;
   font-size: 16px;

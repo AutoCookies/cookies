@@ -19,7 +19,7 @@ interface PostProps {
   user: {
     _id: string;
     username: string;
-    profilePicture: string;
+    profilePicture: string | null;
   };
   visibility: "public" | "private" | "friends";
   onLike: () => void;
@@ -128,7 +128,7 @@ const PostCard: React.FC<PostProps> = ({
       <div className={styles["post-header"]}>
         <div className={styles["user-info"]}>
           <img
-            src={user.profilePicture || "/default-avatar.jpg"}
+            src={user?.profilePicture ?? "/default/default-profile.jpeg"}
             alt="User Avatar"
             className={styles["user-avatar"]}
           />

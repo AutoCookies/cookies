@@ -2,6 +2,7 @@ import { toast } from "react-hot-toast";
 import { ENV_VARS } from "@/lib/envVars";
 
 interface User {
+    _id: string;
     username: string;
     fullName: string;
     email: string;

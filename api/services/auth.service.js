@@ -82,7 +82,7 @@ export const logoutUserService = async (req, res) => {
  * @returns {Promise<Object>} Thông tin user (_id, name, role, email)
  */
 export const getUserInfoService = async (userId) => {
-    const user = await User.findById(userId).select("_id username role email");
+    const user = await User.findById(userId).select("_id username role email profilePicture");
 
     if (!user) {
         throw new Error("User not found");

@@ -3,7 +3,7 @@ import { ENV_VARS } from './config/envVars.js';
 import { connectDB } from "./config/db.js";
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
-import adminRoutes from './routes/admin.route.js';
+import adminRoutes from './routes/admin/admin.route.js';
 import postRoute from './routes/post.route.js';
 import commentRoute from './routes/comment.route.js';
 import followRoute from './routes/follow.route.js';

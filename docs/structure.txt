@@ -69,6 +69,12 @@
 │   │   │   ├── page.tsx (Server)
 │   │   │   ├── loading.tsx (Client)
 │   │   │   └── error.tsx (Client)
+│   │   ├── 📂 dashboard
+│   │   │   ├── 📂 users
+│   │   │   │   └── page.css
+│   │   │   ├── page.tsx (Server)
+│   │   │   ├── loading.tsx (Client)
+│   │   │   └── error.tsx (Client)
 │   │   │   
 │   ├── 📂 components (Client Components)
 │   │   ├── 📂 comments

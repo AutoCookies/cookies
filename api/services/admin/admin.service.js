@@ -1,9 +1,9 @@
-import User from "../models/user.model.js";
-import Post from '../models/post.model.js';
-import { SharePost } from '../models/sharedPost.model.js';
+import User from "../../models/user.model.js";
+import Post from '../../models/post.model.js';
+import { SharePost } from '../../models/sharedPost.model.js';
 import mongoose from 'mongoose';
-import { generateTokenAndSetCookie } from '../utils/generateToken.js';
-import BanHistory from "../models/banHistory.model.js";
+import { generateTokenAndSetCookie } from '../../utils/generateToken.js';
+import BanHistory from "../../models/banHistory.model.js";
 
 export const getUserService = async (currentUser, id) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -16,12 +16,28 @@ export const getUserService = async (currentUser, id) => {
 };
 
 //
-export const getAllUserService = async (currentUser) => {
+export const getAllUserService = async (currentUser, page = 1, limit = 20) => {
     if (!currentUser || currentUser.role !== "admin") {
         throw new Error("Bạn không có quyền xem danh sách người dùng!");
     }
 
-    return await User.find().select("-password").lean();
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+        User.find()
+            .select("-password")
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        User.countDocuments()
+    ]);
+
+    return {
+        total,
+        page,
+        limit,
+        users
+    };
 };
 
 export const deleteUserService = async (currentUser, userId) => {

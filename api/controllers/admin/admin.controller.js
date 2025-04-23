@@ -9,13 +9,14 @@ import {
     searchUserByNameService,
     banUserService,
     deleteCommentService
-} from '../services/admin.service.js';
-import { catchAsyncErrors } from '../middlewares/catchAsyncError.middleware.js';
+} from '../../services/admin/admin.service.js';
+import { catchAsyncErrors } from '../../middlewares/catchAsyncError.middleware.js';
 
 export const getAllUsers = asyncHandler(async (req, res) => {
-    const users = await getAllUserService(req.user);
-    res.json(users);
-});
+    const { page = 1, limit = 20 } = req.query;
+    const users = await getAllUserService(req.user, Number(page), Number(limit));
+    res.status(200).json(users);
+});  
 
 export const deleteUser = asyncHandler(async (req, res) => {
     const message = await deleteUserService(req.user, req.params.id);

@@ -9,7 +9,7 @@ import {
     searchUserByName,
     banUser,
     deleteCommnet
-} from '../controllers/admin.controller.js'
+} from '../../controllers/admin/admin.controller.js'
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 import express from "express";
 import { registerUser, loginUser, logoutUser } from "../controllers/auth.controller.js";
-import { loginRateLimiter } from "../middlewares/rateLimit.middleware.js"
+import { loginRateLimiter } from "../middlewares/rateLimit.middleware.js";
 import { protectRoute } from "../middlewares/auth.middleware.js";
 import { getAuthUser } from "../controllers/auth.controller.js";
 

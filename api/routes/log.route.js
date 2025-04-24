@@ -1,7 +1,11 @@
 import express from 'express';
 const router = express.Router();
-import { handleCreateLog } from '../controllers/log.controller.js';
+import { 
+    handleCreateLog,
+    handleGetLogs
+} from '../controllers/log.controller.js';
 
 router.post("/", handleCreateLog);
+router.get("/", handleGetLogs);
 
 export default router;

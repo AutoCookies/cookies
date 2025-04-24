@@ -1,4 +1,6 @@
 import express from "express";
+import http from "http"; 
+import { Server } from "socket.io";
 import { ENV_VARS } from './config/envVars.js';
 import { connectDB } from "./config/db.js";
 import authRoutes from './routes/auth.route.js';
@@ -15,41 +17,63 @@ import { checkBanStatus } from "./middlewares/checkBan.middleware.js";
 import cors from 'cors';
 import User from "./models/user.model.js";
 
+const app = express();
 
-const app = express()
+// Tạo server http để gắn socket
+const server = http.createServer(app);
+
+// Tạo socket.io instance
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  }
+});
+
+global._io = io;
+
+io.on("connection", (socket) => {
+  console.log("Socket.IO client connected!");
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
 
 const createAdminIfNotExists = async () => {
-    try {
-        const adminExists = await User.findOne({ role: "admin" });
+  try {
+    const adminExists = await User.findOne({ role: "admin" });
 
-        if (!adminExists) {
-            console.log("Không tìm thấy admin, đang tạo tài khoản admin mặc định...");
+    if (!adminExists) {
+      console.log("Không tìm thấy admin, đang tạo tài khoản admin mặc định...");
 
-            const adminUser = await User.create({
-                username: "admin",
-                fullName: "Administrator",
-                email: "admin@example.com",
-                password: "admin123", 
-                role: "admin",
-            });
+      const adminUser = await User.create({
+        username: "admin",
+        fullName: "Administrator",
+        email: "admin@example.com",
+        password: "admin123", 
+        role: "admin",
+      });
 
-            console.log(`Admin được tạo: ${adminUser.email}`);
-        } else {
-            console.log("Admin đã tồn tại.");
-        }
-    } catch (error) {
-        console.error("Lỗi khi tạo admin:", error);
+      console.log(`Admin được tạo: ${adminUser.email}`);
+    } else {
+      console.log("Admin đã tồn tại.");
     }
+  } catch (error) {
+    console.error("Lỗi khi tạo admin:", error);
+  }
 };
 
-app.use(express.json())
-app.use(CookieParser())
+app.use(express.json());
+app.use(CookieParser());
+
 app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-    optionsSuccessStatus: 200,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+  origin: "http://localhost:3000",
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 
 app.use("/api/v1/auth", authRoutes);
@@ -61,10 +85,9 @@ app.use("/api/v1/likes", protectRoute, checkBanStatus, likeRoute);
 app.use("/api/v1/follow", protectRoute, checkBanStatus, followRoute);
 app.use("/api/v1/logs", logRoutes);
 
-app.listen(ENV_VARS.PORT, () => {
-    console.log(`Server running on port ${ENV_VARS.PORT}`);
-    connectDB()
-    .then(() => {
-        createAdminIfNotExists();
-    });
+server.listen(ENV_VARS.PORT, () => {
+  console.log(`Server running on port ${ENV_VARS.PORT}`);
+  connectDB().then(() => {
+    createAdminIfNotExists();
+  });
 });

@@ -10,16 +10,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <h1>Admin Dashboard</h1>
                 <nav className={styles.nav}>
                     <Link href="/dashboard" className={styles.navLink}>
-                        Thống kê
+                        Statistic
                     </Link>
                     <Link href="/dashboard/users" className={styles.navLink}>
-                        Tài khoản
+                        Accounts
                     </Link>
-                    <Link href="/admin/posts" className={styles.navLink}>
-                        Bài viết
+                    <Link href="/dashboard/logs" className={styles.navLink}>
+                        Logs
                     </Link>
                     <Link href="/admin/settings" className={styles.navLink}>
-                        Cài đặt
+                        Settings
                     </Link>
                 </nav>
             </header>

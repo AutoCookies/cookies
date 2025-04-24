@@ -24,6 +24,8 @@ export const handleSendLog = async (logData: LogData): Promise<void> => {
       body: JSON.stringify(logData),
       credentials: "include",
     });
+
+    console.log("Log đã được gửi thành công:", logData);
   } catch (err) {
     console.error("Gửi log thất bại:", err);
   }

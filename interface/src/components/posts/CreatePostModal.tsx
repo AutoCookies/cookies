@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import styles from './styles/CreatePostModal.module.css';
 import { handleCreatePost } from '@/utils/posts/handleCreatePost';
 import { handleSendLog, LogData } from "@/utils/logs/handleSendLog";
+import { metadata } from 'motion/react-client';
 
 interface UserData {
     _id: string;
@@ -35,81 +36,167 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-
+    
         if (!file) {
-            sendLog('error', 'error', 'No file selected or file is undefined');
+            const errorMsg = 'No file selected';
+            setError(errorMsg);
+            handleSendLog({
+                type: 'error',
+                level: 'error',
+                message: errorMsg,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role
+                },
+                metadata: {
+                    error: errorMsg,
+                },
+            });
             return;
         }
-
+    
         const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (!validTypes.includes(file.type)) {
-            setError('Chỉ chấp nhận file ảnh (JPEG, PNG, GIF)');
-            sendLog('error', 'warn', `Người dùng chọn file sai định dạng: ${file.type}`);
+            const errorMsg = 'Chỉ chấp nhận file ảnh (JPEG, PNG, GIF)';
+            setError(errorMsg);
+            handleSendLog({
+                type: 'error',
+                level: 'warn',
+                message: errorMsg,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role
+                },
+                metadata: {
+                    fileType: file.type,
+                },
+            });
             return;
         }
-
+    
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-            setError('Kích thước ảnh không được vượt quá 5MB');
-            sendLog('error', 'warn', `Người dùng chọn ảnh quá lớn: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+            const errorMsg = 'Kích thước ảnh không được vượt quá 5MB';
+            setError(errorMsg);
+            handleSendLog({
+                type: 'error',
+                level: 'warn',
+                message: errorMsg,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role
+                },
+                metadata: {
+                    fileSize: file.size,
+                },
+            });
             return;
         }
-
+    
         setSelectedImage(file);
         setError(null);
-
+    
         const reader = new FileReader();
         reader.onload = (event) => {
             if (event.target?.result) {
                 setImagePreview(event.target.result as string);
+                // Ghi log sau khi đọc file thành công
+                handleSendLog({
+                    type: 'action',
+                    level: 'info',
+                    message: `Changed image successfully`,
+                    user: {
+                        _id: data._id,
+                        email: data.email,
+                        role: data.role
+                    },
+                    metadata: {
+                        fileName: file.name,
+                        fileSize: file.size,
+                        fileType: file.type,
+                    },
+                });
             }
         };
+    
+        reader.onerror = () => {
+            const errorMsg = 'Failed to read file';
+            setError(errorMsg);
+            handleSendLog({
+                type: 'error',
+                level: 'error',
+                message: errorMsg,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role
+                },
+                metadata: {
+                    error: reader.error,
+                },
+            });
+        };
+    
         reader.readAsDataURL(file);
-
-        try {
-            sendLog('action', 'info', `Người dùng thay ảnh thành công: ${file.name}`);
-            console.log("Người dùng thay ảnh thành công:");
-        } catch (err) {
-            sendLog('error', 'error', `Lỗi khi gửi log: ${err instanceof Error ? err.message : err}`);
-        }
-    };
-
-    // Hàm wrapper để gửi log
-    const sendLog = (
-        type: LogData["type"],
-        level: LogData["level"],
-        message: string,
-        metadata?: Record<string, any>
-    ) => {
-        if (!data?._id || !data?.email || !data?.role) return;
-
-        handleSendLog({
-            type: type,
-            level,
-            message,
-            user: {
-                _id: data._id,
-                email: data.email,
-                role: data.role,
-            },
-            metadata,
-        });
     };
 
     const handleRemoveImage = () => {
-        setImagePreview(null);
-        setSelectedImage(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+        if (!selectedImage && !imagePreview) return;
+    
+        try {
+            handleSendLog({
+                type: 'action',
+                level: 'info',
+                message: `Deleted image successfully`,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role
+                },
+                metadata: {
+                    fileName: selectedImage?.name,
+                    fileSize: selectedImage?.size,
+                    fileType: selectedImage?.type,
+                },
+            });
+    
+            setImagePreview(null);
+            setSelectedImage(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        } catch (err) {
+            const errorMsg = 'Failed to log image removal';
+            handleSendLog({
+                type: 'error',
+                level: 'error',
+                message: errorMsg,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role
+                },
+                metadata: {
+                    error: err instanceof Error ? err.message : String(err),
+                },
+            });
         }
-
-        sendLog('action', 'info', 'Người dùng xóa ảnh đính kèm');
     };
 
     const handleVisibilitySelect = (value: Visibility) => {
         setVisibility(value);
         setShowVisibilityDropdown(false);
-        sendLog('action', 'info', `Người dùng chọn chế độ hiển thị: ${value}`);
+        handleSendLog({
+            type: 'action',
+            level: 'info',
+            message: `Changed visibility to ${value}`,
+            metadata: {
+                visibility: value,
+            },
+        });
     };
 
     const handleSubmit = async () => {
@@ -148,7 +235,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
                         level: 'info',
                         message: `Bài viết mới đã được tạo: ${newPost.title}`,
                         user: {
-                            _id: data._id, // giả sử bạn có userId ở đây
+                            _id: data._id,
                             email: data.email,
                             role: data.role,
                         },
@@ -166,6 +253,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
                         type: 'error',
                         level: 'warn',
                         message: `Không thể tạo bài viết: ${title}`,
+                        user: {
+                            _id: data._id,
+                            email: data.email,
+                            role: data.role,
+                        },
                         metadata: {
                             error: error,
                             title,
@@ -198,6 +290,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
                 type: 'error',
                 level: 'error',
                 message: `Lỗi hệ thống khi tạo bài viết: ${title}`,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role,
+                },
                 metadata: {
                     error: err instanceof Error ? err.message : err,
                     stack: err instanceof Error ? err.stack : null,

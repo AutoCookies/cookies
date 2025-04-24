@@ -68,6 +68,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
 
         try {
             sendLog('action', 'info', `Người dùng thay ảnh thành công: ${file.name}`);
+            console.log("Người dùng thay ảnh thành công:");
         } catch (err) {
             sendLog('error', 'error', `Lỗi khi gửi log: ${err instanceof Error ? err.message : err}`);
         }
@@ -101,11 +102,14 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+
+        sendLog('action', 'info', 'Người dùng xóa ảnh đính kèm');
     };
 
     const handleVisibilitySelect = (value: Visibility) => {
         setVisibility(value);
         setShowVisibilityDropdown(false);
+        sendLog('action', 'info', `Người dùng chọn chế độ hiển thị: ${value}`);
     };
 
     const handleSubmit = async () => {

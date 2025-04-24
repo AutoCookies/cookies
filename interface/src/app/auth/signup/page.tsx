@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "../../../styles/auth/signup.module.css";
 import Link from "next/link";
 import { ENV_VARS } from "../../../lib/envVars";
+import { handleSendLog } from "@/utils/logs/handleSendLog";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -19,7 +20,7 @@ export default function SignUp() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
     try {
       const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/signup`, {
         method: "POST",
@@ -27,18 +28,52 @@ export default function SignUp() {
         body: JSON.stringify({ username, fullName, email, password }),
         credentials: "include",
       });
-
+  
       if (!res.ok) {
         const errorData = await res.json();
+  
+        // Log khi đăng ký thất bại
+        await handleSendLog({
+          type: "auth",
+          level: "warn",
+          message: `Đăng ký thất bại với email: ${email}`,
+          metadata: { reason: errorData.message },
+        });
+  
         throw new Error(errorData.message || "Đăng ký thất bại!");
       }
-
+  
       const data = await res.json();
       console.log("Registered user:", data);
-
+  
+      // Log khi đăng ký thành công
+      await handleSendLog({
+        type: "auth",
+        level: "info",
+        message: `Người dùng mới đã đăng ký: ${data.email}`,
+        user: {
+          _id: data._id,
+          email: data.email,
+          role: data.role,
+        },
+        metadata: {
+          fullName,
+          createdAt: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+        },
+      });
+  
       router.push("/auth/signin");
     } catch (err: any) {
       setError(err.message);
+  
+      // Log lỗi hệ thống
+      await handleSendLog({
+        type: "error",
+        level: "error",
+        message: `Lỗi khi đăng ký người dùng ${email}: ${err.message}`,
+        metadata: { username, fullName, stack: err.stack },
+      });
     } finally {
       setLoading(false);
     }

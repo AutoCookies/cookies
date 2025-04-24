@@ -1,16 +1,27 @@
 import React, { useState, useRef } from 'react';
 import styles from './styles/CreatePostModal.module.css';
 import { handleCreatePost } from '@/utils/posts/handleCreatePost';
+import { handleSendLog, LogData } from "@/utils/logs/handleSendLog";
+
+interface UserData {
+    _id: string;
+    username: string;
+    role: string;
+    email: string;
+    profilePicture: string;
+};
+
 
 interface CreatePostModalProps {
+    data: UserData,
     isOpen: boolean;
     onClose: () => void;
-    onPostCreated?: (newPost: any) => void; 
+    onPostCreated?: (newPost: any) => void;
 }
 
 type Visibility = 'public' | 'friends' | 'private';
 
-const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPostCreated }) => {
+const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose, onPostCreated }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -23,32 +34,65 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPo
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
+        const file = e.target.files?.[0];
 
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            if (!validTypes.includes(file.type)) {
-                setError('Chỉ chấp nhận file ảnh (JPEG, PNG, GIF)');
-                return;
-            }
-
-            const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) {
-                setError('Kích thước ảnh không được vượt quá 5MB');
-                return;
-            }
-
-            setSelectedImage(file);
-            setError(null);
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target?.result) {
-                    setImagePreview(event.target.result as string);
-                }
-            };
-            reader.readAsDataURL(file);
+        if (!file) {
+            sendLog('error', 'error', 'No file selected or file is undefined');
+            return;
         }
+
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            setError('Chỉ chấp nhận file ảnh (JPEG, PNG, GIF)');
+            sendLog('error', 'warn', `Người dùng chọn file sai định dạng: ${file.type}`);
+            return;
+        }
+
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            setError('Kích thước ảnh không được vượt quá 5MB');
+            sendLog('error', 'warn', `Người dùng chọn ảnh quá lớn: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+            return;
+        }
+
+        setSelectedImage(file);
+        setError(null);
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            if (event.target?.result) {
+                setImagePreview(event.target.result as string);
+            }
+        };
+        reader.readAsDataURL(file);
+
+        try {
+            sendLog('action', 'info', `Người dùng thay ảnh thành công: ${file.name}`);
+        } catch (err) {
+            sendLog('error', 'error', `Lỗi khi gửi log: ${err instanceof Error ? err.message : err}`);
+        }
+    };
+
+    // Hàm wrapper để gửi log
+    const sendLog = (
+        type: LogData["type"],
+        level: LogData["level"],
+        message: string,
+        metadata?: Record<string, any>
+    ) => {
+        if (!data?._id || !data?.email || !data?.role) return;
+
+        handleSendLog({
+            type: type,
+            level,
+            message,
+            user: {
+                _id: data._id,
+                email: data.email,
+                role: data.role,
+            },
+            metadata,
+        });
     };
 
     const handleRemoveImage = () => {
@@ -93,17 +137,68 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPo
                     setSelectedImage(null);
                     setVisibility('public');
                     onClose();
+
+                    // Log thành công khi tạo bài viết
+                    handleSendLog({
+                        type: 'action',
+                        level: 'info',
+                        message: `Bài viết mới đã được tạo: ${newPost.title}`,
+                        user: {
+                            _id: data._id, // giả sử bạn có userId ở đây
+                            email: data.email,
+                            role: data.role,
+                        },
+                        metadata: {
+                            visibility: newPost.visibility,
+                            postId: newPost._id,
+                        },
+                    });
                 },
                 (error) => {
                     setError(error);
+
+                    // Log lỗi khi tạo bài viết không thành công
+                    handleSendLog({
+                        type: 'error',
+                        level: 'warn',
+                        message: `Không thể tạo bài viết: ${title}`,
+                        metadata: {
+                            error: error,
+                            title,
+                            content,
+                        },
+                    });
                 }
             );
 
             if (!result.success) {
                 setError(result.message || 'Có lỗi xảy ra khi tạo bài viết');
+
+                // Log khi backend trả lỗi
+                handleSendLog({
+                    type: 'error',
+                    level: 'warn',
+                    message: `Lỗi từ server khi tạo bài viết: ${title}`,
+                    metadata: {
+                        error: result.message,
+                        title,
+                        content,
+                    },
+                });
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi tạo bài viết');
+
+            // Log lỗi hệ thống hoặc lỗi không mong đợi
+            handleSendLog({
+                type: 'error',
+                level: 'error',
+                message: `Lỗi hệ thống khi tạo bài viết: ${title}`,
+                metadata: {
+                    error: err instanceof Error ? err.message : err,
+                    stack: err instanceof Error ? err.stack : null,
+                },
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -146,7 +241,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPo
                 <div className={styles.formGroup}>
                     <label>Chế độ hiển thị</label>
                     <div className={styles.visibilityDropdown} ref={dropdownRef}>
-                        <button 
+                        <button
                             type="button"
                             className={styles.visibilityToggle}
                             onClick={() => setShowVisibilityDropdown(!showVisibilityDropdown)}
@@ -158,21 +253,21 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPo
                         </button>
                         {showVisibilityDropdown && (
                             <div className={styles.visibilityDropdownMenu}>
-                                <button 
+                                <button
                                     type="button"
                                     className={`${styles.visibilityOption} ${visibility === 'public' ? styles.active : ''}`}
                                     onClick={() => handleVisibilitySelect('public')}
                                 >
                                     Công khai (Public)
                                 </button>
-                                <button 
+                                <button
                                     type="button"
                                     className={`${styles.visibilityOption} ${visibility === 'friends' ? styles.active : ''}`}
                                     onClick={() => handleVisibilitySelect('friends')}
                                 >
                                     Bạn bè (Friends)
                                 </button>
-                                <button 
+                                <button
                                     type="button"
                                     className={`${styles.visibilityOption} ${visibility === 'private' ? styles.active : ''}`}
                                     onClick={() => handleVisibilitySelect('private')}

@@ -8,6 +8,7 @@ import postRoute from './routes/post.route.js';
 import commentRoute from './routes/comment.route.js';
 import followRoute from './routes/follow.route.js';
 import likeRoute from './routes/like.route.js';
+import logRoutes from './routes/log.route.js';
 import CookieParser from "cookie-parser";
 import { isAdmin, protectRoute } from "./middlewares/auth.middleware.js";
 import { checkBanStatus } from "./middlewares/checkBan.middleware.js";
@@ -58,6 +59,7 @@ app.use("/api/v1/posts", protectRoute, checkBanStatus, postRoute)
 app.use("/api/v1/comments", protectRoute, checkBanStatus, commentRoute);
 app.use("/api/v1/likes", protectRoute, checkBanStatus, likeRoute);
 app.use("/api/v1/follow", protectRoute, checkBanStatus, followRoute);
+app.use("/api/v1/logs", logRoutes);
 
 app.listen(ENV_VARS.PORT, () => {
     console.log(`Server running on port ${ENV_VARS.PORT}`);

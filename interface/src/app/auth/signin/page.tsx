@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import styles from "../../../styles/auth/signin.module.css";
 import Link from "next/link";
 import { ENV_VARS } from "../../../lib/envVars";
+import { handleSendLog } from "@/utils/logs/handleSendLog";
+
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -29,14 +31,29 @@ export default function SignIn() {
       const data = await res.json();
   
       if (!res.ok) {
+        // Gửi log khi đăng nhập thất bại
+        await handleSendLog({
+          type: "auth",
+          level: "warn",
+          message: `Thử đăng nhập thất bại với email: ${email}`,
+          metadata: { reason: data.message },
+        });
         throw new Error(data.message || "Đăng nhập thất bại!");
       }
   
-      console.log("User data:", data);
+      // Gửi log khi đăng nhập thành công
+      await handleSendLog({
+        type: "auth",
+        level: "info",
+        message: `Người dùng ${data.email} (${data.role}) đã đăng nhập.`,
+        user: { _id: data._id, email: data.email, role: data.role },
+        metadata: {
+          loginTime: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+        },
+      });
   
-      // Lưu token vào localStorage hoặc cookie
-      // localStorage.setItem("token", data.token);
-  
+      // Điều hướng tùy vào role
       if (data.role === "admin" && data.isBaned === false) {
         router.push("/dashboard");
       } else if (data.role === "user" && data.isBaned === false) {
@@ -46,10 +63,18 @@ export default function SignIn() {
       }
     } catch (err: any) {
       setError(err.message);
+  
+      // Gửi log lỗi hệ thống nếu có lỗi bất ngờ
+      await handleSendLog({
+        type: "error",
+        level: "error",
+        message: `Lỗi trong quá trình đăng nhập: ${err.message}`,
+        metadata: { email, stack: err.stack },
+      });
     } finally {
       setLoading(false);
     }
-  };  
+  };    
 
   return (
     <div className={styles.signinContainer}>

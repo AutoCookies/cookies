@@ -8,6 +8,7 @@ import CreatePostModal from "@/components/posts/CreatePostModal";
 import styles from "@/styles/home/postPage.module.css";
 import { ENV_VARS } from "@/lib/envVars";
 import { useRouter } from 'next/navigation';
+import { set } from "animejs";
 
 export default function PostPage() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -18,6 +19,7 @@ export default function PostPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const lastFetchedPage = useRef(0);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [data, setData] = useState<any>(null);
 
   const router = useRouter();
 
@@ -57,6 +59,7 @@ export default function PostPage() {
         });
         if (res.ok) {
           const data = await res.json();
+          setData(data);
           setCurrentUserId(data._id.toString());
         }
       } catch (error) {
@@ -142,6 +145,7 @@ export default function PostPage() {
       {error && <p className={styles.error}>Lỗi: {error}</p>}
 
       <CreatePostModal
+        data={data}
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onPostCreated={handlePostCreated}

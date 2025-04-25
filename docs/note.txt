@@ -22,3 +22,5 @@ Tương tự với likeComment cũng vậy
 
 - Hướng tiếp theo là khi vào trang cá nhân của user đó có thể follow hoặc unfollow user (Server truyền dữ liệu với key là gì thì khi truyền props
 nhớ đặt tên đúng key như vậy thì mới nhận được)
+
+- Hướng tiếp theo: admin sẽ quản lý bài Post, xây dựng model AI nhận diện user đó có đang thế nào đó không?

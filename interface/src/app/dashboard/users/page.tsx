@@ -7,6 +7,9 @@ import { toast } from "react-hot-toast";
 import { handleBanUser } from "@/utils/admin/handleBanUser";  // Đoạn import này thêm để gọi API ban user
 import styles from '@/styles/dashboard/users.module.css';
 import { handleUnBanUser } from "@/utils/admin/handleUnBanUser";  // Đoạn import này thêm để gọi API unban user
+import { handleCreateUserAccount } from "@/utils/admin/handleCreateUserAccount";
+import { handleSendLog } from "@/utils/logs/handleSendLog";
+import { ENV_VARS } from "@/lib/envVars";
 
 interface User {
     _id: string;
@@ -36,6 +39,36 @@ export default function AdminUserPage() {
     const [reason, setReason] = useState<string>("");
     const [duration, setDuration] = useState<number>(1); // Default to 1 day
 
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+    const [newUsername, setNewUsername] = useState<string>("");
+    const [newFullName, setNewFullName] = useState<string>("");
+    const [newEmail, setNewEmail] = useState<string>("");
+    const [newPassword, setNewPassword] = useState<string>("");
+    const [newRole, setNewRole] = useState<string>("user");
+
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [data, setData] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
+                    credentials: "include",
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setData(data);
+                    setCurrentUserId(data._id.toString());
+                }
+            } catch (error) {
+                console.error("Error fetching user:", error);
+            }
+        };
+
+        fetchCurrentUser();
+    }, []);
+
+
     const fetchUsers = async () => {
         setLoading(true);
         const data = await handleGetAllUser(page, limit);
@@ -47,6 +80,33 @@ export default function AdminUserPage() {
         }
         setLoading(false);
     };
+
+    const handleCreateAccount = async () => {
+        setLoading(true);
+        if (!newUsername || !newFullName || !newEmail || !newPassword) {
+            toast.error("Tất cả các trường là bắt buộc!");
+            return;
+        }
+
+        handleSendLog({
+            type: "action",
+            level: "info",
+            message: `Admin ${data?.email} có Id: ${data._id} tạo tài khoản ${newEmail}`,
+            user: {
+                _id: data._id,
+                email: data.email,
+                role: data.role
+            },
+            metadata: {
+                newUsername: newUsername,
+                newFullName: newFullName,
+                newEmail: newEmail,
+                newRole: newRole
+            }
+        })
+
+        fetchUsers();
+    }
 
     const handleBan = async (userId: string) => {
         if (!reason) {
@@ -60,6 +120,17 @@ export default function AdminUserPage() {
             toast.success(`Đã ban người dùng ${banUser?.username}`);
             setIsBanModalOpen(false);
             fetchUsers();
+
+            handleSendLog({
+                type: "action",
+                level: "info",
+                message: `Admin ${data?.email} có Id: ${data._id} đã chặn người dùng ${userId}`,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role
+                },
+            })
         }
     };
 
@@ -68,6 +139,17 @@ export default function AdminUserPage() {
         if (success) {
             toast.success(`Đã bỏ ban người dùng ${userId}`);
             fetchUsers();
+
+            handleSendLog({
+                type: "action",
+                level: "info",
+                message: `Admin ${data?.email} có Id: ${data._id} bỏ ban người dùng ${userId}`,
+                user: {
+                    _id: data._id,
+                    email: data.email,
+                    role: data.role
+                }
+            })
         }
     }
 
@@ -77,6 +159,9 @@ export default function AdminUserPage() {
 
     return (
         <div className={styles.container}>
+            <div className= {styles.createContainer}>
+                <button className={styles.createButton} onClick={() => setIsCreateModalOpen(true)}>Create Account</button>
+            </div>
             {loading ? (
                 <p className={styles.loading}>Loading...</p>
             ) : (
@@ -203,6 +288,78 @@ export default function AdminUserPage() {
                         <div>
                             <button onClick={() => banUser && handleBan(banUser._id)}>Ban</button>
                             <button onClick={() => setIsBanModalOpen(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Create Account Pagnition*/}
+            {isCreateModalOpen && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <h3>Create User Account</h3>
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={newUsername}
+                            onChange={(e) => setNewUsername(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Full Name"
+                            value={newFullName}
+                            onChange={(e) => setNewFullName(e.target.value)}
+                        />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={newEmail}
+                            onChange={(e) => setNewEmail(e.target.value)}
+                        />
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <select
+                            value={newRole}
+                            onChange={(e) => setNewRole(e.target.value)}
+                        >
+                            <option value="user">User</option>
+                            <option value="moderator">Moderator</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <div>
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        await handleCreateUserAccount({
+                                            username: newUsername,
+                                            fullName: newFullName,
+                                            email: newEmail,
+                                            password: newPassword,
+                                            role: newRole,
+                                        });
+                                        toast.success("Tạo tài khoản thành công!");
+                                        setIsCreateModalOpen(false);
+                                        fetchUsers(); // Refresh danh sách
+                                        // Reset form
+                                        setNewUsername("");
+                                        setNewFullName("");
+                                        setNewEmail("");
+                                        setNewPassword("");
+                                        setNewRole("user");
+
+                                        handleCreateAccount()
+                                    } catch (error: any) {
+                                        toast.error(error.message || "Tạo tài khoản thất bại!");
+                                    }
+                                }}
+                            >
+                                Create
+                            </button>
+                            <button onClick={() => setIsCreateModalOpen(false)}>Cancel</button>
                         </div>
                     </div>
                 </div>

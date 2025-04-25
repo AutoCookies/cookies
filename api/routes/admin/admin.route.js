@@ -18,7 +18,7 @@ router.get("/users/:id", getUserProfile);
 router.get("/users", getAllUsers);
 router.delete("/users/:id", deleteUser);
 router.post("/users", createAccount);
-router.get("/search/user", searchUserByName);
+router.get("/search/:name", searchUserByName);
 router.get("/posts", getAllPostsForAdmin);
 router.delete("/posts/:postId", adminDeletePost);
 router.post("/users/:userId/ban", banUser);

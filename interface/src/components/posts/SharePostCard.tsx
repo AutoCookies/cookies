@@ -8,6 +8,7 @@ import CommentSection from "../comments/commentSection";
 import { ENV_VARS } from "@/lib/envVars";
 import { handleUpdateSharePost } from "@/utils/posts/handleUpdateSharePost";
 import EditSharePostModal from './EditSharePostModal';
+import { handleSendLog } from "@/utils/logs/handleSendLog";
 
 interface SharePostProps {
   sharePostId: string;
@@ -62,7 +63,9 @@ const SharePostCard: React.FC<SharePostProps> = ({
   const [liked, setLiked] = useState(isLiked);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [currentUserEmail, setCurrentUserEmail] = useState<string>("");
+  const [currentUserRole, setCurrentUserRole] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -72,14 +75,42 @@ const SharePostCard: React.FC<SharePostProps> = ({
     try {
       setLiked(prev => !prev);
       await handleLike(sharePostId, liked, onLike);
+      await handleSendLog({
+        type: "action",
+        level: "info",
+        message: `Người dùng ${currentUserEmail} đã ${liked ? "thích" : "bỏ thích"} bài viết chia sẻ.`,
+        user: {
+            _id: currentUserId,
+            email: currentUserEmail,
+            role: currentUserRole
+        },
+        metadata: {
+            postId: sharePostId
+        }
+      })
     } catch (error) {
       setLiked(prev => !prev);
       console.error("Failed to like post:", error);
     }
   };
 
-  const handleSharePost = (caption: string, visibility: "public" | "private" | "friends") => {
+  const handleSharePost = async (caption: string, visibility: "public" | "private" | "friends") => {
     handleShare(sharePostId, caption, visibility, onShare);
+    handleSendLog({
+      type: "action",
+      level: "info",
+      message: `Người dùng ${currentUserEmail} đã chia sẻ bài viết với caption: ${caption} và chế độ hiển thị ${visibility} cho bài viết ${sharePostId}.`,
+      user: {
+          _id: currentUserId,
+          email: currentUserEmail,
+          role: currentUserRole
+      },
+      metadata: {
+          postId: sharePostId,
+          caption,
+          visibility
+      }
+    })
   };
 
   const toggleComments = () => {
@@ -90,8 +121,35 @@ const SharePostCard: React.FC<SharePostProps> = ({
     setIsDeleting(true);
     const { success } = await handleDeletePost(sharePostId, () => {
       onDelete?.(); // Gọi callback khi xóa thành công
+
+      handleSendLog({
+        type: "action",
+        level: "info",
+        message: `Người dùng ${currentUserEmail} đã xóa bài viết ${sharePostId}.`,
+        user: {
+            _id: currentUserId,
+            email: currentUserEmail,
+            role: currentUserRole
+        },
+        metadata: {
+            postId: sharePostId
+        }
+      })
     }, (error) => {
       console.error("Lỗi khi xóa bài viết:", error);
+      handleSendLog({
+        type: "error",
+        level: "error",
+        message: `Lỗi khi xóa bài viết ${sharePostId}: ${error}`,
+        user: {
+            _id: currentUserId,
+            email: currentUserEmail,
+            role: currentUserRole
+        },
+        metadata: {
+            postId: sharePostId
+        }
+      })
     });
     setIsDeleting(false);
     setShowDropdown(false);
@@ -106,6 +164,21 @@ const SharePostCard: React.FC<SharePostProps> = ({
       if (success) {
         setIsEditing(false);
         onEdit?.(); // Notify parent component
+
+        await handleSendLog({
+          type: "action",
+          level: "info",
+          message: `Người dùng ${currentUserEmail} đã sửa caption bài viết ${sharePostId} thanh: ${newCaption}.`,
+          user: {
+              _id: currentUserId,
+              email: currentUserEmail,
+              role: currentUserRole
+          },
+          metadata: {
+              postId: sharePostId,
+              newCaption
+          }
+        })
       }
     } catch (error) {
       console.error("Update failed:", error);
@@ -122,6 +195,8 @@ const SharePostCard: React.FC<SharePostProps> = ({
         if (res.ok) {
           const data = await res.json();
           setCurrentUserId(data._id.toString());
+          setCurrentUserEmail(data.email);
+          setCurrentUserRole(data.role)
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -397,6 +472,8 @@ const SharePostCard: React.FC<SharePostProps> = ({
       {showComments && (
         <CommentSection
           postId={sharePostId}
+          email={currentUserEmail}
+          role={currentUserRole}
           currentUserId={currentUserId}
           onCommentAdd={onChangeComment}
         />

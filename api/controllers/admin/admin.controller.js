@@ -67,6 +67,7 @@ export const getAllPostsForAdmin = async (req, res) => {
 
 export const searchUserByName = async (req, res) => {
     try {
+        // Lấy thông tin từ query string
         const { name } = req.query;
         if (!name || name.trim() === "") {
             return res.status(400).json({ error: "Vui lòng nhập tên cần tìm!" });

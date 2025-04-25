@@ -106,7 +106,7 @@
 │   │   ├── formatDate.ts (Client) (Chỉ xử lý dữ liệu UI)
 │   │   ├── auth.ts (Server) (Hàm kiểm tra auth từ backend)
 │   │   └── constants.ts (Client) (Chứa các giá trị không đổi)
-│   ├── 📂 styles (Chứa CSS/SCSS/Tailwind)
+│   ├── 📂 styles (Chứa CSS/SCSS)
 │   │   ├── 📂 auth
 │   │   ├── 📂 home
 │   │   ├── 📂 learn-more

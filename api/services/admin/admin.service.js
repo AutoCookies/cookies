@@ -137,11 +137,12 @@ export const searchUserByNameService = async (query, limit = 10) => {
         const users = await User.find({
             $or: [
                 { fullname: { $regex: query, $options: "i" } }, // Tìm theo fullname
-                { username: { $regex: query, $options: "i" } } // Tìm theo username
+                { username: { $regex: query, $options: "i" } }, // Tìm theo username
+                { email: { $regex: query, $options: "i" } }
             ]
         })
         .limit(limit) // Giới hạn số lượng kết quả
-        .select("_id username fullname email avatar"); // Chỉ lấy thông tin cần thiết
+        .select("_id username fullname email role isBanned followerCount followingCount");
 
         return users;
     } catch (error) {

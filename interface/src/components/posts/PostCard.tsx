@@ -7,6 +7,7 @@ import SharePostModal from "@/components/posts/sharePostModal";
 import { ENV_VARS } from "@/lib/envVars";
 import { handleDeletePost } from "@/utils/posts/handleDeletePost";
 import EditPostModal from "@/components/posts/EditPostModal";
+import { handleSendLog } from "@/utils/logs/handleSendLog";
 
 interface PostProps {
   postId: string;
@@ -19,6 +20,8 @@ interface PostProps {
   user: {
     _id: string;
     username: string;
+    role: string;
+    email: string;
     profilePicture: string | null;
   };
   visibility: "public" | "private" | "friends";
@@ -50,10 +53,13 @@ const PostCard: React.FC<PostProps> = ({
   const [liked, setLiked] = useState(isLiked);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string>("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string>("");
+  const [currentUserRole, setCurrentUserRole] = useState<string>("");
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLikePost = () => {
@@ -68,6 +74,18 @@ const PostCard: React.FC<PostProps> = ({
       // console.log("Đã cập nhật UI sau khi chia sẻ!");
       onShare();
     });
+
+    handleSendLog({
+      type: "action",
+      level: "info",
+      message: `Người dùng ${currentUserEmail} đã chia sẻ bài viết với caption: ${caption} và chế độ hiển thị ${visibility} cho bài viết ${postId}`,
+      user: { _id: currentUserId, email: currentUserEmail, role: currentUserRole },
+      metadata: {
+        postId,
+        caption,
+        visibility
+      }
+    })
   };
 
   const toggleComments = () => {
@@ -83,6 +101,16 @@ const PostCard: React.FC<PostProps> = ({
     });
     setIsDeleting(false);
     setShowDropdown(false);
+
+    handleSendLog({
+      type: "action",
+      level: "info",
+      message: `Người dùng ${currentUserEmail} đã xóa bài viết ${postId}`,
+      user: { _id: currentUserId, email: currentUserEmail, role: currentUserRole },
+      metadata: {
+        postId,
+      }
+    })
   };
 
   useEffect(() => {
@@ -94,6 +122,8 @@ const PostCard: React.FC<PostProps> = ({
         if (res.ok) {
           const data = await res.json();
           setCurrentUserId(data._id.toString());
+          setCurrentUserEmail(data.email);
+          setCurrentUserRole(data.role);
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -307,6 +337,8 @@ const PostCard: React.FC<PostProps> = ({
       {showComments && (
         <CommentSection
           postId={postId}
+          email={currentUserEmail}
+          role={currentUserRole}
           currentUserId={currentUserId}
           onCommentAdd={onChangeComment}
         />

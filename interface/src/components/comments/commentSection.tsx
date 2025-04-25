@@ -3,6 +3,7 @@ import { getPostComments } from "@/utils/comments/getPostComment";
 import { CommentBubble } from "./CommentBubble";
 import { handleAddComment } from "@/utils/comments/handleAddComments";
 import styles from './styles/commentSection.module.css'; // Sửa import
+import { handleSendLog } from "@/utils/logs/handleSendLog";
 
 interface Comment {
   id: string;
@@ -17,9 +18,11 @@ interface Comment {
   isLiked: boolean;
 }
 
-const CommentSection = ({ postId, currentUserId, onCommentAdd }: { 
+const CommentSection = ({ postId, email, role, currentUserId, onCommentAdd }: { 
   postId: string;
-  currentUserId: string | null;
+  email: string;
+  role: string;
+  currentUserId: string;
   onCommentAdd: () => void;
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -49,11 +52,38 @@ const CommentSection = ({ postId, currentUserId, onCommentAdd }: {
         content: newComment
       });
 
+      await handleSendLog({
+        type: "action",
+        level: "info",
+        message: `Người dùng ${email} đã thêm bình luận mới.`,
+        user: { 
+          _id: currentUserId, 
+          email: email, 
+          role: role
+        },
+        metadata: {
+          postId,
+          commentContent: newComment,
+          timestamp: new Date().toISOString(),
+        },
+      });
+
       setNewComment(""); 
       await fetchComments(); 
       onCommentAdd(); 
     } catch (error) {
       console.error("Failed to add comment:", error);
+      await handleSendLog({
+        type: "error",
+        level: "error",
+        message: `Người dùng ${email} đã thêm bình luận mới vào bài viết ${postId}, nhưng gặp lỗi.`,
+        user: { _id: currentUserId, email, role },
+        metadata: {
+          postId,
+          commentContent: newComment,
+          timestamp: new Date().toISOString(),
+        },
+      })
     } finally {
       setIsSubmitting(false);
     }

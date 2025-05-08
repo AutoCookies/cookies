@@ -3,6 +3,7 @@ import { getLogs } from "../services/log.service.js";
  
 export const handleCreateLog = async (req, res) => {
   try {
+    // Lấy thông tin từ request
     const body = req.body;
 
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown";

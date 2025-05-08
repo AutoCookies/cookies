@@ -8,7 +8,6 @@ import CreatePostModal from "@/components/posts/CreatePostModal";
 import styles from "@/styles/home/postPage.module.css";
 import { ENV_VARS } from "@/lib/envVars";
 import { useRouter } from 'next/navigation';
-import { set } from "animejs";
 
 export default function PostPage() {
   const [posts, setPosts] = useState<any[]>([]);

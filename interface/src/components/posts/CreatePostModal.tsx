@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import styles from './styles/CreatePostModal.module.css';
 import { handleCreatePost } from '@/utils/posts/handleCreatePost';
 import { handleSendLog, LogData } from "@/utils/logs/handleSendLog";
-import { metadata } from 'motion/react-client';
+import { handleNotifyFollowers, NotifyType  } from '@/utils/notifications/handleNotifyFollowers';
 
 interface UserData {
     _id: string;
@@ -281,6 +281,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
                         content,
                     },
                 });
+
+                handleNotifyFollowers({
+                    type: NotifyType.post,
+                    content: `${data.username} Đã tạo bài viết mới: ${title}`,
+                });
+                
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi tạo bài viết');

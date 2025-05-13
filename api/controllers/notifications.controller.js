@@ -3,11 +3,11 @@ import {
     markNotificationsAsSeen,
     addNotificationService,
     notifyFollowersService,
-    updateSeenStatusService
+    updateSeenStatusService,
 } from "../services/notifications.service.js";
 
 export const fetchNotifications = async (req, res) => {
-    const userId = req.user._id; // Giả sử đã xác thực và gán user vào req.user
+    const userId = req.user._id;
     const { page = 1, limit = 10 } = req.query;
 
     try {
@@ -32,18 +32,24 @@ export const markAllAsSeen = async (req, res) => {
 };
 
 export const addNotification = async (req, res) => {
-    const userId = req.user._id;
+    const userId = req.user._id; // Người sẽ nhận thông báo
     const { fromUserId, type, content } = req.body;
 
     try {
         const notification = await addNotificationService(userId, fromUserId, type, content);
+
+        // Gửi thông báo realtime nếu có socket đang kết nối
+        if (global._io) {
+            // Gửi thông báo chỉ đến user nhận (đã join room userId trước đó)
+            global._io.to(userId.toString()).emit("new-notification", notification);
+        }
 
         res.status(200).json({ success: true, notification });
     } catch (error) {
         console.error("Error adding notification:", error);
         res.status(500).json({ success: false, message: "Không thể thêm thông báo" });
     }
-}
+};
 
 /**
  * Controller để gửi notification đến followers khi user thực hiện hành động
@@ -74,4 +80,4 @@ export const updateSeenStatus = async (req, res) => {
         console.error("Error updating notification status:", error);
         res.status(500).json({ success: false, message: "Không thể cập nhật trạng thái thông báo" });
     }
-}
+};

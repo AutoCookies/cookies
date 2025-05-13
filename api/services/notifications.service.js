@@ -35,7 +35,6 @@ export const addNotificationService = async (userId, fromUserId, type, content) 
             type,
             content,
         });
-
         await notification.save();
         return notification;
     } catch (error) {

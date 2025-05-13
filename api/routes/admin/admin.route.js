@@ -12,6 +12,8 @@ import {
     deleteCommnet
 } from '../../controllers/admin/admin.controller.js'
 
+import { getUserStatistics } from "../../controllers/admin/statistic.controller.js";
+
 import { createUserAccount } from "../../controllers/admin/account.controller.js";
 const router = express.Router();
 
@@ -28,5 +30,7 @@ router.post("/users/:userId/unban", unbanUser);
 router.post("/create", createUserAccount);
 
 router.delete("/comment/:commentId", deleteCommnet);
+
+router.get("/statistic/users", getUserStatistics);
 
 export default router;

@@ -5,6 +5,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { handleGetNotification, NotificationResponse, Notification } from "@/utils/notifications/handleGetNotification";
 import Link from 'next/link';
 import { handleUpdateSeenStatus } from "@/utils/notifications/handleUpdateSeenStatus";
+import { useFetchNotifications } from "@/hooks/fetchNotificationHooks";
+import { toast } from "react-toastify";
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -35,7 +37,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
             console.error("Error fetching profile data:", error);
         }
     };
-
     const fetchCurrentUser = async () => {
         try {
             const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/me`, {
@@ -65,6 +66,11 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    useFetchNotifications(currentUserId ?? "", (newNotification) => {
+        setNotifications((prev) => [newNotification, ...prev]);
+        toast.info(`🔔 ${newNotification.fromUser.username}: ${newNotification.content}`);
+    });
 
     const handleBellClick = async () => {
         if (!currentUserId) {

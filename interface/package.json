@@ -22,8 +22,11 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-intersection-observer": "^9.16.0",
+    "react-toastify": "^11.0.5",
+    "recharts": "^2.15.3",
     "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "toast": "^0.5.4"
   },
   "devDependencies": {
     "@types/animejs": "^3.1.13",

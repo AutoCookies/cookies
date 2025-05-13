@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import styles from './styles/CreatePostModal.module.css';
 import { handleCreatePost } from '@/utils/posts/handleCreatePost';
 import { handleSendLog, LogData } from "@/utils/logs/handleSendLog";
-import { handleNotifyFollowers, NotifyType  } from '@/utils/notifications/handleNotifyFollowers';
+import { handleNotifyFollowers, NotifyType } from '@/utils/notifications/handleNotifyFollowers';
 
 interface UserData {
     _id: string;
@@ -36,7 +36,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-    
+
         if (!file) {
             const errorMsg = 'No file selected';
             setError(errorMsg);
@@ -55,7 +55,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
             });
             return;
         }
-    
+
         const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (!validTypes.includes(file.type)) {
             const errorMsg = 'Chỉ chấp nhận file ảnh (JPEG, PNG, GIF)';
@@ -75,7 +75,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
             });
             return;
         }
-    
+
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
             const errorMsg = 'Kích thước ảnh không được vượt quá 5MB';
@@ -95,10 +95,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
             });
             return;
         }
-    
+
         setSelectedImage(file);
         setError(null);
-    
+
         const reader = new FileReader();
         reader.onload = (event) => {
             if (event.target?.result) {
@@ -121,7 +121,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
                 });
             }
         };
-    
+
         reader.onerror = () => {
             const errorMsg = 'Failed to read file';
             setError(errorMsg);
@@ -139,13 +139,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
                 },
             });
         };
-    
+
         reader.readAsDataURL(file);
     };
 
     const handleRemoveImage = () => {
         if (!selectedImage && !imagePreview) return;
-    
+
         try {
             handleSendLog({
                 type: 'action',
@@ -162,7 +162,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
                     fileType: selectedImage?.type,
                 },
             });
-    
+
             setImagePreview(null);
             setSelectedImage(null);
             if (fileInputRef.current) {
@@ -281,13 +281,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ data, isOpen, onClose
                         content,
                     },
                 });
-
-                handleNotifyFollowers({
-                    type: NotifyType.post,
-                    content: `${data.username} Đã tạo bài viết mới: ${title}`,
-                });
-                
             }
+
+            handleNotifyFollowers({
+                type: NotifyType.post,
+                content: `${data.username} Đã tạo bài viết mới: ${title}`,
+            });
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi tạo bài viết');
 

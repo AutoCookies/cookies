@@ -1,0 +1,36 @@
+.container {
+  padding: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.summary {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-weight: 600;
+  color: #333;
+}
+
+.statValue {
+  font-size: 20px;
+  color: #0070f3;
+}
+
+.chartWrapper {
+  width: 100%;
+  height: 350px;
+}

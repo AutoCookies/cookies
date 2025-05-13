@@ -4,6 +4,7 @@ import { ENV_VARS } from "@/lib/envVars";
 import React, { useState, useEffect, useRef } from 'react';
 import { handleGetNotification, NotificationResponse, Notification } from "@/utils/notifications/handleGetNotification";
 import Link from 'next/link';
+import { handleUpdateSeenStatus } from "@/utils/notifications/handleUpdateSeenStatus";
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -113,12 +114,18 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                     </Link>
                 </div>
 
-                <div className={styles.rightSection} style={{ position: 'relative' }}>
+                <div className={styles.rightSection}>
                     <button
                         className={styles.iconButton}
                         onClick={handleBellClick}
+                        style={{ position: 'relative' }}
                     >
                         <img src="/svg/bell-svgrepo-com.svg" alt="Notification" className={styles.iconSVG} />
+                        {notifications.some(n => !n.seen) && (
+                            <span className={styles.unreadCount}>
+                                {notifications.filter(n => !n.seen).length}
+                            </span>
+                        )}
                     </button>
 
                     {showDropdown && (
@@ -130,12 +137,20 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
                                 <ul className={styles.notificationList}>
                                     {notifications.map(n => (
                                         <li key={n._id} className={styles.notificationItem}>
-                                            <Link href={`/home/${n.fromUser._id}`} className={styles.notificationLink}>
+                                            <a
+                                                href={`/home/${n.fromUser._id}`}
+                                                className={styles.notificationLink}
+                                                onClick={async (e) => {
+                                                    e.preventDefault(); // Ngăn điều hướng ngay lập tức
+                                                    await handleUpdateSeenStatus({ notificationId: n._id });
+                                                    window.location.href = `/home/${n.fromUser._id}`; // Điều hướng thủ công qua HTML
+                                                }}
+                                            >
                                                 <strong>{n.fromUser.username}</strong> {n.content}
                                                 <span className={styles.time}>
                                                     {new Date(n.createdAt).toLocaleString()}
                                                 </span>
-                                            </Link>
+                                            </a>
                                         </li>
                                     ))}
                                 </ul>

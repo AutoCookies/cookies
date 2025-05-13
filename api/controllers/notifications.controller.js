@@ -2,7 +2,8 @@ import {
     getNotifications,
     markNotificationsAsSeen,
     addNotificationService,
-    notifyFollowersService
+    notifyFollowersService,
+    updateSeenStatusService
 } from "../services/notifications.service.js";
 
 export const fetchNotifications = async (req, res) => {
@@ -61,3 +62,16 @@ export const sendToFollowersController = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to notify followers." });
     }
 };
+
+export const updateSeenStatus = async (req, res) => {
+    const userId = req.user._id; // Giả sử đã xác thực và gán user vào req.user
+    const { notificationId } = req.body;
+
+    try {
+        const updatedNotification = await updateSeenStatusService(userId, notificationId);
+        res.status(200).json({ success: true, notification: updatedNotification });
+    } catch (error) {
+        console.error("Error updating notification status:", error);
+        res.status(500).json({ success: false, message: "Không thể cập nhật trạng thái thông báo" });
+    }
+}

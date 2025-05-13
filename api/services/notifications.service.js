@@ -83,3 +83,12 @@ export const notifyFollowersService = async (fromUser, type, content) => {
         )
     );
 };
+
+export const updateSeenStatusService = async (userId, notificationIds) => {
+    if (!notificationIds || !notificationIds.length) return;
+
+    await Notification.updateMany(
+        { user: userId, _id: { $in: notificationIds.toString() } },
+        { $set: { seen: true } }
+    );
+}

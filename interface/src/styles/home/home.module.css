@@ -127,6 +127,24 @@
     flex: 1;
 }
 
+.unreadCount {
+  position: absolute;
+  top: 4px;
+  right: 42px; /* canh chỉnh cho đúng vị trí trên icon chuông */
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  min-width: 20px;
+  text-align: center;
+  box-shadow: 0 0 0 2px white;
+  z-index: 10;
+}
+
+
 .navIcon {
     display: flex;
     flex-direction: column;

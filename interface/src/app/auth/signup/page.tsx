@@ -1,10 +1,9 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "../../../styles/auth/signup.module.css";
+import styles from "@/styles/auth/signup.module.css";
 import Link from "next/link";
-import { ENV_VARS } from "../../../lib/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 import { handleSendLog } from "@/utils/logs/handleSendLog";
 
 export default function SignUp() {
@@ -20,7 +19,7 @@ export default function SignUp() {
     e.preventDefault();
     setLoading(true);
     setError("");
-  
+
     try {
       const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/signup`, {
         method: "POST",
@@ -28,25 +27,21 @@ export default function SignUp() {
         body: JSON.stringify({ username, fullName, email, password }),
         credentials: "include",
       });
-  
+
       if (!res.ok) {
         const errorData = await res.json();
-  
-        // Log khi đăng ký thất bại
         await handleSendLog({
           type: "auth",
           level: "warn",
           message: `Đăng ký thất bại với email: ${email}`,
           metadata: { reason: errorData.message },
         });
-  
         throw new Error(errorData.message || "Đăng ký thất bại!");
       }
-  
+
       const data = await res.json();
-      console.log("Registered user:", data);
-  
-      // Log khi đăng ký thành công
+      console.log("Registered Shaft user:", data);
+
       await handleSendLog({
         type: "auth",
         level: "info",
@@ -62,12 +57,10 @@ export default function SignUp() {
           userAgent: navigator.userAgent,
         },
       });
-  
+
       router.push("/auth/signin");
     } catch (err: any) {
       setError(err.message);
-  
-      // Log lỗi hệ thống
       await handleSendLog({
         type: "error",
         level: "error",
@@ -81,7 +74,6 @@ export default function SignUp() {
 
   return (
     <div className={styles.signupContainer}>
-
       <h2 className={styles.signupTitle}>Sign Up</h2>
       <form onSubmit={handleSignUp} className={styles.signupForm}>
         <input
@@ -91,6 +83,7 @@ export default function SignUp() {
           onChange={(e) => setUsername(e.target.value)}
           required
           className={styles.inputField}
+          disabled={loading}
         />
         <input
           type="text"
@@ -99,6 +92,7 @@ export default function SignUp() {
           onChange={(e) => setFullName(e.target.value)}
           required
           className={styles.inputField}
+          disabled={loading}
         />
         <input
           type="email"
@@ -107,6 +101,7 @@ export default function SignUp() {
           onChange={(e) => setEmail(e.target.value)}
           required
           className={styles.inputField}
+          disabled={loading}
         />
         <input
           type="password"
@@ -115,6 +110,7 @@ export default function SignUp() {
           onChange={(e) => setPassword(e.target.value)}
           required
           className={styles.inputField}
+          disabled={loading}
         />
         {error && <p className={styles.errorMessage}>{error}</p>}
         <button type="submit" disabled={loading} className={styles.submitButton}>

@@ -6,6 +6,11 @@ interface UserStatistics {
   verifiedUsers: number;
   bannedUsers: number;
   newUsersThisMonth: number;
+  totalAdminUser: number;
+  totalUser: number;
+  totalMorderatorUser: number;
+  totalPublicUser: number;
+  totalPrivateUser: number 
 }
 
 // Hàm gọi API và trả về thống kê người dùng

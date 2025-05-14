@@ -1,12 +1,10 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "../../../styles/auth/signin.module.css";
+import styles from "@/styles/auth/signin.module.css";
 import Link from "next/link";
-import { ENV_VARS } from "../../../lib/envVars";
+import { ENV_VARS } from "@/lib/envVars";
 import { handleSendLog } from "@/utils/logs/handleSendLog";
-
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -19,7 +17,7 @@ export default function SignIn() {
     e.preventDefault();
     setLoading(true);
     setError("");
-  
+
     try {
       const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/login`, {
         method: "POST",
@@ -27,11 +25,10 @@ export default function SignIn() {
         body: JSON.stringify({ email, password }),
         credentials: "include",
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
-        // Gửi log khi đăng nhập thất bại
         await handleSendLog({
           type: "auth",
           level: "warn",
@@ -40,8 +37,7 @@ export default function SignIn() {
         });
         throw new Error(data.message || "Đăng nhập thất bại!");
       }
-  
-      // Gửi log khi đăng nhập thành công
+
       await handleSendLog({
         type: "auth",
         level: "info",
@@ -52,8 +48,7 @@ export default function SignIn() {
           userAgent: navigator.userAgent,
         },
       });
-  
-      // Điều hướng tùy vào role
+
       if (data.role === "admin" && data.isBaned === false) {
         router.push("/dashboard");
       } else if (data.role === "user" && data.isBaned === false) {
@@ -63,8 +58,6 @@ export default function SignIn() {
       }
     } catch (err: any) {
       setError(err.message);
-  
-      // Gửi log lỗi hệ thống nếu có lỗi bất ngờ
       await handleSendLog({
         type: "error",
         level: "error",
@@ -74,7 +67,7 @@ export default function SignIn() {
     } finally {
       setLoading(false);
     }
-  };    
+  };
 
   return (
     <div className={styles.signinContainer}>
@@ -83,7 +76,6 @@ export default function SignIn() {
           <div className={styles.spinner}></div>
         </div>
       )}
-
       <h2>Sign In</h2>
       <form onSubmit={handleSignIn} className={styles.signinForm}>
         <input

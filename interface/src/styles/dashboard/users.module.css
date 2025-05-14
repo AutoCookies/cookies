@@ -1,274 +1,290 @@
-/* styles/dashboard/users.module.css */
-
+/* Root container */
 .container {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 2rem;
-  max-width: 100%;
-  overflow-x: auto;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
 }
 
+/* Create Button Container */
+.createContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.createButton {
+  background: #1a73e8;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.createButton:hover {
+  background: #1557b0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.createButton:active {
+  transform: translateY(0);
+}
+
+/* Loading State */
 .loading {
   text-align: center;
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: #555;
+  font-size: 1.5rem;
+  color: #333;
+  animation: pulse 1.5s infinite;
 }
 
+/* Table Styles */
 .table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 1.5rem;
-  min-width: 800px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-.table thead {
-  background-color: #f8f9fa;
+.table th,
+.table td {
+  padding: 1rem;
   text-align: left;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.table th, .table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #ddd;
-}
-
-.table tbody tr:nth-child(even) {
-  background-color: #f6f6f6;
-}
-
-.table button {
-  margin-right: 6px;
-  padding: 6px 12px;
-  border: none;
-  background-color: #007bff;
+.table th {
+  background: #1a73e8;
   color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.table tr {
+  transition: background 0.2s ease;
+}
+
+.table tr:hover {
+  background: #f0f4ff;
+}
+
+.table td button {
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
-.table button:last-child {
-  background-color: #dc3545;
+.table td button:first-child {
+  background: #ff4d4f;
+  color: white;
 }
 
-.table button:hover {
-  opacity: 0.9;
+.table td button:first-child:hover {
+  background: #d9363e;
+}
+
+.table td button:last-child {
+  background: #ff9500;
+  color: white;
+}
+
+.table td button:last-child:hover {
+  background: #cc7700;
 }
 
 /* Pagination */
 .pagination {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 1rem;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
+  margin-top: 2rem;
 }
 
 .pagination button {
-  padding: 6px 14px;
-  background-color: #343a40;
+  background: #1a73e8;
   color: white;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .pagination button:disabled {
-  background-color: #aaa;
+  background: #ccc;
   cursor: not-allowed;
 }
 
-.pagination span {
-  font-size: 1rem;
+.pagination button:hover:not(:disabled) {
+  background: #1557b0;
+  transform: translateY(-2px);
 }
 
-/* Modal */
+.pagination span {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Modal Styles */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
-}
-
-.modalContent {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.3s ease;
 }
 
+.modalContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease;
+}
+
 .modalContent h3 {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: #333;
 }
 
 .modalContent p {
   margin-bottom: 1rem;
+  color: #555;
 }
 
 .modalContent label {
   display: block;
-  margin-top: 1rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   font-weight: 500;
-}
-
-.modalContent select,
-.modalContent input[type="number"] {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.modalContent button {
-  margin-top: 1.5rem;
-  margin-right: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background-color: #007bff;
-  color: white;
-}
-
-.modalContent button:last-child {
-  background-color: #6c757d;
-}
-
-.createContainer {
-  background-color: #007bff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-  margin-bottom: 10px;
-}
-
-.createContainer .createButton {
-  background-color: #ee0cdb;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-/* AdminUserManagement.module.css */
-
-.container {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.modalContent {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
-  width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.modalContent h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  text-align: center;
+  color: #333;
 }
 
 .modalContent input,
 .modalContent select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.modalContent input:focus,
+.modalContent select:focus {
+  border-color: #1a73e8;
+  outline: none;
+}
+
+.modalContent div:last-child {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
 }
 
 .modalContent button {
-  padding: 10px 15px;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
-  font-weight: bold;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s ease;
-  margin-right: 10px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
-.modalContent button:first-of-type {
-  background-color: #28a745;
+.modalContent button:first-child {
+  background: #1a73e8;
   color: white;
 }
 
-.modalContent button:first-of-type:hover {
-  background-color: #218838;
+.modalContent button:first-child:hover {
+  background: #1557b0;
 }
 
-.modalContent button:last-of-type {
-  background-color: #dc3545;
+.modalContent button:last-child {
+  background: #ff4d4f;
   color: white;
 }
 
-.modalContent button:last-of-type:hover {
-  background-color: #c82333;
+.modalContent button:last-child:hover {
+  background: #d9363e;
 }
 
-
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
-/* Responsive */
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .table {
-    min-width: 100%;
-    overflow-x: auto;
-    display: block;
+  .container {
+    padding: 1rem;
   }
 
-  .table th, .table td {
-    padding: 0.5rem;
-  }
-
-  .modalContent {
-    padding: 1.5rem;
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    font-size: 0.9rem;
   }
 
   .pagination {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .modalContent {
+    padding: 1.5rem;
+    max-width: 90%;
   }
 }

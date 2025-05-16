@@ -1,72 +1,66 @@
+/* styles/home.module.css */
+
 .container {
   position: relative;
+  min-height: 100vh;
   width: 100%;
-  height: 100vh;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(to bottom, #ffebee, #fce4ec, #f8bbd0);
-}
-
-.sakuraContainer {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-.sakura {
-  position: absolute;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ffcdd2" d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2m4.5 5.1c-.3-.1-.6-.1-.9.1-.3.2-.5.5-.5.8 0 .3.1.6.3.8.2.2.5.3.8.3.3 0 .6-.1.8-.3.2-.2.3-.5.3-.8 0-.1 0-.2-.1-.3-.3-.4-.7-.6-1.2-.6z"/></svg>');
-  background-size: contain;
-  background-repeat: no-repeat;
-  animation: falling linear infinite;
-  opacity: 0.8;
-}
-
-@keyframes falling {
-  0% {
-    transform: translateY(-10vh) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(110vh) rotate(360deg);
-    opacity: 0;
-  }
+  background: linear-gradient(to bottom, #fff1f2 0%, #ffe4e6 100%);
 }
 
 .welcome {
   position: relative;
-  z-index: 1;
+  z-index: 10;
   text-align: center;
   padding: 2rem;
-  max-width: 800px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  width: 90%;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 192, 203, 0.3);
+  animation: fadeIn 1.5s ease-out;
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 800;
+  color: #881337; /* Deep pink-800 */
   margin-bottom: 1.5rem;
-  color: #d81b60;
-  font-family: 'Georgia', serif;
-  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, #db2777, #831843);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(to right, #f9a8d4, #f472b6);
+  border-radius: 2px;
 }
 
 .subtitle {
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 400;
+  color: #4c0519;
   margin-bottom: 3rem;
-  color: #880e4f;
-  font-style: italic;
+  line-height: 1.6;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .animatedText {
@@ -81,74 +75,169 @@
   height: 2px;
   bottom: -5px;
   left: 0;
-  background: linear-gradient(90deg, transparent, #f06292, transparent);
-  animation: underline 3s infinite;
+  background: linear-gradient(to right, transparent, #f472b6, transparent);
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.5s ease-out;
+}
+
+.welcome:hover .animatedText::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
 }
 
 .buttonContainer {
   display: flex;
   justify-content: center;
   gap: 2rem;
+  flex-wrap: wrap;
   margin-top: 3rem;
 }
 
 .btn {
   position: relative;
-  padding: 1rem 2rem;
-  border-radius: 50px;
+  padding: 1rem 2.5rem;
   font-size: 1.1rem;
-  font-weight: bold;
+  font-weight: 600;
+  border-radius: 50px;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
   z-index: 1;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .primaryBtn {
-  background: rgba(216, 27, 96, 0.2);
-  color: #d81b60;
-  border: 2px solid #d81b60;
+  background: linear-gradient(45deg, #db2777, #be185d);
+  color: white;
 }
 
 .secondaryBtn {
-  background: rgba(255, 255, 255, 0.3);
-  color: #880e4f;
-  border: 2px solid #f8bbd0;
+  background: white;
+  color: #db2777;
+  border: 2px solid #f9a8d4;
 }
 
 .btnHoverEffect {
   position: absolute;
-  width: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  width: 50px;
   height: 100%;
-  top: 0;
   left: 0;
-  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.6s ease;
+  top: 0;
+  transform: skewX(-15deg) translateX(-100px);
+  transition: all 0.6s ease;
   z-index: -1;
 }
 
 .btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(216, 27, 96, 0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .btn:hover .btnHoverEffect {
-  transform: translateX(100%);
+  transform: skewX(-15deg) translateX(300px);
 }
 
-/* Hiệu ứng responsive */
+.primaryBtn:hover {
+  box-shadow: 0 10px 20px rgba(219, 39, 119, 0.3);
+}
+
+.secondaryBtn:hover {
+  background: #fdf2f8;
+  box-shadow: 0 10px 20px rgba(244, 114, 182, 0.3);
+}
+
+/* Sakura petal animation effects */
+@keyframes petalFall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
+  .welcome {
+    padding: 1.5rem;
+    width: 95%;
+  }
+  
+  .buttonContainer {
+    gap: 1.5rem;
+  }
+  
+  .btn {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome {
+    padding: 1rem;
+  }
+  
   .title {
     font-size: 1.8rem;
+    padding-bottom: 0.5rem;
   }
   
   .subtitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    margin-bottom: 2rem;
   }
   
   .buttonContainer {
     flex-direction: column;
     gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .btn {
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Floating effect for the welcome container */
+.welcome {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0px);
   }
 }

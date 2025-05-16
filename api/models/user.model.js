@@ -168,8 +168,6 @@ userSchema.pre("deleteOne", { document: true, query: false }, async function (ne
       mongoose.model("Chat").deleteMany({ users: userId })
     ]);
 
-    // Optional: cập nhật lại followerCount/followingCount cho những người đã follow user này nếu cần
-
     next();
   } catch (error) {
     console.error("Error when deleting user related data:", error);

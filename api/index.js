@@ -15,6 +15,7 @@ import notficationRoutes from './routes/notification.route.js';
 import CookieParser from "cookie-parser";
 import { isAdmin, protectRoute } from "./middlewares/auth.middleware.js";
 import { checkBanStatus } from "./middlewares/checkBan.middleware.js";
+import chatRoute from './routes/chat.route.js';
 import cors from 'cors';
 import User from "./models/user.model.js";
 
@@ -86,6 +87,7 @@ app.use("/api/v1/likes", protectRoute, checkBanStatus, likeRoute);
 app.use("/api/v1/follow", protectRoute, checkBanStatus, followRoute);
 app.use("/api/v1/logs", logRoutes);
 app.use("/api/v1/notifications", protectRoute, checkBanStatus, notficationRoutes);
+app.use("/api/v1/chat", protectRoute, checkBanStatus, chatRoute);
 
 server.listen(ENV_VARS.PORT, () => {
   console.log(`Server running on port ${ENV_VARS.PORT}`);

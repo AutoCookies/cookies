@@ -18,6 +18,7 @@ import { checkBanStatus } from "./middlewares/checkBan.middleware.js";
 import chatRoute from './routes/chat.route.js';
 import cors from 'cors';
 import User from "./models/user.model.js";
+import moderatorRoutes from "./routes/moderator/post.route.js";
 
 const app = express();
 
@@ -88,6 +89,7 @@ app.use("/api/v1/follow", protectRoute, checkBanStatus, followRoute);
 app.use("/api/v1/logs", logRoutes);
 app.use("/api/v1/notifications", protectRoute, checkBanStatus, notficationRoutes);
 app.use("/api/v1/chat", protectRoute, checkBanStatus, chatRoute);
+app.use("/api/v1/moderator", protectRoute, isAdmin, checkBanStatus, moderatorRoutes);
 
 server.listen(ENV_VARS.PORT, () => {
   console.log(`Server running on port ${ENV_VARS.PORT}`);

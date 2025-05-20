@@ -55,7 +55,12 @@ export default function SignIn() {
         router.push("/home");
       } else if (data.isBaned === true) {
         router.push("/auth/ban");
+      } else if (data.role === "moderator" && data.isBaned === false) {
+        router.push("/moderator");
+      } else {
+        throw new Error("Error in change navigate");
       }
+
     } catch (err: any) {
       setError(err.message);
       await handleSendLog({

@@ -39,12 +39,10 @@ export const protectRoute = async (req, res, next) => {
     }
 };
 
-
 export const isAdmin = (req, res, next) => {
-    if (req.user && (req.user.role === "admin" || req.user.role === "moderator")) {
-        next();
-    } else {
-        res.status(403);
-        throw new Error("Permission denied!");
-    }
+  if (req.user && (req.user.role === "admin" || req.user.role === "moderator")) {
+    next();
+  } else {
+    return res.status(403).json({ message: "Permission denied!" });
+  }
 };

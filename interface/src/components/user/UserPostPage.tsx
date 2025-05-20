@@ -22,6 +22,7 @@ export default function UserPostPage({ userId }: UserProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const lastFetchedPage = useRef(0);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [data, setData] = useState<any>(null);
 
   const router = useRouter();
 
@@ -61,6 +62,7 @@ export default function UserPostPage({ userId }: UserProps) {
         });
         if (res.ok) {
           const data = await res.json();
+          setData(data);
           setCurrentUserId(data._id.toString());
         }
       } catch (error) {
@@ -148,6 +150,7 @@ export default function UserPostPage({ userId }: UserProps) {
       {error && <p className={styles.error}>Lỗi: {error}</p>}
 
       <CreatePostModal
+        data={data}
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onPostCreated={handlePostCreated}

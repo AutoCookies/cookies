@@ -1,11 +1,12 @@
-// app/home/[userId]/followers/page.tsx
-
+import type { Metadata } from "next";
 import FollowersList from "@/components/follow/FollowersList";
 
-export default async function Page({ params }: { params: { userId: string }}) {
+interface PageProps {
+  params: Promise<{ userId: string }>;
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export default async function Page({ params }: PageProps) {
   const { userId } = await params;
-
-  console.log(`Followers Page - User ID: ${userId}`);
-
   return <FollowersList userId={userId} />;
 }

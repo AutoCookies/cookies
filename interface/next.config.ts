@@ -14,22 +14,25 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: "frame-ancestors 'none'",
           },
-          // Thêm các headers bảo mật khác nếu cần
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            value: 'nosniff',
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
-          }
+            value: 'origin-when-cross-origin',
+          },
         ],
       },
     ];
   },
-  // Các cấu hình khác có thể thêm ở đây
+
   reactStrictMode: true,
-  productionBrowserSourceMaps: false, // Tắt source map production để bảo mật
+  productionBrowserSourceMaps: false,
+
+  experimental: {
+    typedRoutes: false,
+  },
 };
 
 export default nextConfig;

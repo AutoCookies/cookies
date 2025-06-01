@@ -7,19 +7,20 @@ import {
     checkFollowStatus,
     getFollowersOfUser
  } from "../controllers/follow.controller.js";
+ import { userRateLimiter } from "../middlewares/rateLimit.middleware.js";
 
 const router = express.Router();
 
 // Follow một user
-router.post("/:id", followUser);
+router.post("/:id", userRateLimiter, followUser);
 // unFollow một người dùng
-router.delete("/:id", unfollowUser);
+router.delete("/:id", userRateLimiter, unfollowUser);
 // Lấy followers của một người dùng
-router.get("/:userId/followers", getFollowers);
+router.get("/:userId/followers", userRateLimiter, getFollowers);
 // Lấy following của một người dùng
-router.get("/:userId/following", getFollowing);
+router.get("/:userId/following", userRateLimiter, getFollowing);
 // Kiểm tra trạng thái follow
-router.get("/:userId/check", checkFollowStatus);
+router.get("/:userId/check", userRateLimiter, checkFollowStatus);
 // Lấy followers của một người dùng
-router.get("/:userId/followersOfUser", getFollowersOfUser);
+router.get("/:userId/followersOfUser", userRateLimiter, getFollowersOfUser);
 export default router;

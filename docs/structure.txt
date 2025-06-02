@@ -1,5 +1,8 @@
 /backend
 │── 📂 config
+│   ├── 📂 auth
+│   ├── login.test.js
+│── 📂 config
 │   ├── cloudinary.js
 │   ├── db.js
 │   ├── envVars.js
@@ -32,6 +35,8 @@
 │── 📂 routes
 │── index.js
 │── .env
+│── .babelrc
+│── jest.config.js
 /frontend
 │── 📂 src
 │   ├── 📂 app (Chứa layout, page & server components)

@@ -3,33 +3,46 @@ import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 import redisClient from "../config/redisClient.js";
 
 export const registerUserService = async ({ username, fullName, email, password }, res) => {
+    // Nếu thiếu bất kỳ field nào, trả về object báo lỗi (không ném Exception)
     if (!username || !fullName || !email || !password) {
-        throw new Error("All fields are required!");
+        return { error: true, message: "All fields are required!" };
     }
 
+    // Kiểm tra email hợp lệ
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        throw new Error("Invalid email!");
+        return { error: true, message: "Invalid email!" };
     }
 
+    // Kiểm tra độ dài password
     if (password.length < 6) {
-        throw new Error("Password must be at least 6 characters!");
+        return { error: true, message: "Password must be at least 6 characters!" };
     }
 
+    // Kiểm tra email đã tồn tại chưa
     const userExists = await User.exists({ email });
-    if (userExists) throw new Error("Email already exists!");
+    if (userExists) {
+        return { error: true, message: "Email already exists!" };
+    }
 
+    // Tạo user mới
     const user = await User.create({ username, fullName, email, password, role: "user" });
+    if (!user) {
+        return { error: true, message: "Create user failed!" };
+    }
 
-    if (!user) throw new Error("Create user failed!");
-
+    // Tạo token và set cookie
     const token = generateTokenAndSetCookie(user._id, res);
 
+    // Trả về thông tin user + token
     return {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        token: token,
+        error: false,
+        data: {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            token: token,
+        },
     };
 };
 
@@ -39,6 +52,7 @@ export const loginUserService = async ({ email, password, res }) => {
     }
 
     const user = await User.findOne({ email });
+    
     if (!user || !(await user.matchPassword(password))) {
         throw new Error("Wrong email or password!");
     }

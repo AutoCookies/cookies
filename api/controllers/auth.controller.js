@@ -1,4 +1,4 @@
-import asyncHandler from "express-async-handler";
+// controllers/auth.controller.js
 import {
     registerUserService,
     loginUserService,
@@ -7,19 +7,43 @@ import {
 } from "../services/auth.service.js";
 import { loginRateLimiter } from "../middlewares/rateLimit.middleware.js";
 
-export const registerUser = asyncHandler(async (req, res) => {
-    const data = await registerUserService(req.body, res);
-    res.status(201).json(data);
-});
+export const registerUser = async (req, res) => {
+    try {
+        // Gọi service
+        const result = await registerUserService(req.body, res);
+
+        // Nếu service trả về error: true, nghĩa là thiếu field hoặc validation fail
+        if (result.error) {
+            // Trả status 200 và thông điệp tương ứng
+            return res.status(200).json({ message: result.message });
+        }
+
+        // Ngược lại, thành công
+        return res.status(201).json(result.data);
+    } catch (error) {
+        // Trường hợp bất thường (chẳng hạn lỗi DB, v.v)
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
 
 export const loginUser = async (req, res) => {
+    const { email, password } = req.body;
+
+    // Kiểm tra thiếu field
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required!" });
+    }
+
     try {
-        const { email, password } = req.body;
-        const userData = await loginUserService({ email, password, res })
-        loginRateLimiter.resetKey(req.body.email);
-        res.status(200).json(userData);
+        const userData = await loginUserService({ email, password, res });
+        loginRateLimiter.resetKey(email);
+        return res.status(200).json(userData);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        if (error.message === "Wrong email or password!") {
+            return res.status(401).json({ message: error.message });
+        }
+
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -32,11 +56,6 @@ export const logoutUser = async (req, res) => {
     return res.status(200).json({ message: "Đăng xuất thành công!" });
 };
 
-/**
- * Controller để lấy thông tin user từ token.
- * @route GET /auth/me
- * @access Private (Yêu cầu token hợp lệ)
- */
 export const getAuthUser = async (req, res) => {
     try {
         const user = await getUserInfoService(req.user._id);

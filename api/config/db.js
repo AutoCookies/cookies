@@ -3,11 +3,19 @@ import { ENV_VARS } from "./envVars.js";
 
 export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(ENV_VARS.MONGO_URI);
+    const uri =
+      ENV_VARS.NODE_ENV === "test"
+        ? ENV_VARS.MONGO_URI_TEST
+        : ENV_VARS.MONGO_URI;
 
-    console.log("MongoDB connected: " + conn.connection.host);
+    const conn = await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log(`MongoDB connected to ${ENV_VARS.NODE_ENV} DB: ${conn.connection.host}`);
   } catch (error) {
-    console.log("Error connecting to MongoDB: " + error.message);
+    console.error("Error connecting to MongoDB: " + error.message);
     process.exit(1);
   }
 };

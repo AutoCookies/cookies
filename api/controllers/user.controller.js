@@ -108,6 +108,7 @@ export const updateProfilePicture = async (req, res) => {
     }
 };
 
+// controllers/user.controller.js
 export const updateCoverPhoto = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -118,12 +119,13 @@ export const updateCoverPhoto = async (req, res) => {
         }
 
         const result = await updateCoverPhotoService(userId, imageBuffer);
-
+        // FIXED: use res.status instead of status
         return res.status(200).json(result);
     } catch (error) {
-        return status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
-}
+};
+
 
 export const getProfilePicture = async (req, res) => {
     try {

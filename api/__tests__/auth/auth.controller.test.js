@@ -6,7 +6,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 
 // --- Mock services and rate limiter before importing controllers ---
-jest.mock('../services/auth.service.js', () => ({
+jest.mock('../../services/auth.service.js', () => ({
   __esModule: true,
   registerUserService: jest.fn(),
   loginUserService: jest.fn(),
@@ -14,7 +14,7 @@ jest.mock('../services/auth.service.js', () => ({
   getUserInfoService: jest.fn(),
 }));
 
-jest.mock('../middlewares/rateLimit.middleware.js', () => ({
+jest.mock('../../middlewares/rateLimit.middleware.js', () => ({
   __esModule: true,
   loginRateLimiter: {
     handler: jest.fn((req, res, next) => next()),
@@ -28,16 +28,16 @@ import {
   loginUser,
   logoutUser,
   getAuthUser,
-} from '../controllers/auth.controller.js';
+} from '../../controllers/auth.controller.js';
 
 import {
   registerUserService,
   loginUserService,
   logoutUserService,
   getUserInfoService,
-} from '../services/auth.service.js';
+} from '../../services/auth.service.js';
 
-import { loginRateLimiter } from '../middlewares/rateLimit.middleware.js';
+import { loginRateLimiter } from '../../middlewares/rateLimit.middleware.js';
 
 // --- Create an Express app for testing ---
 function createApp() {

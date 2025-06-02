@@ -16,7 +16,7 @@ import {
   getCoverPhoto,
   getUserImagePage,
   searchUserByName,
-} from '../controllers/user.controller.js';
+} from '../../controllers/user.controller.js';
 
 import {
   getUser,
@@ -30,10 +30,10 @@ import {
   getCoverPhotoService,
   getUserImagePageService,
   searchUserByNameService,
-} from '../services/user.service.js';
+} from '../../services/user.service.js';
 
 // 1) Mock all service functions
-jest.mock('../services/user.service.js', () => ({
+jest.mock('../../services/user.service.js', () => ({
   __esModule: true,
   getUser: jest.fn(),
   changePasswordService: jest.fn(),

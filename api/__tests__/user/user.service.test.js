@@ -2,7 +2,7 @@
 
 import { jest } from '@jest/globals';
 import bcrypt from 'bcryptjs';
-import cloudinary from '../config/cloudinary.js';
+import cloudinary from '../../config/cloudinary.js';
 
 import {
   getUser,
@@ -16,12 +16,12 @@ import {
   getCoverPhotoService,
   getUserImagePageService,
   searchUserByNameService,
-} from '../services/user.service.js';
+} from '../../services/user.service.js';
 
-import User from '../models/user.model.js';
+import User from '../../models/user.model.js';
 
 // --- Mock User model methods ---
-jest.mock('../models/user.model.js', () => ({
+jest.mock('../../models/user.model.js', () => ({
   __esModule: true,
   default: {
     findById: jest.fn(),
@@ -36,7 +36,7 @@ jest.mock('bcryptjs', () => ({
 }));
 
 // --- Mock cloudinary uploader ---
-jest.mock('../config/cloudinary.js', () => ({
+jest.mock('../../config/cloudinary.js', () => ({
   __esModule: true,
   default: {
     uploader: {

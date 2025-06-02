@@ -11,7 +11,7 @@ const mockAuth = (req, res, next) => {
 };
 
 // Mock all service functions before importing the controllers
-jest.mock('../services/post.service.js', () => ({
+jest.mock('../../services/post.service.js', () => ({
   __esModule: true,
   createPostService: jest.fn(),
   getOwnPostsService: jest.fn(),
@@ -33,7 +33,7 @@ import {
   getAllPosts,
   updateSharePost,
   getPostsByUserId,
-} from '../controllers/post.controller.js';
+} from '../../controllers/post.controller.js';
 
 import {
   createPostService,
@@ -44,7 +44,7 @@ import {
   getAllPostsService,
   updateSharePostService,
   getPostsByUserIdService,
-} from '../services/post.service.js';
+} from '../../services/post.service.js';
 
 describe('Post Controller', () => {
   let app;

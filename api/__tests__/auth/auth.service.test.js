@@ -2,19 +2,19 @@
 
 import { jest } from '@jest/globals';
 
-import User from '../models/user.model.js';
-import redisClient from '../config/redisClient.js';
-import { generateTokenAndSetCookie } from '../utils/generateToken.js';
+import User from '../../models/user.model.js';
+import redisClient from '../../config/redisClient.js';
+import { generateTokenAndSetCookie } from '../../utils/generateToken.js';
 
 import {
   registerUserService,
   loginUserService,
   logoutUserService,
   getUserInfoService,
-} from '../services/auth.service.js';
+} from '../../services/auth.service.js';
 
 // --- Mock external dependencies ---
-jest.mock('../models/user.model.js', () => ({
+jest.mock('../../models/user.model.js', () => ({
   __esModule: true,
   default: {
     exists: jest.fn(),
@@ -24,7 +24,7 @@ jest.mock('../models/user.model.js', () => ({
   },
 }));
 
-jest.mock('../config/redisClient.js', () => ({
+jest.mock('../../config/redisClient.js', () => ({
   __esModule: true,
   default: {
     get: jest.fn(),
@@ -33,7 +33,7 @@ jest.mock('../config/redisClient.js', () => ({
   },
 }));
 
-jest.mock('../utils/generateToken.js', () => ({
+jest.mock('../../utils/generateToken.js', () => ({
   __esModule: true,
   generateTokenAndSetCookie: jest.fn(),
 }));

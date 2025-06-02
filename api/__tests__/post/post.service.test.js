@@ -11,25 +11,25 @@ import {
   sharePostService,
   getAllPostsService,
   getPostsByUserIdService,
-} from '../services/post.service.js';
+} from '../../services/post.service.js';
 
-import User from '../models/user.model.js';
-import Post from '../models/post.model.js';
-import { SharePost } from '../models/sharedPost.model.js';
-import LikePost from '../models/likePost.model.js';
-import { uploadImageService } from '../services/upload.service.js';
-import cloudinary from '../config/cloudinary.js';
-import redisClient from '../config/redisClient.js';
+import User from '../../models/user.model.js';
+import Post from '../../models/post.model.js';
+import { SharePost } from '../../models/sharedPost.model.js';
+import LikePost from '../../models/likePost.model.js';
+import { uploadImageService } from '../../services/upload.service.js';
+import cloudinary from '../../config/cloudinary.js';
+import redisClient from '../../config/redisClient.js';
 
 // --- Mock external dependencies and models ---
-jest.mock('../models/user.model.js', () => ({
+jest.mock('../../models/user.model.js', () => ({
   __esModule: true,
   default: {
     findById: jest.fn(),
   },
 }));
 
-jest.mock('../models/post.model.js', () => ({
+jest.mock('../../models/post.model.js', () => ({
   __esModule: true,
   default: {
     create: jest.fn(),
@@ -39,7 +39,7 @@ jest.mock('../models/post.model.js', () => ({
   },
 }));
 
-jest.mock('../models/sharedPost.model.js', () => {
+jest.mock('../../models/sharedPost.model.js', () => {
   const mSharePost = jest.fn().mockImplementation((data) => ({
     ...data,
     save: jest.fn(),
@@ -54,19 +54,19 @@ jest.mock('../models/sharedPost.model.js', () => {
   };
 });
 
-jest.mock('../models/likePost.model.js', () => ({
+jest.mock('../../models/likePost.model.js', () => ({
   __esModule: true,
   default: {
     find: jest.fn(),
   },
 }));
 
-jest.mock('../services/upload.service.js', () => ({
+jest.mock('../../services/upload.service.js', () => ({
   __esModule: true,
   uploadImageService: jest.fn(),
 }));
 
-jest.mock('../config/cloudinary.js', () => ({
+jest.mock('../../config/cloudinary.js', () => ({
   __esModule: true,
   default: {
     uploader: {
@@ -75,7 +75,7 @@ jest.mock('../config/cloudinary.js', () => ({
   },
 }));
 
-jest.mock('../config/redisClient.js', () => ({
+jest.mock('../../config/redisClient.js', () => ({
   __esModule: true,
   default: {
     set: jest.fn(),

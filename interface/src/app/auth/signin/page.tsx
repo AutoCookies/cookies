@@ -1,10 +1,13 @@
+// src/app/auth/signin/page.tsx
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/auth/signin.module.css";
 import Link from "next/link";
-import { ENV_VARS } from "@/lib/envVars";
+import { handleSignIn } from "@/utils/auth/handleSignin";
 import { handleSendLog } from "@/utils/logs/handleSendLog";
+import { ENV_VARS } from "@/lib/envVars";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -13,31 +16,18 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
-      });
+      // Gọi hàm handleSignIn đã tách riêng
+      const data = await handleSignIn(email, password);
+      console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+      console.log("ENV_VARS.API_URL:", ENV_VARS.API_ROUTE);
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        await handleSendLog({
-          type: "auth",
-          level: "warn",
-          message: `Thử đăng nhập thất bại với email: ${email}`,
-          metadata: { reason: data.message },
-        });
-        throw new Error(data.message || "Đăng nhập thất bại!");
-      }
-
+      // Gửi log đăng nhập thành công
       await handleSendLog({
         type: "auth",
         level: "info",
@@ -49,26 +39,26 @@ export default function SignIn() {
         },
       });
 
-      if (data.role === "admin" && data.isBaned === false) {
-        router.push("/dashboard");
-      } else if (data.role === "user" && data.isBaned === false) {
-        router.push("/home");
-      } else if (data.isBaned === true) {
+      // Điều hướng dựa theo role và trạng thái bị cấm
+      if (data.isBaned) {
         router.push("/auth/ban");
-      } else if (data.role === "moderator" && data.isBaned === false) {
+      } else if (data.role === "admin") {
+        router.push("/dashboard");
+      } else if (data.role === "moderator") {
         router.push("/moderator");
       } else {
-        throw new Error("Error in change navigate");
+        router.push("/home");
       }
-
     } catch (err: any) {
-      setError(err.message);
+      // Gửi log lỗi khi đăng nhập thất bại
       await handleSendLog({
         type: "error",
         level: "error",
         message: `Lỗi trong quá trình đăng nhập: ${err.message}`,
         metadata: { email, stack: err.stack },
       });
+
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -82,7 +72,7 @@ export default function SignIn() {
         </div>
       )}
       <h2>Sign In</h2>
-      <form onSubmit={handleSignIn} className={styles.signinForm}>
+      <form onSubmit={onSubmit} className={styles.signinForm}>
         <input
           type="email"
           placeholder="Email"

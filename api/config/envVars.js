@@ -18,5 +18,6 @@ export const ENV_VARS = {
     REDIS_USERNAME: process.env.REDIS_USERNAME,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-    API_ROUTE: process.env.API_ROUTE || "localhost:3001",
+    API_ROUTE: process.env.API_ROUTE,
+    CLIENT_URL: process.env.CLIENT_URL,
 }

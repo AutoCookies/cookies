@@ -1,0 +1,345 @@
+Dưới đây là ví dụ cách sửa Dockerfile để dùng **build-arg** cho `NEXT_PUBLIC_API_ROUTE` (và có thể thêm args khác về sau). Cơ bản là bạn sẽ:
+
+1. Định nghĩa `ARG` trong giai đoạn builder.
+2. Gán nó vào `ENV` để Next.js đọc được khi chạy `npm run build`.
+3. Khi build, truyền trực tiếp giá trị bằng `--build-arg`.
+
+---
+
+## 1. Dockerfile mẫu
+
+```dockerfile
+# -----------------------
+# Stage 1: Cài dependencies
+# -----------------------
+FROM node:18-alpine AS deps
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# -----------------------
+# Stage 2: Build Next.js (nhận build-arg)
+# -----------------------
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# Định nghĩa các build-arg bạn cần (ví dụ NEXT_PUBLIC_API_ROUTE, và có thể thêm KEY_API khác)
+ARG NEXT_PUBLIC_API_ROUTE
+ARG OTHER_API_KEY    # nếu sau này bạn muốn truyền thêm biến nhạy cảm (chỉ dùng ở server-side)
+
+# Export ra ENV để Next.js có thể đọc lúc build-time
+ENV NEXT_PUBLIC_API_ROUTE=${NEXT_PUBLIC_API_ROUTE}
+ENV OTHER_API_KEY=${OTHER_API_KEY}
+
+# Copy node_modules từ stage deps
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy toàn bộ source code
+COPY . .
+
+# Chạy build (Next.js sẽ đọc process.env.NEXT_PUBLIC_API_ROUTE và process.env.OTHER_API_KEY)
+RUN npm run build
+
+# -----------------------
+# Stage 3: Runtime image (chỉ chứa assets để chạy production)
+# -----------------------
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+# Copy node_modules từ stage deps
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy kết quả build
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.ts ./next.config.ts
+COPY --from=builder /app/package.json ./package.json
+
+EXPOSE 3000
+
+# Lệnh chạy production
+CMD ["npm", "run", "start"]
+```
+
+* **Giải thích nhanh**:
+
+  * `ARG NEXT_PUBLIC_API_ROUTE` khai báo build-arg, và sau đó `ENV NEXT_PUBLIC_API_ROUTE=${NEXT_PUBLIC_API_ROUTE}` để Next.js có thể truy xuất qua `process.env.NEXT_PUBLIC_API_ROUTE` lúc build.
+  * `ARG OTHER_API_KEY` + `ENV OTHER_API_KEY=${OTHER_API_KEY}` chỉ là ví dụ cho trường hợp có thêm key “nhạy cảm” dùng nội bộ (ví dụ gọi API server-side). Nhưng chú ý: nếu bạn đặt key gì không có tiền tố `NEXT_PUBLIC_`, Next.js sẽ chỉ có giá trị đó trong **server code** (vd API routes, `getServerSideProps`), chứ không leak ra client.
+  * Khi build, bạn truyền `--build-arg NEXT_PUBLIC_API_ROUTE=... --build-arg OTHER_API_KEY=...`, Docker sẽ gán đúng các biến đó vào giai đoạn `builder`.
+
+---
+
+## 2. Cách build và run
+
+Giả sử bạn cần build với:
+
+* `NEXT_PUBLIC_API_ROUTE=http://localhost:3001/api/v1`
+* (sau này) `OTHER_API_KEY=abcdef123456`
+
+Trên terminal (ở thư mục chứa Dockerfile), chạy:
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_API_ROUTE=http://localhost:3001/api/v1 \
+  --build-arg OTHER_API_KEY=abcdef123456 \
+  -t my-frontend:latest .
+```
+
+* Docker sẽ đưa các giá trị này vào `ENV` ngay trong builder stage. Next.js lúc `npm run build` đọc được `process.env.NEXT_PUBLIC_API_ROUTE` và (nếu code server-side có dùng) `process.env.OTHER_API_KEY`.
+
+Sau khi build xong, bạn chạy container:
+
+```bash
+docker run -d --name my-frontend-test -p 3000:3000 my-frontend:latest
+```
+
+Lưu ý:
+
+* Khi container khởi động, Next.js đã compile xong và “bake” giá trị `NEXT_PUBLIC_API_ROUTE` vào bundle, nên bạn không cần truyền lại `--env-file` hay `-e` nữa (nếu chỉ cần client đọc API endpoint).
+* Nếu sau này bạn vẫn muốn dùng `OTHER_API_KEY` trong code server (ví dụ một API route gọi đến dịch vụ thứ ba), Next.js cũng đã có sẵn `process.env.OTHER_API_KEY`, vì ta đã export từ build arg.
+
+---
+
+## 3. Cách sử dụng trong code Next.js
+
+### 3.1. Với `NEXT_PUBLIC_API_ROUTE`
+
+Giả sử bạn có file `src/lib/envVars.ts`:
+
+```ts
+export const ENV_VARS = {
+  API_ROUTE: process.env.NEXT_PUBLIC_API_ROUTE,
+};
+```
+
+Và trong `src/utils/auth/handleSignIn.ts`:
+
+```ts
+import { ENV_VARS } from "@/lib/envVars";
+
+export async function handleSignIn(email: string, password: string) {
+  console.log(">>> [handleSignIn] API_ROUTE =", ENV_VARS.API_ROUTE);
+  const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+    credentials: "include",
+  });
+  // ...
+}
+```
+
+* Lúc build, Next.js đã đọc `process.env.NEXT_PUBLIC_API_ROUTE` từ `ENV` (do Dockerfile gán).
+* Mã `handleSignIn` sẽ thấy `ENV_VARS.API_ROUTE` là chuỗi `"http://localhost:3001/api/v1"` hoặc giá trị bạn truyền build-arg.
+
+### 3.2. Với biến server-only (ví dụ `OTHER_API_KEY`)
+
+Nếu bạn có một API route hoặc `getServerSideProps` cần dùng `OTHER_API_KEY`, Next.js sẽ tự động có vì bạn đã set `ENV OTHER_API_KEY` trong builder stage. Ví dụ trong `src/pages/api/example.ts`:
+
+```ts
+import type { NextApiRequest, NextApiResponse } from "next";
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const secret = process.env.OTHER_API_KEY; // giá trị "abcdef123456" từ build-arg
+  // ...gọi service bên ngoài, ghi log, v.v.
+  res.status(200).json({ ok: true, usedKey: secret });
+}
+```
+
+* Biến `OTHER_API_KEY` sẽ **không** được bundle ra client vì nó không có tiền tố `NEXT_PUBLIC_`.
+* Chỉ code trên server (API routes, `getServerSideProps`, `getStaticProps`) mới đọc được.
+
+---
+
+## 4. Khi cần thêm các key/API khác
+
+Giả sử sau này bạn có thêm API key thứ hai ví dụ `ANOTHER_SECRET` (chỉ dùng server), bạn làm tương tự:
+
+1. Thêm dòng `ARG ANOTHER_SECRET` và `ENV ANOTHER_SECRET=${ANOTHER_SECRET}` tại giai đoạn builder.
+2. Build image với thêm `--build-arg ANOTHER_SECRET=giatri123`.
+3. Trong code server-side (API route), dùng `process.env.ANOTHER_SECRET`.
+
+Ví dụ cập nhật Dockerfile ở builder stage:
+
+```dockerfile
+ARG NEXT_PUBLIC_API_ROUTE
+ARG OTHER_API_KEY
+ARG ANOTHER_SECRET
+
+ENV NEXT_PUBLIC_API_ROUTE=${NEXT_PUBLIC_API_ROUTE}
+ENV OTHER_API_KEY=${OTHER_API_KEY}
+ENV ANOTHER_SECRET=${ANOTHER_SECRET}
+```
+
+Build:
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_API_ROUTE=http://localhost:3001/api/v1 \
+  --build-arg OTHER_API_KEY=abcdef123456 \
+  --build-arg ANOTHER_SECRET=ghi123xyz \
+  -t my-frontend:latest .
+```
+
+Và trong một API route (ví dụ `src/pages/api/another.ts`):
+
+```ts
+export default function handler(req, res) {
+  const secret2 = process.env.ANOTHER_SECRET;
+  // ...xử lý
+  res.status(200).json({ secretUsed: secret2 });
+}
+```
+
+---
+
+## 5. Tóm tắt nhanh
+
+* **Ưu điểm** của build-arg:
+
+  * Bạn không phải commit file `.env` vào repo hoặc image.
+  * Mọi biến (public hay private) được truyền khi build, và Next “bake” vào build-time.
+* **Nhược điểm**:
+
+  * Nếu muốn đổi giá trị, phải build lại image.
+  * Mọi biến (đặc biệt `NEXT_PUBLIC_*`) khi “bake” vào bundle vẫn sẽ lộ ra client. Chỉ những biến không có tiền tố `NEXT_PUBLIC_` mới an toàn cho server-side.
+
+Khi bạn đã cấu hình như trên, mỗi lần deploy, chỉ cần:
+
+1. Chạy lệnh build kèm `--build-arg`.
+
+2. Chạy container (không cần `--env-file` nữa cho frontend vì đã bake xong).
+
+3. Code client/server đều có thể đọc đúng giá trị tương ứng.
+
+
+Biến không có tiền tố `NEXT_PUBLIC_` (ví dụ API\_KEY) sẽ chỉ dùng ở phía server, không được Next.bundle ra client. Dưới đây là cách xử lý:
+
+---
+
+## 1. Không gán vào `NEXT_PUBLIC_*`
+
+* **Chỉ** đặt những biến phải chạy ở client (ví dụ API endpoint) mới gán tiền tố `NEXT_PUBLIC_`.
+* Các biến như `API_KEY`, `SECRET_KEY` tuyệt đối không có `NEXT_PUBLIC_`, để Next tự động giấu chúng khỏi bundle client.
+
+---
+
+## 2. Cách truyền biến server‐side vào container khi chạy (runtime)
+
+Thay vì bake bằng `ARG` (build‐time), bạn có thể truyền trực tiếp khi `docker run`:
+
+1. **Cấu hình `next.config.js`** để Next nhận biến này ở runtime (ở server):
+
+   ```js
+   // next.config.js
+   const { PHASE_DEVELOPMENT_SERVER } = require("next/constants");
+
+   module.exports = (phase) => {
+     const isDev = phase === PHASE_DEVELOPMENT_SERVER;
+     return {
+       // Công khai cho client
+       publicRuntimeConfig: {
+         NEXT_PUBLIC_API_ROUTE: process.env.NEXT_PUBLIC_API_ROUTE || "",
+       },
+       // Chỉ server mới có
+       serverRuntimeConfig: {
+         API_KEY: process.env.API_KEY || "",
+         // Nếu còn biến nhạy cảm khác, thêm vào đây
+       },
+     };
+   };
+   ```
+
+2. **Khi chạy container**, truyền biến `API_KEY` vào runtime:
+
+   ```bash
+   docker build -t my-frontend:latest .
+   docker run -d --name my-frontend \
+     -e NEXT_PUBLIC_API_ROUTE=http://localhost:3001/api/v1 \
+     -e API_KEY="abcdef123456" \
+     -p 3000:3000 \
+     my-frontend
+   ```
+
+3. **Trong code server‐side** (API route hoặc `getServerSideProps`), đọc via `serverRuntimeConfig`:
+
+   ```ts
+   // src/pages/api/someServer.ts
+   import getConfig from "next/config";
+   import type { NextApiRequest, NextApiResponse } from "next";
+
+   const { serverRuntimeConfig } = getConfig();
+   const apiKey = serverRuntimeConfig.API_KEY;
+
+   export default function handler(req: NextApiRequest, res: NextApiResponse) {
+     // Dùng apiKey để gọi service phía backend
+     // Thông tin apiKey không hề lộ ra client
+     res.status(200).json({ ok: true });
+   }
+   ```
+
+4. **Ở client‐side**, mã `process.env.API_KEY` là `undefined` (đúng vì không expose). Nếu cần fetch API route thì client gọi endpoint Next (ví dụ `/api/someServer`) để server xử lý với `API_KEY`.
+
+---
+
+## 3. Nếu vẫn muốn bake một số biến server‐side vào image (build‐time)
+
+* Đối với biến “chỉ server” mà bạn không ngại bake, có thể dùng `ARG` + `ENV` như sau, nhưng **chỉ dùng trong code server**:
+
+  ```dockerfile
+  FROM node:18-alpine AS deps
+  WORKDIR /app
+  COPY package.json package-lock.json* ./
+  RUN npm ci
+
+  FROM node:18-alpine AS builder
+  WORKDIR /app
+
+  ARG API_KEY
+  ENV API_KEY=${API_KEY}
+
+  COPY --from=deps /app/node_modules ./node_modules
+  COPY . .
+  RUN npm run build
+
+  FROM node:18-alpine AS runner
+  WORKDIR /app
+  COPY --from=deps /app/node_modules ./node_modules
+  COPY --from=builder /app/.next ./.next
+  COPY --from=builder /app/public ./public
+  COPY --from=builder /app/next.config.js ./next.config.js
+  COPY --from=builder /app/package.json ./package.json
+  EXPOSE 3000
+  CMD ["npm", "run", "start"]
+  ```
+
+  Build:
+
+  ```bash
+  docker build \
+    --build-arg API_KEY="abcdef123456" \
+    -t my-frontend:latest .
+  docker run -d --name my-frontend -p 3000:3000 my-frontend
+  ```
+
+  * Ở code server (ví dụ API route), `process.env.API_KEY` đọc được bình thường.
+  * Ở client, `process.env.API_KEY` là `undefined` vì không có `NEXT_PUBLIC_`.
+
+Nhưng cách này **bake API\_KEY vào image**, tức ai có image cũng khui được. Nếu bạn muốn bảo mật hơn, nên dùng *runtime env* (mục 2).
+
+---
+
+### Tóm tắt
+
+* **Biến client** (API endpoint, feature flag) → đặt tiền tố `NEXT_PUBLIC_*`, có thể bake bằng build-arg hoặc runtime env, miễn là không chứa secret.
+* **Biến server (API\_KEY, SECRET\_KEY…)**:
+
+  1. Đặt trong `serverRuntimeConfig` (next.config.js) để Next chỉ đọc được trên server.
+  2. Truyền vào khi `docker run -e API_KEY=...` (runtime), không bake build-time.
+
+Khi đó:
+
+* Code frontend (client) chỉ truy xuất `publicRuntimeConfig.NEXT_PUBLIC_API_ROUTE`.
+* Code backend (API route, server‐side) truy xuất `serverRuntimeConfig.API_KEY`.
+* Cả 2 phần không lẫn nhau, và API\_KEY không bao giờ lộ ra client.

@@ -1,37 +1,34 @@
-# Stage 1: Build step (cài dependencies)
+# Stage 1: Cài dependencies
 FROM node:18-alpine AS deps
 WORKDIR /app
 
-# Copy package.json and package-lock.json (nếu có) rồi cài dependencies
+# Chỉ copy package.json & package-lock.json rồi chạy npm ci
 COPY package.json package-lock.json* ./
 RUN npm ci --production
 
-# Stage 2: Copy toàn bộ source code và build (nếu bạn cần build TS hay tương tự)
+# Stage 2: Copy toàn bộ source code (nếu bạn có bước build TS/Babel, đặt vào đây)
 FROM node:18-alpine AS builder
 WORKDIR /app
-# Copy dependencies từ stage trước
+# Copy node_modules từ stage deps
 COPY --from=deps /app/node_modules ./node_modules
-# Copy toàn bộ source code của backend
+# Copy toàn bộ source code
 COPY . .
 
-# Nếu bạn dùng Babel/ESM, thường không cần build; 
-# nếu code thuần ESM hoặc đã ready thì bỏ qua step này.
+# Nếu cần build (ví dụ TypeScript hoặc Babel), bạn thêm lệnh tại đây.
+# Ví dụ (nếu có):
+# RUN npm run build
 
-# Stage 3: Runtime image gọn nhẹ
+# Stage 3: Runtime image
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-# Copy node_modules từ deps
+# Chỉ copy node_modules đã cài
 COPY --from=deps /app/node_modules ./node_modules
-# Copy toàn bộ source (hoặc chỉ file cần thiết)
+# Copy lại toàn bộ source (hoặc chỉ file sản phẩm build)
 COPY . .
 
-# Thiết lập biến môi trường cho node (đảm bảo chạy ở production)
-ENV NODE_ENV=production
-ENV PORT=5000
+# Mở port 3001 để host bên ngoài có thể map vào
+EXPOSE 3001
 
-# Expose port mà Express sẽ chạy
-EXPOSE 5000
-
-# Lệnh khởi động server
+# Khi chạy, server.js sẽ chạy Node, và code trong server.js/app.js sẽ đọc process.env.PORT
 CMD [ "node", "server.js" ]

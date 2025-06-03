@@ -1,0 +1,26 @@
+# Loại trừ thư mục node_modules từ host
+node_modules
+
+# Loại trừ thư mục .next nếu có khi develop
+.next
+
+# Loại trừ các file .env.* để tránh lộ secret
+.env.local
+.env.development
+.env.production
+.env
+
+# Loại trừ logs, IDE files
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+logs
+*.log
+
+# Thư mục git
+.git
+.gitignore
+
+# Thư mục test/coverage không cần copy
+coverage
+__tests__

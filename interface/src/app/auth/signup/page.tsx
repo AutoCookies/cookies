@@ -1,9 +1,11 @@
+// src/app/auth/signup/page.tsx
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/auth/signup.module.css";
 import Link from "next/link";
-import { ENV_VARS } from "@/lib/envVars";
+import { handleSignUp } from "@/utils/auth/handleSignup";
 import { handleSendLog } from "@/utils/logs/handleSendLog";
 
 export default function SignUp() {
@@ -15,33 +17,16 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, fullName, email, password }),
-        credentials: "include",
-      });
+      // Gọi hàm handleSignUp đã tách riêng
+      const data = await handleSignUp({ username, fullName, email, password });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        await handleSendLog({
-          type: "auth",
-          level: "warn",
-          message: `Đăng ký thất bại với email: ${email}`,
-          metadata: { reason: errorData.message },
-        });
-        throw new Error(errorData.message || "Đăng ký thất bại!");
-      }
-
-      const data = await res.json();
-      console.log("Registered Shaft user:", data);
-
+      // Gửi log đăng ký thành công
       await handleSendLog({
         type: "auth",
         level: "info",
@@ -58,6 +43,7 @@ export default function SignUp() {
         },
       });
 
+      // Chuyển hướng về trang Sign In
       router.push("/auth/signin");
     } catch (err: any) {
       setError(err.message);
@@ -75,7 +61,7 @@ export default function SignUp() {
   return (
     <div className={styles.signupContainer}>
       <h2 className={styles.signupTitle}>Sign Up</h2>
-      <form onSubmit={handleSignUp} className={styles.signupForm}>
+      <form onSubmit={onSubmit} className={styles.signupForm}>
         <input
           type="text"
           placeholder="Username"

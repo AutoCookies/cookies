@@ -10,7 +10,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: `${ENV_VARS.API_ROUTE}`,
+    origin: `${ENV_VARS.CLIENT_URL}`,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }

@@ -1,6 +1,4 @@
-// src/utils/recaptcha.js
-import fetch from "node-fetch";
-import { ENV_VARS } from "../config/envVars";
+import { ENV_VARS } from "../config/envVars.js";
 
 const RECAPTCHA_SECRET = ENV_VARS.RECAPTCHA_SECRET_KEY; // Không để prefix NEXT_PUBLIC_
 
@@ -10,9 +8,7 @@ export async function verifyRecaptchaToken(token, remoteIp) {
   const params = new URLSearchParams();
   params.append("secret", RECAPTCHA_SECRET);
   params.append("response", token);
-  if (remoteIp) {
-    params.append("remoteip", remoteIp);
-  }
+  if (remoteIp) params.append("remoteip", remoteIp);
 
   const res = await fetch("https://www.google.com/recaptcha/api/siteverify", {
     method: "POST",
@@ -20,5 +16,6 @@ export async function verifyRecaptchaToken(token, remoteIp) {
     body: params.toString(),
   });
   const data = await res.json();
-  return data; // data.success (boolean), data["error-codes"], data.score (v3),…
+  console.log("[Verify reCAPTCHA] response from Google:", data);
+  return data;
 }

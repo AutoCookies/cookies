@@ -1,0 +1,5 @@
+- Xác thực zero-trust
+- Xác thực re-captcha
+- Chống DDOS mạnh.
+- CHống CTF, XSS
+- Thêm các chức năng người dùng

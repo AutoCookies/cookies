@@ -1,0 +1,276 @@
+Dưới đây là một số nền tảng cho phép bạn deploy miễn phí (hoặc có gói free tier) ứng dụng web (bao gồm cả Node.js, Next.js, Docker, v.v.). Mình sẽ chia thành hai nhóm: (1) hỗ trợ native Next.js/Node.js, (2) hỗ trợ trực tiếp Docker. Mỗi phần đều nêu ngắn gọn ưu/nhược, hạn mức, và cách bắt đầu cơ bản.
+
+---
+
+## 1. Nền tảng hỗ trợ native Next.js/Node.js (không cần Docker)
+
+1. **Vercel**
+
+   * **Ưu điểm**:
+
+     * Tích hợp sẵn Next.js (SSR, API routes).
+     * Deploy chỉ với vài dòng lệnh (hoặc connect GitHub).
+     * Hỗ trợ Preview Deploy tự động khi push code.
+     * Miễn phí cho hầu hết dự án cá nhân, bao gồm SSL, CDN, tự rebuild khi có commit mới.
+   * **Nhược điểm**:
+
+     * Free tier giới hạn 1 TB băng thông/tháng, 100 GB lưu trữ.
+     * Giới hạn 100GB-bw/truy vấn API route/ngày (mức cơ bản).
+     * Không deploy container Docker (phải build Next.js ra static/SSR).
+   * **Bắt đầu**:
+
+     1. Tạo tài khoản Vercel, cài `vercel` CLI.
+     2. Trong thư mục project Next.js, chạy `vercel` và làm theo prompt (kết nối GitHub hoặc deploy thủ công).
+
+2. **Netlify**
+
+   * **Ưu điểm**:
+
+     * Tối ưu cho static site (Next.js dùng export hoặc tĩnh hóa).
+     * Cung cấp CDN, SSL miễn phí.
+     * Tích hợp CI/CD với GitHub/GitLab.
+   * **Nhược điểm**:
+
+     * Next.js phải build thành static (ví dụ `next export`) hoặc dùng Netlify Functions cho serverless, không hỗ trợ SSR đầy đủ như Vercel.
+     * Free tier giới hạn 100 GB băng thông/tháng, 300 build minute/tháng.
+   * **Bắt đầu**:
+
+     1. Đăng ký Netlify, connect repository chứa code.
+     2. Đặt build command: `npm run build && npm run export` (nếu pre-render) hoặc cấu hình functions.
+     3. Netlify tự deploy khi có commit.
+
+3. **Heroku (Free tier)**
+
+   * **Ưu điểm**:
+
+     * Triển khai Node.js (hoặc bất cứ server nào) rất nhanh qua Git.
+     * Hỗ trợ add-ons (PostgreSQL miễn phí, Redis miễn phí).
+   * **Nhược điểm**:
+
+     * Free dyno “sleep” sau 30 phút không hoạt động → cold start chậm.
+     * Nhà sản xuất Heroku giảm dung lượng Free vào 2024, hạn chế 550–1.000 giờ dyno/tháng nếu liên kết thẻ tín dụng. Sau hết hạn giờ, app tự offline.
+   * **Bắt đầu**:
+
+     1. Cài `heroku-cli`, đăng nhập.
+     2. Trong project root có `package.json`, chạy:
+
+        ```bash
+        heroku create <app-name>
+        git push heroku main
+        ```
+     3. Config biến môi trường bằng `heroku config:set KEY=VALUE`.
+
+4. **GitHub Pages + GitHub Actions (chỉ static)**
+
+   * **Ưu điểm**:
+
+     * Hoàn toàn miễn phí cho site tĩnh (HTML/CSS/JS).
+     * Tự động build Next.js static bằng GitHub Actions.
+   * **Nhược điểm**:
+
+     * Chỉ dùng cho site static (no SSR, no backend).
+   * **Bắt đầu**:
+
+     1. Tạo workflow Action để chạy `npm install && npm run build && npm run export`.
+     2. Push folder `out/` lên branch `gh-pages`.
+     3. Kích hoạt GitHub Pages, chọn branch `gh-pages`.
+
+---
+
+## 2. Nền tảng hỗ trợ trực tiếp Docker (linh hoạt cho mọi ngôn ngữ)
+
+1. **Fly.io (Free tier)**
+
+   * **Ưu điểm**:
+
+     * Triển khai Docker container hoặc app Node/Go/Rust ngay lập tức.
+     * Có thể đổi region, auto-scaling cơ bản.
+     * Free tier: 3 shared-cpu-1x instances, 256 MB RAM, 160 GB lưu trữ mạng cho mỗi tổ chức, \~160 giờ CPU/tháng.
+   * **Nhược điểm**:
+
+     * Quy trình cấu hình Volume, Secrets hơi phức tạp với người mới.
+   * **Bắt đầu**:
+
+     1. Cài `flyctl`: `curl -L https://fly.io/install.sh | sh`.
+     2. Trong thư mục project, khởi tạo: `fly launch --dockerfile Dockerfile`.
+     3. Chọn app name, region, Fly tự build và deploy.
+     4. Để thêm secret (API\_KEY…), chạy `fly secrets set API_KEY=xxxx`.
+
+2. **Render (Free tier)**
+
+   * **Ưu điểm**:
+
+     * Hỗ trợ Docker, Node.js, Python, Ruby…
+     * Tự rebuild khi push GitHub/GitLab.
+     * Free tier dành cho web service (512 MB RAM), PostgreSQL 100 MB.
+   * **Nhược điểm**:
+
+     * Free service “sleep” sau 15 phút không truy cập, restart chậm.
+   * **Bắt đầu**:
+
+     1. Đăng ký Render, connect Git repo.
+     2. Tạo Web Service mới: chọn Docker hoặc chỉ định build command (vd `npm run build && npm start`).
+     3. Cấu hình Env vars (API\_KEY, NODE\_ENV…).
+
+3. **Railway (Free tier)**
+
+   * **Ưu điểm**:
+
+     * Tự động detect Dockerfile hoặc Node.js.
+     * Free tier \~5 GB lưu lượng mạng/tháng, 0.5 GB RAM.
+     * Hỗ trợ database (PostgreSQL, MySQL) miễn phí.
+   * **Nhược điểm**:
+
+     * Cần request invite code (đã mở rộng nhưng đôi khi giới hạn slot).
+     * Free RAM và CPU thấp, chậm nếu traffic cao.
+   * **Bắt đầu**:
+
+     1. Sign up Railway, tạo Project mới.
+     2. Kết nối GitHub repository, Railway auto build và deploy.
+     3. Cấu hình Env vars và database service (nếu cần).
+
+4. **Heroku Container Registry (Free tier)**
+
+   * **Ưu điểm**:
+
+     * Vẫn dùng Heroku nhưng deploy qua Docker (`heroku container:push`).
+     * Miễn phí (như phần Heroku Free dyno), dễ cấu hình secret.
+   * **Nhược điểm**:
+
+     * Vẫn chịu chính sách dyno “sleep” (không phù hợp app production luôn online).
+   * **Bắt đầu**:
+
+     1. Login: `heroku container:login`.
+     2. Tạo app: `heroku create <app-name>`.
+     3. Docker build & push:
+
+        ```bash
+        docker build -t registry.heroku.com/<app-name>/web .
+        heroku container:push web -a <app-name>
+        heroku container:release web -a <app-name>
+        ```
+     4. Cấu hình config vars bằng dashboard hoặc CLI (`heroku config:set KEY=VALUE`).
+
+5. **Google Cloud Run (Free tier)**
+
+   * **Ưu điểm**:
+
+     * Deploy Docker image, auto scale to zero.
+     * Free tier: 2 triệu request HTTP, 360,000 vCPU-seconds, 1 GB RAM-seconds/tháng.
+   * **Nhược điểm**:
+
+     * Cần tài khoản Google Cloud (có credit free \$300 cho 90 ngày), cấu hình IAM phức tạp.
+   * **Bắt đầu**:
+
+     1. Cài `gcloud`, `gcloud auth login`, `gcloud config set project <PROJECT_ID>`.
+     2. Build image:
+
+        ```bash
+        gcloud builds submit --tag gcr.io/<PROJECT_ID>/my-frontend
+        gcloud run deploy my-frontend \
+          --image gcr.io/<PROJECT_ID>/my-frontend \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated
+        ```
+     3. Gán Env vars ngay khi deploy hoặc qua console GCP.
+
+6. **AWS (Free tier)**
+
+   * **S3 + CloudFront**:
+
+     * Dùng cho site tĩnh (Next.js export) với SSL miễn phí.
+   * **Elastic Beanstalk (Docker/Node.js)**:
+
+     * Free tier: 750 hours EC2 t2.micro + 5 GB EBS.
+     * Cần cấu hình khá rườm rà.
+   * **AWS Amplify (Frontend)**:
+
+     * Deploy Next.js dễ dàng, free host 5 GB storage + 1 GB bandwidth/tháng.
+   * **AWS ECS / Fargate**:
+
+     * Free tier giới hạn vCPU/RAM dưới 50 GB-storage, khó tận dụng lâu dài.
+
+7. **Azure (Free tier)**
+
+   * **Static Web Apps**:
+
+     * Dành cho site Next.js static, có free SSL.
+   * **App Service (Docker/Node.js)**:
+
+     * Free tier 1 instance/unit, 1 GB RAM.
+   * Cần tài khoản Azure (có credit \$200 cho 30 ngày).
+
+---
+
+## 3. So sánh ngắn gọn & gợi ý chọn nền tảng
+
+| Nền tảng          | Hỗ trợ Docker | Free-tier giới hạn chính                                          | Lý do chọn nếu…                                                   |
+| ----------------- | ------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Vercel            | Không         | 100 GB-bw, 1 TB băng thông/tháng                                  | Ưa Next.js, cần SSR/ISR (fast), CI tự động bằng Git               |
+| Netlify           | Không         | 100 GB bandwidth, 300 build-minutes/tháng                         | Ưa site tĩnh, muốn deploy nhanh, CDN tự động                      |
+| Fly.io            | Có            | 3 shared-cpu-1x, 256 MB RAM mỗi app, 160 GB network               | Cần chạy container (Docker), muốn đa region, miễn phí nhỏ         |
+| Render            | Có            | 512 MB RAM, 0.5 CPU, auto-sleep, 100 GB network/tháng             | Cần chạy Docker, muốn CI/CD từ Git, config dễ hơn Fly.io          |
+| Railway           | Có            | 0.5 GB RAM, 5 GB network/tháng, database free                     | Muốn thử nghiệm nhanh, deploy Docker/Node.js ào ào, dễ kết nối DB |
+| Heroku (Dyno)     | Có            | \~550–1.000 dyno-hrs/tháng (sleep after idle), Hobby-tier trả phí | Đã quen Heroku CLI, muốn deploy nhanh Node/Docker                 |
+| Google Cloud Run  | Có            | 360,000 vCPU-s, 1 GB RAM-s, 2M requests/tháng                     | Có account GCP, muốn auto scale to zero, traffic đột biến         |
+| AWS Amplify       | Không Docker  | 5 GB storage, 1 GB bandwidth/tháng (web)                          | Chỉ frontend tĩnh hoặc Next.js static                             |
+| Azure App Service | Có            | Free tier 1 GB RAM, 60 CPU-minutes/ngày                           | Dùng Azure, quen Azure DevOps                                     |
+
+* **Nếu project Next.js + API (Serverless)**:
+  → **Vercel** (ưu tiên vì quá tiện) hoặc **Netlify Functions** (nếu chỉ cần tĩnh + một số function).
+* **Nếu project Next.js đòi Docker (có các service, middleware tùy chỉnh)**:
+  → **Fly.io** (nhiều region, tương thích Docker), **Render** (CI/CD qua GitHub), hoặc **Railway** (dễ bắt đầu, có database)
+* **Nếu cần deploy backend Node.js thuần (Express, NestJS, v.v.)**:
+  → Heroku Free (nhưng dyno sleep), Railway, Render, Google Cloud Run.
+* **Nếu chỉ frontend static (React, Next export, SPA)**:
+  → GitHub Pages, Netlify, Vercel, AWS S3 + CloudFront (semi-static).
+
+---
+
+## 4. Ví dụ minh họa: Deploy Docker-based Next.js lên Fly.io
+
+1. **Cài Fly CLI**:
+
+   ```bash
+   curl -L https://fly.io/install.sh | sh
+   ```
+2. **Đăng nhập**:
+
+   ```bash
+   fly auth login
+   ```
+3. **Tạo Fly app**:
+
+   ```bash
+   cd /path/to/your/nextjs-project
+   fly launch --name my-nextjs-app --region=sgp
+   ```
+
+   * Khi được hỏi “Would you like to deploy now?” chọn `No` nếu muốn tinh chỉnh Dockerfile trước.
+4. **Sửa `Dockerfile`** (tham khảo phần đề xuất build-arg bên trên).
+5. **Deploy**:
+
+   ```bash
+   fly deploy
+   ```
+6. **Cấu hình Secret/Env vars (nếu cần)**:
+
+   ```bash
+   fly secrets set OTHER_API_KEY=secret123
+   ```
+7. **Truy cập app**: `https://my-nextjs-app.fly.dev`
+
+---
+
+### Kết luận
+
+* Với **biến NHẠY CẢM** (API\_KEY, SECRET), không bao giờ gắn dưới dạng `NEXT_PUBLIC_` → dùng `serverRuntimeConfig` (Next.js) hoặc truyền qua `fly secrets`/`render secrets`/`railway variables`/`heroku config:set`.
+* Với **endpoint API** (NEXT\_PUBLIC\_API\_ROUTE), có thể bake bằng build-arg hoặc truyền runtime tùy nền tảng.
+* Chọn nền tảng tuỳ theo nhu cầu:
+
+  * Chỉ frontend + SSR Next.js → **Vercel** hoặc **Netlify**.
+  * Cần Docker → **Fly.io** / **Render** / **Railway**.
+  * Cần backend Node.js thuần (Express, Nest…) → **Heroku** hoặc **Google Cloud Run**.
+
+Hy vọng những gợi ý trên giúp bạn chọn được môi trường deploy miễn phí phù hợp. Nếu cần hướng dẫn chi tiết bước-từng-bước với bất cứ nền tảng nào, cứ báo mình biết!

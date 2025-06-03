@@ -3,4 +3,5 @@ console.log(">>> DEBUG NEXT_PUBLIC_API_ROUTE:", process.env.NEXT_PUBLIC_API_ROUT
 
 export const ENV_VARS = {
     API_ROUTE: process.env.NEXT_PUBLIC_API_ROUTE,
+    PUBLIC_SOCLET_URL: process.env.NEXT_PUBLIC_SOCKET_URL,
 };

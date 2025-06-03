@@ -32,7 +32,7 @@ export const unlikeComment = catchAsyncErrors(async (req, res) => {
     const { commentId } = req.params;
     const userId = req.user._id;
 
-    console.log(`CommentId trong api: ${commentId}`)
+    // console.log(`CommentId trong api: ${commentId}`)
 
     // Gọi service để unlike comment
     const result = await unlikeCommentService(userId, commentId);
@@ -86,7 +86,7 @@ export const checkUserLikedPosts = async (req, res) => {
 
         res.json({ likedPostIds });
     } catch (error) {
-        console.error("Lỗi API check likes:", error);
+        // console.error("Lỗi API check likes:", error);
         res.status(500).json({ message: "Không thể kiểm tra trạng thái like." });
     }
 };

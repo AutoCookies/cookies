@@ -19,14 +19,14 @@ export const commentPost = catchAsyncErrors(async (req, res) => {
 
 export const deleteCommnet = catchAsyncErrors(async (req, res) => {
     try {
-        console.log(`User ID: ${req.user._id}`); // Debug user ID
+        // console.log(`User ID: ${req.user._id}`); // Debug user ID
         const { commentId } = req.params;
         const userId = req.user._id; // Lấy userId đúng
 
         const result = await deleteCommentService(commentId, userId);
         res.status(200).json(result);
     } catch (error) {
-        console.error("Error deleting comment:", error.message); // Log chi tiết lỗi
+        // console.error("Error deleting comment:", error.message); // Log chi tiết lỗi
         res.status(400).json({ message: error.message });
     }
 });
@@ -49,7 +49,7 @@ export const getCommentsByPost = async (req, res) => {
     try {
         const { postId } = req.params;
         const userId = req.user._id;
-        console.log(`User ID: ${userId}`);
+        // console.log(`User ID: ${userId}`);
         const { page = 1, limit = 10 } = req.query;
 
         // Gọi service để lấy comment

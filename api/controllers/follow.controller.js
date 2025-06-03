@@ -80,7 +80,7 @@ export const getFollowersOfUser = async (req, res) => {
             followers,
         });
     } catch (error) {
-        console.error("Error in getFollowersOfUserController:", error.message);
+        // console.error("Error in getFollowersOfUserController:", error.message);
         return res.status(500).json({
             success: false,
             message: error.message || "Đã xảy ra lỗi khi lấy danh sách follower.",

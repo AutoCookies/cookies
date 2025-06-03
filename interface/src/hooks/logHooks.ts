@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 import { LogEntry } from "@/utils/logs/handleGetLogs";
+import { ENV_VARS } from "@/lib/envVars";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+const SOCKET_URL = ENV_VARS.PUBLIC_SOCLET_URL;
 
 let socket: Socket | null = null;
 

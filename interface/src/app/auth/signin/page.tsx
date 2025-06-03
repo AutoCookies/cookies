@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import ReCAPTCHA from "react-google-recaptcha";
 import styles from "@/styles/auth/signin.module.css";
 import Link from "next/link";
+import { handleSignIn } from "@/utils/auth/handleSignin";
+import { handleSendLog } from "@/utils/logs/handleSendLog";
 import { ENV_VARS } from "@/lib/envVars";
 
 export default function SignIn() {
@@ -13,8 +15,11 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Khi backend yêu cầu reCAPTCHA
   const [showCaptcha, setShowCaptcha] = useState(false);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+
   const router = useRouter();
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -23,47 +28,54 @@ export default function SignIn() {
     setError("");
 
     try {
-      // 1) Chuẩn bị payload:
-      let recaptchaToken = "";
+      let token = "";
       if (showCaptcha && recaptchaRef.current) {
-        // Lấy token reCAPTCHA (Invisible)
-        recaptchaToken = (await recaptchaRef.current.executeAsync()) || "";
+        // Lấy token reCAPTCHA invisible
+        token = (await recaptchaRef.current.executeAsync()) || "";
       }
 
-      const body = { email, password } as any;
-      if (showCaptcha) {
-        body.recaptchaToken = recaptchaToken;
-      }
+      // Gọi handleSignIn với hoặc không có recaptchaToken
+      const data = await handleSignIn(email, password, token);
+      console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+      console.log("ENV_VARS.API_ROUTE:", ENV_VARS.API_ROUTE);
 
-      // 2) Gửi request:
-      const res = await fetch(`${ENV_VARS.API_ROUTE}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+      // Gửi log đăng nhập thành công
+      await handleSendLog({
+        type: "auth",
+        level: "info",
+        message: `Người dùng ${data.email} (${data.role}) đã đăng nhập.`,
+        user: { _id: data._id, email: data.email, role: data.role },
+        metadata: {
+          loginTime: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+        },
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        // Nếu backend trả needCaptcha: true → bật thẻ captcha
-        if (data.needCaptcha) {
-          setShowCaptcha(true);
-          setError(data.message || "Vui lòng giải reCAPTCHA.");
-        } else {
-          setError(data.message || "Đăng nhập thất bại.");
-        }
-        setLoading(false);
-        // Reset reCAPTCHA widget để next lần get token mới
-        recaptchaRef.current?.reset();
-        return;
+      // Điều hướng theo role hoặc trạng thái
+      if (data.isBaned) {
+        router.push("/auth/ban");
+      } else if (data.role === "admin") {
+        router.push("/dashboard");
+      } else if (data.role === "moderator") {
+        router.push("/moderator");
+      } else {
+        router.push("/home");
+      }
+    } catch (err: any) {
+      // Nếu backend trả needCaptcha = true, err là object { message, needCaptcha }
+      if (err.needCaptcha) {
+        // Lần sau phải show captcha
+        setShowCaptcha(true);
+        setError(err.message || "Vui lòng giải reCAPTCHA để tiếp tục.");
+      } else {
+        // Các lỗi khác (wrong credentials, server error)
+        setError(err.message || "Lỗi đăng nhập, thử lại sau.");
       }
 
-      // 3) Nếu thành công, có thể server đã set cookie JWT, ta redirect
-      router.push("/home");
-    } catch (err: any) {
-      setError(err.message || "Lỗi mạng, vui lòng thử lại.");
-      setLoading(false);
+      // Nếu đã dùng reCAPTCHA lần này, dù fail hay OK thì cũng phải reset
       recaptchaRef.current?.reset();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,6 +86,7 @@ export default function SignIn() {
           <div className={styles.spinner}></div>
         </div>
       )}
+
       <h2>Sign In</h2>
       <form onSubmit={onSubmit} className={styles.signinForm}>
         <input
@@ -95,7 +108,7 @@ export default function SignIn() {
           disabled={loading}
         />
 
-        {/* Chỉ render ReCAPTCHA khi cần (sau 3 lần sai) */}
+        {/* Chỉ hiển thị reCAPTCHA khi cần (sau 3 lần thất bại backend báo needCaptcha) */}
         {showCaptcha && (
           <ReCAPTCHA
             ref={recaptchaRef}
@@ -109,7 +122,12 @@ export default function SignIn() {
             {error}
           </p>
         )}
-        <button type="submit" disabled={loading} className={styles.submitButton}>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={styles.submitButton}
+        >
           {loading ? "Signing in..." : "Sign In"}
         </button>
         <p>

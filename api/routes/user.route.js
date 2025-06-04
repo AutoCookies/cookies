@@ -18,7 +18,7 @@ import upload from "../middlewares/upload.middleware.js";
 const router = express.Router();
 
 // Lấy profile của một user khi biết id
-router.get("/:id", protectRoute, getUserProfile);
+router.get("/:id", getUserProfile);
 // Thay đổi mật khẩu một tài khoản
 router.put("/change-password", changeUserPassword);
 // Thay đổi username của một tài khoản

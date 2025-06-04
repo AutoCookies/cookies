@@ -250,17 +250,47 @@ describe('Auth Service', () => {
   // ---------------------------
   // 3. logoutUserService
   // ---------------------------
-  describe('logoutUserService', () => {
-    it('throws ReferenceError because userId is undefined', async () => {
-      const fakeReq = {};
+  describe('Auth Service - logoutUserService', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('clears cookie and does not call redis.del when req.user._id is missing', async () => {
+      // Arrange: req.user undefined
+      const fakeReq = { user: undefined };
       const fakeRes = { clearCookie: jest.fn() };
-      await expect(logoutUserService(fakeReq, fakeRes)).rejects.toThrow(ReferenceError);
+
+      // Act
+      await logoutUserService(fakeReq, fakeRes);
+
+      // Assert: clearCookie called with correct args
       expect(fakeRes.clearCookie).toHaveBeenCalledWith('jwt-token', {
         httpOnly: true,
         secure: true,
         sameSite: 'Strict',
         path: '/',
       });
+      // redisClient.del should NOT be called
+      expect(redisClient.del).not.toHaveBeenCalled();
+    });
+
+    it('clears cookie and calls redis.del with correct key when req.user._id exists', async () => {
+      // Arrange: req.user._id provided
+      const fakeReq = { user: { _id: 'user123' } };
+      const fakeRes = { clearCookie: jest.fn() };
+
+      // Act
+      await logoutUserService(fakeReq, fakeRes);
+
+      // Assert: clearCookie called
+      expect(fakeRes.clearCookie).toHaveBeenCalledWith('jwt-token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Strict',
+        path: '/',
+      });
+      // redisClient.del called with "user_session:user123"
+      expect(redisClient.del).toHaveBeenCalledWith('user_session:user123');
     });
   });
 

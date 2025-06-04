@@ -1,5 +1,8 @@
 /* styles/home.module.css */
 
+/* ================================
+   Container & Background (Hoa Anh Đào)
+   ================================ */
 .container {
   position: relative;
   min-height: 100vh;
@@ -8,9 +11,108 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(to bottom, #fff1f2 0%, #ffe4e6 100%);
+  /* Gradient tone pastel cherry blossom */
+  background: linear-gradient(
+    to bottom,
+    #fff0f3 0%,
+    #ffe4e6 50%,
+    #ffdce1 100%
+  );
 }
 
+/* Optional: nhẹ nhàng vệt hoa anh đào rơi (dùng keyframes petalFall nếu có phần tử HTML tương ứng) */
+@keyframes petalFall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ============================
+   Profile Dropdown (Cherry Pink Accents)
+   ============================ */
+/* ============================
+   Profile dropdown & Signout
+   ============================ */
+
+/* Container for the profile dropdown */
+.profileDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid rgba(255, 182, 193, 0.5);
+  box-shadow: 0 4px 12px rgba(255, 192, 203, 0.3);
+  border-radius: 8px;
+  z-index: 50;
+  width: 160px;
+}
+
+/* List wrapper */
+.profileMenuList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+/* Each menu item */
+.profileMenuItem {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  color: #881337;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 182, 193, 0.3);
+}
+
+.profileMenuItem:last-child {
+  border-bottom: none;
+}
+
+.profileMenuItem:hover {
+  background-color: #ffe4e6;
+}
+
+/* Link inside menu item (“Trang cá nhân”) */
+.profileMenuItem > a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+/* Signout button styled like a link */
+.signoutButton {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  font: inherit;
+  color: #881337;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: block;
+}
+
+/* Hover effect for signout button */
+.signoutButton:hover {
+  background-color: #ffe4e6;
+}
+
+/* ===============================
+   Header Title & Subtitles
+   =============================== */
 .welcome {
   position: relative;
   z-index: 10;
@@ -20,19 +122,19 @@
   width: 90%;
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(255, 182, 193, 0.2); /* light pink shadow */
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 192, 203, 0.3);
+  border: 1px solid rgba(255, 182, 193, 0.3);
   animation: fadeIn 1.5s ease-out;
 }
 
 .title {
   font-size: clamp(2rem, 5vw, 4rem);
   font-weight: 800;
-  color: #881337; /* Deep pink-800 */
+  color: #d6336c; /* deep cherry blossom */
   margin-bottom: 1.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(to right, #db2777, #831843);
+  text-shadow: 2px 2px 4px rgba(255, 182, 193, 0.5);
+  background: linear-gradient(to right, #ff96c5, #d6336c);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -48,14 +150,14 @@
   transform: translateX(-50%);
   width: 100px;
   height: 4px;
-  background: linear-gradient(to right, #f9a8d4, #f472b6);
+  background: linear-gradient(to right, #ffb6c1, #ff96c5);
   border-radius: 2px;
 }
 
 .subtitle {
   font-size: clamp(1rem, 2vw, 1.5rem);
   font-weight: 400;
-  color: #4c0519;
+  color: #6f1d3e; /* màu hồng đậm nhẹ */
   margin-bottom: 3rem;
   line-height: 1.6;
   max-width: 800px;
@@ -63,9 +165,13 @@
   margin-right: auto;
 }
 
+/* ==============================
+   Animated Text Underline
+   ============================== */
 .animatedText {
   display: inline-block;
   position: relative;
+  color: #d6336c;
 }
 
 .animatedText::after {
@@ -75,7 +181,7 @@
   height: 2px;
   bottom: -5px;
   left: 0;
-  background: linear-gradient(to right, transparent, #f472b6, transparent);
+  background: linear-gradient(to right, transparent, #ff96c5, transparent);
   transform: scaleX(0);
   transform-origin: bottom right;
   transition: transform 0.5s ease-out;
@@ -86,6 +192,9 @@
   transform-origin: bottom left;
 }
 
+/* ==============================
+   Buttons & Hover Effects
+   ============================== */
 .buttonContainer {
   display: flex;
   justify-content: center;
@@ -106,23 +215,23 @@
   z-index: 1;
   border: none;
   cursor: pointer;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(255, 182, 193, 0.3);
 }
 
 .primaryBtn {
-  background: linear-gradient(45deg, #db2777, #be185d);
+  background: linear-gradient(45deg, #ff96c5, #d6336c);
   color: white;
 }
 
 .secondaryBtn {
-  background: white;
-  color: #db2777;
-  border: 2px solid #f9a8d4;
+  background: #fff;
+  color: #d6336c;
+  border: 2px solid #ffb6c1;
 }
 
 .btnHoverEffect {
   position: absolute;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 182, 193, 0.4);
   width: 50px;
   height: 100%;
   left: 0;
@@ -134,7 +243,7 @@
 
 .btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4);
 }
 
 .btn:hover .btnHoverEffect {
@@ -142,43 +251,27 @@
 }
 
 .primaryBtn:hover {
-  box-shadow: 0 10px 20px rgba(219, 39, 119, 0.3);
+  box-shadow: 0 10px 20px rgba(214, 51, 108, 0.4);
 }
 
 .secondaryBtn:hover {
-  background: #fdf2f8;
-  box-shadow: 0 10px 20px rgba(244, 114, 182, 0.3);
+  background: #ffe4e6;
+  box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4);
 }
 
-/* Sakura petal animation effects */
-@keyframes petalFall {
-  0% {
-    transform: translateY(-10vh) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* Responsive adjustments */
+/* ==============================
+   Responsive Adjustments
+   ============================== */
 @media (max-width: 768px) {
   .welcome {
     padding: 1.5rem;
     width: 95%;
   }
-  
+
   .buttonContainer {
     gap: 1.5rem;
   }
-  
+
   .btn {
     padding: 0.8rem 2rem;
     font-size: 1rem;
@@ -189,23 +282,23 @@
   .welcome {
     padding: 1rem;
   }
-  
+
   .title {
     font-size: 1.8rem;
     padding-bottom: 0.5rem;
   }
-  
+
   .subtitle {
     font-size: 1rem;
     margin-bottom: 2rem;
   }
-  
+
   .buttonContainer {
     flex-direction: column;
     gap: 1rem;
     margin-top: 2rem;
   }
-  
+
   .btn {
     width: 100%;
     max-width: 250px;
@@ -213,7 +306,9 @@
   }
 }
 
-/* Animations */
+/* ==============================
+   Animations
+   ============================== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -225,11 +320,7 @@
   }
 }
 
-/* Floating effect for the welcome container */
-.welcome {
-  animation: float 6s ease-in-out infinite;
-}
-
+/* Floating gentle effect */
 @keyframes float {
   0% {
     transform: translateY(0px);
@@ -240,4 +331,8 @@
   100% {
     transform: translateY(0px);
   }
+}
+
+.welcome {
+  animation: float 6s ease-in-out infinite;
 }

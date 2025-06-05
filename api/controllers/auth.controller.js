@@ -48,12 +48,21 @@ export const loginUser = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-    if (!req.cookies["jwt-token"]) {
-        return res.status(400).json({ message: "Bạn chưa đăng nhập!" });
+    try {
+        const result = await logoutUserService(req, res);
+        
+        if (!result.success) {
+            return res.status(400).json(result);
+        }
+        
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Logout controller error:', error);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Internal server error" 
+        });
     }
-
-    logoutUserService(req, res);
-    return res.status(200).json({ message: "Đăng xuất thành công!" });
 };
 
 export const getAuthUser = async (req, res) => {

@@ -8,7 +8,6 @@ interface LoginResponse {
   email: string;
   role: string;
   isBaned: boolean;
-  token: string;
 }
 
 interface LoginError {

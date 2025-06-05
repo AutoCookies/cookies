@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
-import { generateTokenAndSetCookie } from "../utils/generateToken.js";
+import { generateTokenAndSetCookie, generateRefreshTokenAndSetCookie } from "../utils/generateToken.js";
 import redisClient from "../config/redisClient.js";
+import { verifyAccessToken } from "../utils/verifyToken.js";
 
 export const registerUserService = async ({ username, fullName, email, password }, res) => {
     // Nếu thiếu bất kỳ field nào, trả về object báo lỗi (không ném Exception)
@@ -30,9 +31,6 @@ export const registerUserService = async ({ username, fullName, email, password 
         return { error: true, message: "Create user failed!" };
     }
 
-    // Tạo token và set cookie
-    const token = generateTokenAndSetCookie(user._id, res);
-
     // Trả về thông tin user + token
     return {
         error: false,
@@ -41,7 +39,6 @@ export const registerUserService = async ({ username, fullName, email, password 
             username: user.username,
             email: user.email,
             role: user.role,
-            token: token,
         },
     };
 };
@@ -65,9 +62,11 @@ export const loginUserService = async ({ email, password, res }) => {
 
     // Tạo token mới
     const token = generateTokenAndSetCookie(user._id, res);
+    const refreshToken = generateRefreshTokenAndSetCookie(user._id, res);
 
     // Lưu token vào Redis với thời gian sống (TTL) 1 ngày
-    await redisClient.set(`user_session:${user._id}`, token, "EX", 24 * 60 * 60);
+    await redisClient.set(`user_session:${user._id}`, token, "EX", 15 * 60);
+    await redisClient.set(`user_refresh_session:${user._id}`, refreshToken, "EX", 7 * 24 * 60 * 60); // 30 ngày
 
     return {
         _id: user._id,
@@ -76,21 +75,60 @@ export const loginUserService = async ({ email, password, res }) => {
         email: user.email,
         role: user.role,
         isBaned: user.isBanned,
-        token,
     };
 };
 
-// Sau này front end nên cho xóa ảnh và token khi đăng xuất
 export const logoutUserService = async (req, res) => {
-    res.clearCookie("jwt-token", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "Strict",
-        path: "/", 
-    });
-    await redisClient.del(`user_session:${userId}`);
-};
+    try {
 
+        const decoded = verifyAccessToken(req);
+        const userId = decoded.userId.toString();
+
+        // Xóa cookies
+        const cookieOptions = {
+            httpOnly: true,
+            secure: ENV_VARS.NODE_ENV === "production",
+            sameSite: "None",
+            path: "/",
+        };
+
+        res.clearCookie("jwt-token", cookieOptions);
+        res.clearCookie("jwt-refresh-token", cookieOptions);
+
+        // Xóa session trong Redis
+        await Promise.all([
+            redisClient.del(`user_session:${userId}`),
+            redisClient.del(`user_refresh_session:${userId}`)
+        ]);
+
+        return { 
+            success: true, 
+            message: "Logged out successfully" 
+        };
+    } catch (error) {
+        console.error("Logout error:", error);
+
+        // Xóa cookies ngay cả khi token không hợp lệ
+        res.clearCookie("jwt-token");
+        res.clearCookie("jwt-refresh-token");
+
+        if (error.name === "JsonWebTokenError") {
+            return { 
+                success: false, 
+                message: "Invalid token" 
+            };
+        }
+
+        if (error.name === "TokenExpiredError") {
+            return { 
+                success: false, 
+                message: "Token expired" 
+            };
+        }
+
+        throw new Error("Logout failed");
+    }
+};
 /**
  * Lấy thông tin user từ database dựa vào userId.
  * @param {string} userId 

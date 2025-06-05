@@ -20,4 +20,5 @@ export const ENV_VARS = {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     API_ROUTE: process.env.API_ROUTE,
     CLIENT_URL: process.env.CLIENT_URL,
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
 }

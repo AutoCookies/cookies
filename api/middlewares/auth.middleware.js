@@ -1,43 +1,34 @@
-import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import { verifyAccessToken } from "../utils/verifyToken.js";
 
 export const protectRoute = async (req, res, next) => {
     try {
-        let token = req.cookies?.["jwt-token"];
-        // console.log("Cookies:", req.cookies);
-        // console.log("Authorization header:", req.headers.authorization);
-
-        if (!token && req.headers.authorization?.startsWith("Bearer")) {
-            token = req.headers.authorization.split(" ")[1];
-        }
-
-        if (!token) {
-            return res.status(401).json({ message: "Permission denied! Please log in to continue." });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // console.log("Decoded Token:", decoded);
-
+        const decoded = verifyAccessToken(req);
         const user = await User.findById(decoded.userId).select("-password");
 
         if (!user) {
-            return res.status(401).json({ message: "User not found. Please log in again!" });
+            return res.status(401).json({
+                success: false,
+                message: "User not found. Please log in again!",
+            });
         }
-
-        // console.log("User from DB:", user);
 
         req.user = { ...user.toObject(), _id: user._id.toString() };
-
-        next();
+        return next();
     } catch (error) {
         console.error("Auth Error:", error);
-
         if (error.name === "TokenExpiredError") {
-            res.clearCookie("jwt-token");
-            return res.status(401).json({ message: "Session expired! Please log in again." });
+            return res.status(401).json({
+                success: false,
+                message: "Access token expired. Please refresh token.",
+                code: "TOKEN_EXPIRED",
+            });
         }
 
-        return res.status(401).json({ message: "Invalid token! Please log in." });
+        return res.status(401).json({
+            success: false,
+            message: "Invalid token! Please log in.",
+        });
     }
 };
 

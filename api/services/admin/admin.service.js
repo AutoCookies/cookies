@@ -80,15 +80,12 @@ export const createAccountService = async ({ username, fullName, email, password
 
     if (!user) throw new Error("Create user failed!");
 
-    const token = generateTokenAndSetCookie(user._id, res);
-
     return {
         _id: user._id,
         username: user.username,
         fullName: user.fullName,
         email: user.email,
         role: user.role,
-        token: token,
     };
 };
 

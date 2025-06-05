@@ -17,6 +17,7 @@ import moderatorRoutes from './routes/moderator/post.route.js';
 
 import { isAdmin, protectRoute } from "./middlewares/auth.middleware.js";
 import { checkBanStatus } from "./middlewares/checkBan.middleware.js";
+import { ENV_VARS } from "./config/envVars.js";
 
 const app = express();
 
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: `${process.env.CLIENT_URL}`,
+  origin: `${ENV_VARS.CLIENT_URL}`,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']

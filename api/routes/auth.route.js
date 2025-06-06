@@ -10,7 +10,7 @@ router.post("/signup", registerUser);
 
 router.post("/login", loginRateLimiter, loginUser)
 
-router.post("/logout", logoutUser)
+router.post("/logout", protectRoute, logoutUser)
 
 router.get("/me", protectRoute, getAuthUser);
 

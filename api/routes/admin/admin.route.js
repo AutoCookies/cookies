@@ -13,6 +13,7 @@ import {
 } from '../../controllers/admin/admin.controller.js'
 
 import { getUserStatistics } from "../../controllers/admin/statistic.controller.js";
+import { protectRoute } from "../../middlewares/auth.middleware.js";
 
 import { createUserAccount } from "../../controllers/admin/account.controller.js";
 const router = express.Router();

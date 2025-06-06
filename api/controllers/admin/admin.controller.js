@@ -17,7 +17,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     const users = await getAllUserService(req.user, Number(page), Number(limit));
     res.status(200).json(users);
-});  
+});
 
 export const deleteUser = asyncHandler(async (req, res) => {
     const message = await deleteUserService(req.user, req.params.id);
@@ -104,16 +104,25 @@ export const banUser = async (req, res) => {
 
 export const unbanUser = async (req, res) => {
     try {
-        const { userId } = req.params; // Lấy userId từ URL
-        const adminId = req.user._id; // Lấy adminId từ token xác thực
+        const { userId } = req.params;
+        const adminId = req.user?._id;
+        console.log("[unbanUser] userId:", userId, "adminId:", adminId);
+
+        if (!adminId) {
+            console.log("[unbanUser] Không có adminId trong token.");
+            return res.status(401).json({ error: "Chưa đăng nhập!" });
+        }
 
         const result = await unbanUserService(userId, adminId);
 
-        res.status(200).json(result);
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("[unbanUser] error:", error);
+        // Luôn trả về JSON đầy đủ
+        return res.status(500).json({ error: error.message || "Lỗi server" });
     }
 };
+
 
 export const deleteCommnet = catchAsyncErrors(async (req, res) => {
     const { commentId } = req.params;

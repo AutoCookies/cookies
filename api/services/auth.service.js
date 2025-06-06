@@ -88,7 +88,7 @@ export const logoutUserService = async (req, res) => {
         sameSite: "Strict",
         path: "/", 
     });
-    await redisClient.del(`user_session:${userId}`);
+    await redisClient.del(`user_session:${req.user._id}`);
 };
 
 /**

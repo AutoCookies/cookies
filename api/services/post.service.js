@@ -340,63 +340,66 @@ export const getAllPostsService = async (userId, page = 1, limit = 10) => {
 };
 
 
-export const getPostsByUserIdService = async (userId, page = 1, limit = 10) => {
+export const getPostsByUserIdService = async (userId, currentUserId, page = 1, limit = 10) => {
     try {
         const user = await User.findById(userId);
-        if (!user) {
-            throw new Error("Người dùng không tồn tại!");
+        if (!user) throw new Error("Người dùng không tồn tại!");
+
+        // 1. Query post filter theo quyền
+        let postFilter = { user: userId };
+        if (userId.toString() !== currentUserId.toString()) {
+            postFilter.visibility = 'public';
         }
-        // Lấy danh sách bài Post của user với pagination
-        const posts = await Post.find({ user: userId })
+
+        // 2. Lấy bài Post gốc (của user)
+        const posts = await Post.find(postFilter)
             .populate("user", "username profilePicture")
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
             .lean();
 
+        // 3. Lấy bài SharePost của user (share bài nào chỉ được xem public)
         const sharePosts = await SharePost.find({ user: userId })
             .populate("user", "username profilePicture")
-            .populate("originalPost", "title content image user createdAt")
+            .populate("originalPost", "title content image user createdAt visibility")
             .populate({
                 path: "originalPost",
-                populate: {
-                    path: "user",
-                    select: "username profilePicture"
-                }
+                populate: { path: "user", select: "username profilePicture" }
             })
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
             .lean();
 
-        // Lọc bỏ các SharePost mà originalPost không phải public
-        const filteredSharedPosts = sharePosts.filter(
-            post => post.originalPost?.visibility === 'public'
-        );
+        // 4. Nếu không phải chính chủ, chỉ show share post có original là public
+        const filteredSharedPosts = (userId === currentUserId)
+            ? sharePosts
+            : sharePosts.filter(post => post.originalPost?.visibility === 'public');
 
-        // Gộp và sắp xếp bài viết
+        // 5. Gộp & sort lại
         const allPosts = [...posts, ...filteredSharedPosts].sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
 
-        // Kiểm tra bài viết nào user đã like (nếu có userId)
+        // 6. Lấy trạng thái like
         let userLikedPosts = [];
-        if (userId) {
-            userLikedPosts = await LikePost.find({ user: userId })
+        if (currentUserId) {
+            userLikedPosts = await LikePost.find({ user: currentUserId })
                 .distinct("post");
         }
 
-        // Gán trạng thái like
+        // 7. Gán trạng thái like cho từng bài
         const postsWithLikeStatus = allPosts.map(post => ({
             ...post,
             isLiked: userLikedPosts.some(
-                id => id.toString() === post._id.toString()
+                id => id === post._id
             ),
         }));
 
         return postsWithLikeStatus;
-
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        throw error; // Để controller catch trả lỗi 500 nếu có
     }
 };

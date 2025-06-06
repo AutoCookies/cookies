@@ -186,10 +186,12 @@ export const getAllPosts = async (req, res) => {
 export const getPostsByUserId = async (req, res) => {
     try {
         const { userId } = req.params;
+        const currentUserId = req.user._id;
+        console.log("[getPostsByUserId] userId:", userId, "currentUserId:", currentUserId);
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
 
-        const posts = await getPostsByUserIdService(userId, page, limit);
+        const posts = await getPostsByUserIdService(userId, currentUserId, page, limit);
         res.json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });

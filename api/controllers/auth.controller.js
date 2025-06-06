@@ -3,7 +3,8 @@ import {
     registerUserService,
     loginUserService,
     logoutUserService,
-    getUserInfoService
+    getUserInfoService,
+    refreshTokenService
 } from "../services/auth.service.js";
 import { loginRateLimiter } from "../middlewares/rateLimit.middleware.js";
 
@@ -71,5 +72,17 @@ export const getAuthUser = async (req, res) => {
         res.json(user);
     } catch (error) {
         res.status(404).json({ message: error.message });
+    }
+};
+
+export const refreshToken = async (req, res) => {
+    try {
+        const result = await refreshTokenService(req, res);
+        return res.json(result);
+    } catch (error) {
+        const status = error.statusCode || 401;
+        return res.status(status).json({
+            message: error.message,
+        });
     }
 };

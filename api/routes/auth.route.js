@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, loginUser, logoutUser } from "../controllers/auth.controller.js";
+import { registerUser, loginUser, logoutUser, refreshToken } from "../controllers/auth.controller.js";
 import { loginRateLimiter } from "../middlewares/rateLimit.middleware.js";
 import { protectRoute } from "../middlewares/auth.middleware.js";
 import { getAuthUser } from "../controllers/auth.controller.js";
@@ -13,5 +13,8 @@ router.post("/login", loginRateLimiter, loginUser)
 router.post("/logout", logoutUser)
 
 router.get("/me", protectRoute, getAuthUser);
+
+router.post("/refresh-token", refreshToken);
+
 
 export default router; 
